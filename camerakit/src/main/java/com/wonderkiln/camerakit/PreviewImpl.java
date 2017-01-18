@@ -44,6 +44,14 @@ abstract class PreviewImpl {
     }
 
     void setBufferSize(int width, int height) {
+        AspectRatio aspectRatio = AspectRatio.of(width, height);
+        int targetHeight = (int) (getView().getWidth() * aspectRatio.toFloat());
+        float scaleY = (float) targetHeight / (float) getView().getHeight();
+        if (scaleY > 1) {
+            getView().setScaleY(scaleY);
+        } else {
+            getView().setScaleX(1 / scaleY);
+        }
     }
 
     void setSize(int width, int height) {

@@ -371,6 +371,7 @@ public class Camera2 extends CameraViewImpl {
         }
 
         Size previewSize = getOptimalPreviewSize();
+
         mPreview.setBufferSize(previewSize.getWidth(), previewSize.getHeight());
         Surface surface = mPreview.getSurface();
         try {
