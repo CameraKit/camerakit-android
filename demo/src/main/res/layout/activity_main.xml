@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white">
@@ -30,6 +31,7 @@
                 android:weightSum="4">
 
                 <ImageButton
+                    android:id="@+id/capturePhoto"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
@@ -39,15 +41,17 @@
                     android:tint="@android:color/white" />
 
                 <ImageButton
+                    android:id="@+id/captureVideo"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
                     android:layout_weight="1"
-                    android:backgroundTint="@color/colorPrimaryDark"
+                    android:backgroundTint="@color/colorPrimary"
                     android:src="@drawable/ic_video"
                     android:tint="@android:color/white" />
 
                 <ImageButton
+                    android:id="@+id/toggleFlash"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
@@ -57,11 +61,12 @@
                     android:tint="@android:color/white" />
 
                 <ImageButton
+                    android:id="@+id/toggleCamera"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
                     android:layout_weight="1"
-                    android:backgroundTint="@color/colorPrimaryDark"
+                    android:backgroundTint="@color/colorPrimary"
                     android:src="@drawable/ic_switch"
                     android:tint="@android:color/white" />
 
@@ -99,6 +104,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/screenWidth"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="3dp"
@@ -119,11 +125,13 @@
                         android:orientation="horizontal">
 
                         <android.support.v7.widget.AppCompatCheckBox
+                            android:id="@+id/widthWrapContent"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="WRAP_CONTENT" />
 
                         <android.support.v7.widget.AppCompatCheckBox
+                            android:id="@+id/widthMatchParent"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="16dp"
@@ -161,6 +169,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/screenHeight"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="3dp"
@@ -181,11 +190,13 @@
                         android:orientation="horizontal">
 
                         <android.support.v7.widget.AppCompatCheckBox
+                            android:id="@+id/heightWrapContent"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="WRAP_CONTENT" />
 
                         <android.support.v7.widget.AppCompatCheckBox
+                            android:id="@+id/heightMatchParent"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="16dp"

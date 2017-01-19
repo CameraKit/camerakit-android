@@ -3,6 +3,27 @@
 
     <declare-styleable name="CameraView">
 
+        <attr name="ckFacing" format="enum">
+            <enum name="back" value="0" />
+            <enum name="front" value="1" />
+        </attr>
+
+        <attr name="ckFlash" format="enum">
+            <enum name="off" value="0" />
+            <enum name="on" value="1" />
+            <enum name="auto" value="2" />
+        </attr>
+
+        <attr name="ckPictureMode" format="enum">
+            <enum name="quality" value="0" />
+            <enum name="speed" value="1" />
+            <enum name="auto" value="2" />
+        </attr>
+
+        <attr name="ckCropOutput" format="boolean" />
+
+        <attr name="android:adjustViewBounds" />
+
     </declare-styleable>
 
 </resources>

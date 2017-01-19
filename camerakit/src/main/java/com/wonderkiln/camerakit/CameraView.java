@@ -1,6 +1,7 @@
 package com.wonderkiln.camerakit;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.IntDef;
@@ -52,6 +53,8 @@ public class CameraView extends FrameLayout {
 
     private int mPictureMode;
 
+    private boolean mCropOutput;
+
     private boolean mAdjustViewBounds;
 
     private CameraListener mCameraListener;
@@ -63,8 +66,38 @@ public class CameraView extends FrameLayout {
         super(context, null);
     }
 
+    @SuppressWarnings("all")
     public CameraView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+
+        if (attrs != null) {
+            TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.CameraView);
+            final int n = a.getIndexCount();
+            for (int i = 0; i < n; ++i) {
+                int attr = a.getIndex(i);
+
+                if (attr == R.styleable.CameraView_ckFacing) {
+                    mFacing = a.getInteger(R.styleable.CameraView_ckFacing, 0);
+                }
+
+                if (attr == R.styleable.CameraView_ckFlash) {
+                    mFlash = a.getInteger(R.styleable.CameraView_ckFlash, 0);
+                }
+
+                if (attr == R.styleable.CameraView_ckPictureMode) {
+                    mPictureMode = a.getInteger(R.styleable.CameraView_ckPictureMode, 0);
+                }
+
+                if (attr == R.styleable.CameraView_ckCropOutput) {
+                    mCropOutput = a.getBoolean(R.styleable.CameraView_ckCropOutput, false);
+                }
+
+                if (attr == R.styleable.CameraView_android_adjustViewBounds) {
+                    mAdjustViewBounds = a.getBoolean(R.styleable.CameraView_android_adjustViewBounds, false);
+                }
+            }
+            a.recycle();
+        }
 
         final PreviewImpl preview = new TextureViewPreview(context, this);
         mCameraImpl = new Camera2(context, mCameraListener, preview);

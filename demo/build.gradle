@@ -20,6 +20,8 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:25.0.1'
     compile project(':camerakit')
+    compile 'com.android.support:appcompat-v7:25.0.1'
+    compile 'com.jakewharton:butterknife:8.4.0'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
 }
