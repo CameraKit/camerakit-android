@@ -4,6 +4,9 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -14,6 +17,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
+import butterknife.OnTextChanged;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -26,8 +30,20 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.screenWidth)
     TextView screenWidth;
 
+    @BindView(R.id.width)
+    EditText width;
+
+    @BindView(R.id.widthWrapContent)
+    CheckBox widthWrapContent;
+
+    @BindView(R.id.widthMatchParent)
+    CheckBox widthMatchParent;
+
     @BindView(R.id.screenHeight)
     TextView screenHeight;
+
+    @BindView(R.id.height)
+    EditText height;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,10 +56,33 @@ public class MainActivity extends AppCompatActivity {
             public void onGlobalLayout() {
                 screenWidth.setText("screen: " + parent.getWidth() + "px");
                 screenHeight.setText("screen: " + parent.getHeight() + "px");
+
+                if (!widthMatchParent.isChecked() && !widthWrapContent.isChecked()) {
+                    width.setText(String.valueOf(camera.getWidth()));
+                    width.setHint("pixels");
+                } else if (widthMatchParent.isChecked()) {
+                    width.setHint("match_parent");
+                    width.setText("");
+                } else if (widthWrapContent.isChecked()) {
+                    width.setHint("wrap_content");
+                    width.setText("");
+                }
+
+                height.setText(String.valueOf(camera.getHeight()));
             }
         });
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
         camera.start();
+    }
+
+    @Override
+    protected void onPause() {
+        camera.stop();
+        super.onPause();
     }
 
     @OnClick(R.id.capturePhoto)
@@ -86,13 +125,35 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @OnCheckedChanged(R.id.widthWrapContent)
-    void widthWrapContent() {
+    @OnTextChanged(value = R.id.width, callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
+    void widthChanged() {
 
     }
 
+    @OnCheckedChanged(R.id.widthWrapContent)
+    void widthWrapContent(CompoundButton buttonCompat, boolean checked) {
+        if (checked) {
+            ViewGroup.LayoutParams layoutParams = camera.getLayoutParams();
+            layoutParams.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+            camera.setLayoutParams(layoutParams);
+
+            widthMatchParent.setChecked(false);
+        }
+    }
+
     @OnCheckedChanged(R.id.widthMatchParent)
-    void widthMatchParent() {
+    void widthMatchParent(CompoundButton buttonCompat, boolean checked) {
+        if (checked) {
+            ViewGroup.LayoutParams layoutParams = camera.getLayoutParams();
+            layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
+            camera.setLayoutParams(layoutParams);
+
+            widthWrapContent.setChecked(false);
+        }
+    }
+
+    @OnTextChanged(value = R.id.height, callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
+    void heightChanged() {
 
     }
 
@@ -105,6 +166,5 @@ public class MainActivity extends AppCompatActivity {
     void heightMatchParent() {
 
     }
-
 
 }
