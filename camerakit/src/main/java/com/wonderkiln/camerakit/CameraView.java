@@ -20,7 +20,6 @@ import java.lang.annotation.RetentionPolicy;
 public class CameraView extends FrameLayout {
 
     public static final int FACING_BACK = Constants.FACING_BACK;
-
     public static final int FACING_FRONT = Constants.FACING_FRONT;
 
     @IntDef({FACING_BACK, FACING_FRONT})
@@ -29,9 +28,7 @@ public class CameraView extends FrameLayout {
     }
 
     public static final int FLASH_OFF = Constants.FLASH_OFF;
-
     public static final int FLASH_ON = Constants.FLASH_ON;
-
     public static final int FLASH_AUTO = Constants.FLASH_AUTO;
 
     @Retention(RetentionPolicy.SOURCE)
@@ -54,6 +51,8 @@ public class CameraView extends FrameLayout {
     private int mDefaultFlash;
 
     private int mPictureMode;
+
+    private boolean mAdjustViewBounds;
 
     private CameraListener mCameraListener;
     private DisplayOrientationDetector mDisplayOrientationDetector;
@@ -123,16 +122,12 @@ public class CameraView extends FrameLayout {
     }
 
     public void stop() {
-        if (mCameraImpl != null) {
-            mCameraImpl.stop();
-        }
+        mCameraImpl.stop();
     }
 
     public void setFacing(@Facing int facing) {
         this.mFacing = facing;
-        if (mCameraImpl != null) {
-            mCameraImpl.setFacing(facing);
-        }
+        mCameraImpl.setFacing(facing);
     }
 
     @Facing
@@ -152,9 +147,7 @@ public class CameraView extends FrameLayout {
 
     public void setFlash(@Flash int flash) {
         this.mFlash = flash;
-        if (mCameraImpl != null) {
-            mCameraImpl.setFlash(flash);
-        }
+        mCameraImpl.setFlash(flash);
     }
 
     @Flash
