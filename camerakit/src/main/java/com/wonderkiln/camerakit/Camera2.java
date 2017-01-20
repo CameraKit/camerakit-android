@@ -166,7 +166,7 @@ public class Camera2 extends CameraViewImpl {
 
     @Override
     void capturePicture() {
-        if (mFacing == Constants.FACING_BACK) {
+        if (mFacing == INTERNAL_FACINGS.get(Constants.FACING_BACK)) {
             lockFocus();
         } else {
             captureStillPicture();
