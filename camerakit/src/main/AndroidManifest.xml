@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.wonderkiln.camerakit">
+    package="com.flurgle.camerakit">
 
     <uses-permission android:name="android.permission.CAMERA" />
 

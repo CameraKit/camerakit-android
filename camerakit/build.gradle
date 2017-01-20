@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 
 ext {
-    PUBLISH_GROUP_ID = 'com.wonderkiln'
+    PUBLISH_GROUP_ID = 'com.flurgle'
     PUBLISH_ARTIFACT_ID = 'camerakit'
     PUBLISH_VERSION = '0.9.0'
 }

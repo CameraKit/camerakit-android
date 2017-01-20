@@ -2,7 +2,7 @@
 ## Setup
 Add __CameraKit__ to your dependencies block:
 ```groovy
-compile 'com.wonderkiln:camerakit:1.0.0'
+compile 'com.flurgle:camerakit:1.0.0'
 ```
 
 ## Usage
