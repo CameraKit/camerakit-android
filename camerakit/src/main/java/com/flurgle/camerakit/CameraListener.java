@@ -12,10 +12,6 @@ public abstract class CameraListener {
 
     }
 
-    public void onPictureTaken(File picture) {
-
-    }
-
     public void onPictureTaken(byte[] picture) {
 
     }

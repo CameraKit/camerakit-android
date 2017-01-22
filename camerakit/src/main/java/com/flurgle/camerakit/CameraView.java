@@ -15,6 +15,7 @@ import android.util.AttributeSet;
 import android.view.Display;
 import android.widget.FrameLayout;
 
+import java.io.File;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
@@ -206,9 +207,13 @@ public class CameraView extends FrameLayout {
         this.mPictureMode = pictureMode;
     }
 
+    public void setCropOutput(boolean cropOutput) {
+        this.mCropOutput = cropOutput;
+    }
+
     public void setCameraListener(CameraListener cameraListener) {
-        this.mCameraListener = cameraListener;
-        mCameraImpl.setCameraListener(cameraListener);
+        this.mCameraListener = new CameraListenerMiddleWare(cameraListener);
+        mCameraImpl.setCameraListener(mCameraListener);
     }
 
     public void capturePicture() {
@@ -269,6 +274,40 @@ public class CameraView extends FrameLayout {
             }
 
         });
+
+    }
+
+    protected static class CameraListenerMiddleWare extends CameraListener {
+
+        private CameraListener mCameraListener;
+
+        public CameraListenerMiddleWare(CameraListener cameraListener) {
+            this.mCameraListener = cameraListener;
+        }
+
+        @Override
+        public void onCameraOpened() {
+            super.onCameraOpened();
+            mCameraListener.onCameraOpened();
+        }
+
+        @Override
+        public void onCameraClosed() {
+            super.onCameraClosed();
+            mCameraListener.onCameraClosed();
+        }
+
+        @Override
+        public void onPictureTaken(byte[] picture) {
+            super.onPictureTaken(picture);
+            mCameraListener.onPictureTaken(picture);
+        }
+
+        @Override
+        public void onVideoTaken(File video) {
+            super.onVideoTaken(video);
+            mCameraListener.onCameraOpened();
+        }
 
     }
 
