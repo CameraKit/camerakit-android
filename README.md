@@ -13,6 +13,10 @@ Try out all the unique features using the CameraKit Demo from the Google Play st
 - [Setup](#setup)
 - [Usage](#usage)
   - [Extra Attributes](#extra-attributes)
+    - [`ckCropOutput`](#ckCropOutput)
+    - [`ckFacing`](#ckFacing)
+    - [`ckFlash`](#ckFlash)
+    - [`ckPictureMode`](#ckPictureMode)
   - [Capturing Images](#capturing-images)
   - [Capturing Video](#capturing-video)
 - [Automatic Permissions Behavior](#automatic-permissions-behavior)
@@ -68,7 +72,48 @@ protected void onPause() {
 
 ### Extra Attributes
 
-Extra attributes
+```xml
+<com.flurgle.camerakit.CameraView xmlns:camerakit="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/camera"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    camerakit:ckCropOutput="true"  
+    camerakit:ckFacing="back"
+    camerakit:ckFlash="off"
+    camerakit:ckPictureMode="quality" />
+```
+
+#### `ckCropOutput`
+
+| Value         | Description  |
+| --------------| -------------|
+| `true`        | Crop the output image or video to only contain what can be seen on the `CameraView` preview. |
+| `false`       | Output the full image or video regardless of what is visible on the `CameraView` preview. |
+
+
+#### `ckFacing`
+
+| Value         | Description  |
+| --------------| -------------|
+| `back`        | Default `CameraView` preview to back camera. |
+| `front`       | Default `CameraView` preview to front camera. |
+
+
+#### `ckFlash`
+
+| Value         | Description  |
+| --------------| -------------|
+| `off`         | Default `CameraView` flash to off. |
+| `on`          | Default `CameraView` flash to on. |
+| `auto`        | Default `CameraView` flash to automatic. |
+
+#### `ckPictureMode`
+
+| Value         | Description  |
+| --------------| -------------|
+| `quality`     | Use normal Android Camera API image capturing. |
+| `speed`       | Freeze the `CameraView` preview and grab a `Bitmap` of the frame. |
+| `auto`        | Default picture mode to `quality`, but fallback to `speed` if capturing is determined to be too slow. |
 
 ### Capturing images
 
