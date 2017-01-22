@@ -18,7 +18,8 @@
             android:layout_width="match_parent"
             android:layout_height="400dp"
             android:layout_gravity="center_horizontal"
-            app:ckFacing="front" />
+            app:ckCropOutput="true"
+            app:ckFacing="back" />
 
         <LinearLayout
             android:layout_width="match_parent"

@@ -2,6 +2,8 @@ package com.flurgle.camerakit;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.IntDef;
@@ -277,7 +279,7 @@ public class CameraView extends FrameLayout {
 
     }
 
-    protected static class CameraListenerMiddleWare extends CameraListener {
+    protected class CameraListenerMiddleWare extends CameraListener {
 
         private CameraListener mCameraListener;
 
@@ -300,7 +302,14 @@ public class CameraView extends FrameLayout {
         @Override
         public void onPictureTaken(byte[] picture) {
             super.onPictureTaken(picture);
-            mCameraListener.onPictureTaken(picture);
+            if (mCropOutput) {
+                Bitmap bitmap = BitmapFactory.decodeByteArray(picture, 0, picture.length);
+                int previewWidth = mCameraImpl.mPreview.getWidth();
+                int previewHeight = mCameraImpl.mPreview.getWidth();
+                mCameraListener.onPictureTaken(picture);
+            } else {
+                mCameraListener.onPictureTaken(picture);
+            }
         }
 
         @Override

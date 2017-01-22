@@ -57,6 +57,8 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.height)
     EditText height;
 
+    int pictureMode = Constants.PICTURE_MODE_QUALITY;
+
     boolean blockInvalidation;
 
     @Override
