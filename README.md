@@ -200,7 +200,7 @@ You can handle permissions yourself in whatever way you want, but if you make a 
 
 With CameraKit, we will automatically prompt for the `android.permission.CAMERA` permission if it's not available. If you want to handle it yourself, just make sure you dont call `CameraView.start()` until you acquire the permissions.
 
-[Insert GIF]
+![Permissions behavior gif](.repo/permissions.gif)
 
 ## Dynamic Sizing Behavior
 
