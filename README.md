@@ -12,6 +12,7 @@ Try out all the unique features using the CameraKit Demo from the Google Play st
 - [Features](#features)
 - [Setup](#setup)
 - [Usage](#usage)
+  - [Events](#events)
   - [Extra Attributes](#extra-attributes)
     - [`ckCropOutput`](#ckcropoutput)
     - [`ckFacing`](#ckfacing)
@@ -68,6 +69,36 @@ protected void onPause() {
     cameraView.stop();
     super.onPause();
 }
+```
+
+### Events
+
+Make sure you can react to different camera events by setting up a `CameraListener` instance.
+
+```java
+camera.setCameraListener(new CameraListener() {
+
+    @Override
+    public void onCameraOpened() {
+        super.onCameraOpened();
+    }
+
+    @Override
+    public void onCameraClosed() {
+        super.onCameraClosed();
+    }
+
+    @Override
+    public void onPictureTaken(byte[] picture) {
+        super.onPictureTaken(picture);
+    }
+
+    @Override
+    public void onVideoTaken(File video) {
+        super.onVideoTaken(video);
+    }
+    
+});
 ```
 
 ### Extra Attributes
