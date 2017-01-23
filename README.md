@@ -160,6 +160,8 @@ camera.setCameraListener(new CameraListener() {
         Bitmap result = BitmapFactory.decodeByteArray(picture, 0, picture.length);
     }
 });
+
+camera.takePicture();
 ```
 
 ### Capturing Video
@@ -174,6 +176,14 @@ camera.setCameraListener(new CameraListener() {
         // The File parameter is an MP4 file. 
     }
 });
+
+camera.startRecordingVideo();
+camera.postDelayed(new Runnable() {
+    @Override
+    public void run() {
+        camera.stopRecordingVideo();
+    }
+}, 2500);
 ```
 
 ## Automatic Permissions Behavior
