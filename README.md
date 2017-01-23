@@ -202,7 +202,7 @@ You can setup the `CameraView` dimensions however you want. When your dimensions
 
 [Insert GIF]
 
-### `Output Cropping`
+### Output Cropping
 
 When you capture output you can either capture everything - even what is not visible to the user on the `CameraView` - or just the visible preview. See [`ckCropOutput`](#ckcropoutput) above for usage.
 
