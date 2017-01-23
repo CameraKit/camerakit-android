@@ -9,6 +9,7 @@ Try out all the unique features using the CameraKit Demo from the Google Play st
 
 
 ## Table of Contents
+
 - [Features](#features)
 - [Setup](#setup)
 - [Usage](#usage)
@@ -25,6 +26,9 @@ Try out all the unique features using the CameraKit Demo from the Google Play st
   - [Output Cropping](#output-cropping)
   - [`adjustViewBounds`](#adjustviewbounds)
 - [Capture Mode Behavior](#capture-mode-behavior)
+  - [Quality](#quality)
+  - [Speed](#speed)
+  - [Auto](#auto)
 - [Credits](#credits)
 - [License](#license)
 
@@ -41,7 +45,9 @@ Try out all the unique features using the CameraKit Demo from the Google Play st
   - Automatic picture mode determination based on measured speed.
 
 ## Setup
+
 Add __CameraKit__ to the dependencies block in your `app` level `build.gradle`:
+
 ```groovy
 compile 'com.flurgle:camerakit:1.0.0'
 ```
@@ -216,10 +222,32 @@ When you do this the dimension set to `wrap_content` will automatically align wi
 
 ## Capture Mode Behavior
 
-Capture mode behavior
+We decided to add multiple capture modes to CameraKit to allow you to give a better image capturing experience to users with slower cameras when appropriate.
+
+See [`ckPictureMode`](#ckpicturemode) above for usage.
+
+### Quality
+
+When you use `PICTURE_MODE_QUALITY` (`camerakit:ckPictureMode="quality"`), images will be captured using the normal camera API capture method using the shutter.
+
+[Insert GIF]
+
+### Speed
+
+When you use `PICTURE_MODE_SPEED` (`camerakit:ckPictureMode="speed"`), images will be captured by grabbing a single frame from the preview. This behavior is the same as SnapChat and Instagram. This method has a higher rate of motion blur but can be a better experience for users with slower cameras.
+
+[Insert GIF]
+
+## Auto
+
+When you use `PICTURE_MODE_AUTO` (`camerakit:ckPictureMode="speed"`), images will be first be captured using the [quality](#quality) method. If capture consistently takes a long amount of time, the picture mode will fallback to [speed](#speed).
+
+[Insert GIF]
 
 ## Credits
+
 Dylan McIntyre
 
 ## License
+
 CameraKit-Android is [MIT licensed](https://github.com/wonderkiln/camerakit-android/blob/master/LICENSE).

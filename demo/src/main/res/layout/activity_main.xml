@@ -302,14 +302,14 @@
                             android:id="@+id/heightWrapContent"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="WRAP_CONTENT" />
+                            android:text="wrap_content" />
 
                         <android.support.v7.widget.AppCompatCheckBox
                             android:id="@+id/heightMatchParent"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="16dp"
-                            android:text="MATCH_PARENT" />
+                            android:text="match_parent" />
 
                     </LinearLayout>
 
