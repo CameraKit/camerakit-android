@@ -188,7 +188,11 @@ camera.postDelayed(new Runnable() {
 
 ## Automatic Permissions Behavior
 
-Automatic permissions behavior
+You can handle permissions yourself in whatever way you want, but if you make a call to `CameraView.start()` without the `android.permission.CAMERA` permission, an exception would normally be thrown and your app would crash.
+
+With CameraKit, we will automatically prompt for the `android.permission.CAMERA` permission if it's not available. If you want to handle it yourself, just make sure you dont call `CameraView.start()` until you acquire the permissions.
+
+[Insert GIF]
 
 ## Dynamic Sizing Behavior
 
