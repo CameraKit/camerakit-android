@@ -153,17 +153,17 @@ camera.setCameraListener(new CameraListener() {
 
 | Value         | Description  |
 | --------------| -------------|
-| `on`          | Tap to focus is enabled and a visible focus circle appears when tapped, similar to the Android built-in camera. |
-| `invisible`   | Tap to focus is enabled, but no focus circle appears. |
-| `off`         | Tap to focus is off. |
+| `quality`     | Use normal Android Camera API image capturing. |
+| `speed`       | Freeze the `CameraView` preview and grab a `Bitmap` of the frame. |
+| `auto`        | Default picture mode to `quality`, but fallback to `speed` if capturing is determined to be too slow. |
 
 #### `ckTapToFocus`
 
 | Value         | Description  |
 | --------------| -------------|
-| `quality`     | Use normal Android Camera API image capturing. |
-| `speed`       | Freeze the `CameraView` preview and grab a `Bitmap` of the frame. |
-| `auto`        | Default picture mode to `quality`, but fallback to `speed` if capturing is determined to be too slow. |
+| `on`          | Tap to focus is enabled and a visible focus circle appears when tapped, similar to the Android built-in camera. |
+| `invisible`   | Tap to focus is enabled, but no focus circle appears. |
+| `off`         | Tap to focus is off. |
 
 ### Capturing Images
 
