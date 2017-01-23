@@ -1,6 +1,10 @@
 package com.flurgle.camerakit;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
+import android.content.ContextWrapper;
+import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -9,6 +13,8 @@ import android.os.Parcelable;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.hardware.display.DisplayManagerCompat;
 import android.support.v4.os.ParcelableCompat;
 import android.support.v4.os.ParcelableCompatCreatorCallbacks;
@@ -22,6 +28,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 public class CameraView extends FrameLayout {
+
+    private static final int PERMISSION_REQUEST_CAMERA = 16;
 
     public static final int FACING_BACK = Constants.FACING_BACK;
     public static final int FACING_FRONT = Constants.FACING_FRONT;
@@ -59,6 +67,8 @@ public class CameraView extends FrameLayout {
     private boolean mCropOutput;
 
     private boolean mAdjustViewBounds;
+
+    private boolean mWaitingForPermission;
 
     private CameraListener mCameraListener;
     private DisplayOrientationDetector mDisplayOrientationDetector;
@@ -154,7 +164,13 @@ public class CameraView extends FrameLayout {
     }
 
     public void start() {
-        mCameraImpl.start();
+        int permissionCheck = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA);
+        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+            mWaitingForPermission = false;
+            mCameraImpl.start();
+        } else {
+            requestCameraPermission();
+        }
     }
 
     public void stop() {
@@ -235,6 +251,32 @@ public class CameraView extends FrameLayout {
 
     public void stopRecordingVideo() {
 
+    }
+
+    private void requestCameraPermission() {
+        Activity activity = null;
+        Context context = getContext();
+        while (context instanceof ContextWrapper) {
+            if (context instanceof Activity) {
+                activity = (Activity) context;
+            }
+            context = ((ContextWrapper) context).getBaseContext();
+        }
+
+        if (activity != null) {
+            ActivityCompat.requestPermissions(activity, new String[]{ Manifest.permission.CAMERA }, PERMISSION_REQUEST_CAMERA);
+            mWaitingForPermission = true;
+        }
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasWindowFocus) {
+        super.onWindowFocusChanged(hasWindowFocus);
+        if (mWaitingForPermission) {
+            if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                start();
+            }
+        }
     }
 
     protected static class SavedState extends BaseSavedState {
