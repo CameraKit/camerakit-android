@@ -49,7 +49,7 @@ public class CameraView extends FrameLayout {
     }
 
     @Retention(RetentionPolicy.SOURCE)
-    @IntDef({TAP_TO_FOCUS_ON, TAP_TO_FOCUS_INVISIBLE, TAP_TO_FOCUS_OFF})
+    @IntDef({TAP_TO_FOCUS_VISIBLE, TAP_TO_FOCUS_INVISIBLE, TAP_TO_FOCUS_OFF})
     @interface TapToFocus {
     }
 
@@ -105,7 +105,7 @@ public class CameraView extends FrameLayout {
                 }
 
                 if (attr == R.styleable.CameraView_ckTapToFocus) {
-                    mTapToFocus = a.getInteger(R.styleable.CameraView_ckTapToFocus, TAP_TO_FOCUS_ON);
+                    mTapToFocus = a.getInteger(R.styleable.CameraView_ckTapToFocus, TAP_TO_FOCUS_VISIBLE);
                 }
 
                 if (attr == R.styleable.CameraView_android_adjustViewBounds) {

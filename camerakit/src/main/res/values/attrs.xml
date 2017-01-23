@@ -23,7 +23,7 @@
         <attr name="ckCropOutput" format="boolean" />
 
         <attr name="ckTapToFocus" format="enum">
-            <enum name="on" value="0" />
+            <enum name="visible" value="0" />
             <enum name="invisible" value="1" />
             <enum name="off" value="2" />
         </attr>
