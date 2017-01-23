@@ -146,13 +146,35 @@ camera.setCameraListener(new CameraListener() {
 | `speed`       | Freeze the `CameraView` preview and grab a `Bitmap` of the frame. |
 | `auto`        | Default picture mode to `quality`, but fallback to `speed` if capturing is determined to be too slow. |
 
-### Capturing images
+### Capturing Images
 
-Capturing photos
+To capture an image just call `CameraView.capturePicture()`. Make sure you setup a `CameraListener` to handle the image callback.
+
+```java
+camera.setCameraListener(new CameraListener() {
+    @Override
+    public void onPictureTaken(byte[] picture) {
+        super.onPictureTaken(picture);
+        
+        // Create a bitmap
+        Bitmap result = BitmapFactory.decodeByteArray(picture, 0, picture.length);
+    }
+});
+```
 
 ### Capturing Video
 
-Capturing video
+To capture video just call `CameraView.startRecordingVideo()` to start, and `CameraView.stopRecordingVideo()` to finish. Make sure you setup a `CameraListener` to handle the video callback.
+
+```java
+camera.setCameraListener(new CameraListener() {
+    @Override
+    public void onVideoTaken(File video) {
+        super.onVideoTaken(video);
+        // The File parameter is an MP4 file. 
+    }
+});
+```
 
 ## Automatic Permissions Behavior
 
