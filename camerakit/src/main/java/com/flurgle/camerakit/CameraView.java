@@ -27,33 +27,30 @@ import java.io.File;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
+import static com.flurgle.camerakit.CameraKit.Constants.*;
+
 public class CameraView extends FrameLayout {
 
     private static final int PERMISSION_REQUEST_CAMERA = 16;
 
-    public static final int FACING_BACK = Constants.FACING_BACK;
-    public static final int FACING_FRONT = Constants.FACING_FRONT;
-
     @IntDef({FACING_BACK, FACING_FRONT})
     @Retention(RetentionPolicy.SOURCE)
-    public @interface Facing {
+    @interface Facing {
     }
-
-    public static final int FLASH_OFF = Constants.FLASH_OFF;
-    public static final int FLASH_ON = Constants.FLASH_ON;
-    public static final int FLASH_AUTO = Constants.FLASH_AUTO;
 
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({FLASH_OFF, FLASH_ON, FLASH_AUTO})
-    public @interface Flash {
+    @interface Flash {
     }
-
-    public static final int PICTURE_MODE_QUALITY = Constants.PICTURE_MODE_QUALITY;
-    public static final int PICTURE_MODE_SPEED = Constants.PICTURE_MODE_SPEED;
 
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({PICTURE_MODE_QUALITY, PICTURE_MODE_SPEED})
-    public @interface PictureMode {
+    @interface PictureMode {
+    }
+
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({TAP_TO_FOCUS_ON, TAP_TO_FOCUS_INVISIBLE, TAP_TO_FOCUS_OFF})
+    @interface TapToFocus {
     }
 
     private int mFacing;
@@ -65,6 +62,8 @@ public class CameraView extends FrameLayout {
     private int mPictureMode;
 
     private boolean mCropOutput;
+
+    private int mTapToFocus;
 
     private boolean mAdjustViewBounds;
 
@@ -90,19 +89,23 @@ public class CameraView extends FrameLayout {
                 int attr = a.getIndex(i);
 
                 if (attr == R.styleable.CameraView_ckFacing) {
-                    mFacing = a.getInteger(R.styleable.CameraView_ckFacing, 0);
+                    mFacing = a.getInteger(R.styleable.CameraView_ckFacing, FACING_BACK);
                 }
 
                 if (attr == R.styleable.CameraView_ckFlash) {
-                    mFlash = a.getInteger(R.styleable.CameraView_ckFlash, 0);
+                    mFlash = a.getInteger(R.styleable.CameraView_ckFlash, FLASH_OFF);
                 }
 
                 if (attr == R.styleable.CameraView_ckPictureMode) {
-                    mPictureMode = a.getInteger(R.styleable.CameraView_ckPictureMode, 0);
+                    mPictureMode = a.getInteger(R.styleable.CameraView_ckPictureMode, PICTURE_MODE_QUALITY);
                 }
 
                 if (attr == R.styleable.CameraView_ckCropOutput) {
                     mCropOutput = a.getBoolean(R.styleable.CameraView_ckCropOutput, false);
+                }
+
+                if (attr == R.styleable.CameraView_ckTapToFocus) {
+                    mTapToFocus = a.getInteger(R.styleable.CameraView_ckTapToFocus, TAP_TO_FOCUS_ON);
                 }
 
                 if (attr == R.styleable.CameraView_android_adjustViewBounds) {
@@ -229,6 +232,10 @@ public class CameraView extends FrameLayout {
         this.mCropOutput = cropOutput;
     }
 
+    public void setTapToFocus(@TapToFocus int tapToFocus) {
+        this.mTapToFocus = tapToFocus;
+    }
+
     public void setCameraListener(CameraListener cameraListener) {
         this.mCameraListener = new CameraListenerMiddleWare(cameraListener);
         mCameraImpl.setCameraListener(mCameraListener);
@@ -348,6 +355,10 @@ public class CameraView extends FrameLayout {
                 Bitmap bitmap = BitmapFactory.decodeByteArray(picture, 0, picture.length);
                 int previewWidth = mCameraImpl.mPreview.getWidth();
                 int previewHeight = mCameraImpl.mPreview.getWidth();
+
+                AspectRatio viewRatio = AspectRatio.of(getWidth(), getHeight());
+                AspectRatio previewRatio = AspectRatio.of(previewWidth, previewHeight);
+
                 mCameraListener.onPictureTaken(picture);
             } else {
                 mCameraListener.onPictureTaken(picture);

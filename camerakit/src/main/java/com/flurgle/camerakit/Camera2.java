@@ -22,7 +22,6 @@ import android.util.SparseIntArray;
 import android.view.Surface;
 import android.view.View;
 
-import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -37,8 +36,8 @@ public class Camera2 extends CameraViewImpl {
     private static final SparseIntArray INTERNAL_FACINGS = new SparseIntArray();
 
     static {
-        INTERNAL_FACINGS.put(Constants.FACING_BACK, CameraCharacteristics.LENS_FACING_BACK);
-        INTERNAL_FACINGS.put(Constants.FACING_FRONT, CameraCharacteristics.LENS_FACING_FRONT);
+        INTERNAL_FACINGS.put(CameraKit.Constants.FACING_BACK, CameraCharacteristics.LENS_FACING_BACK);
+        INTERNAL_FACINGS.put(CameraKit.Constants.FACING_FRONT, CameraCharacteristics.LENS_FACING_FRONT);
     }
 
     private CameraManager mCameraManager;
@@ -166,7 +165,7 @@ public class Camera2 extends CameraViewImpl {
 
     @Override
     void capturePicture() {
-        if (mFacing == INTERNAL_FACINGS.get(Constants.FACING_BACK)) {
+        if (mFacing == INTERNAL_FACINGS.get(CameraKit.Constants.FACING_BACK)) {
             lockFocus();
         } else {
             captureStillPicture();
@@ -198,15 +197,15 @@ public class Camera2 extends CameraViewImpl {
 
     void updateFlash(CaptureRequest.Builder builder) {
         switch (mFlash) {
-            case Constants.FLASH_OFF:
+            case CameraKit.Constants.FLASH_OFF:
                 builder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON);
                 builder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_OFF);
                 break;
-            case Constants.FLASH_ON:
+            case CameraKit.Constants.FLASH_ON:
                 builder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_ALWAYS_FLASH);
                 builder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_OFF);
                 break;
-            case Constants.FLASH_AUTO:
+            case CameraKit.Constants.FLASH_AUTO:
                 builder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
                 builder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_OFF);
                 break;
@@ -259,7 +258,7 @@ public class Camera2 extends CameraViewImpl {
             }
             // The operation can reach here when the only camera device is an external one.
             // We treat it as facing back.
-            mFacing = Constants.FACING_BACK;
+            mFacing = CameraKit.Constants.FACING_BACK;
             return true;
         } catch (CameraAccessException e) {
             throw new RuntimeException("Failed to get a list of camera devices", e);
@@ -308,7 +307,7 @@ public class Camera2 extends CameraViewImpl {
         Size previewSize = getOptimalPreviewSize();
         AspectRatio aspectRatio = AspectRatio.of(previewSize.getWidth(), previewSize.getHeight());
         Size bestSize = findSizeClosestTo(1500000, aspectRatio, mCaptureSizes);
-        mImageReader = ImageReader.newInstance(bestSize.getWidth(), bestSize.getHeight(), ImageFormat.JPEG, 1);
+        mImageReader = ImageReader.newInstance(bestSize.getWidth(), bestSize.getHeight(), ImageFormat.YUV_420_888, 3);
         mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, mBackgroundHandler);
     }
 
@@ -377,6 +376,7 @@ public class Camera2 extends CameraViewImpl {
         try {
             mPreviewRequestBuilder = mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
             mPreviewRequestBuilder.addTarget(surface);
+            mPreviewRequestBuilder.addTarget(mImageReader.getSurface());
             mCamera.createCaptureSession(Arrays.asList(surface, mImageReader.getSurface()), mSessionCallback, mBackgroundHandler);
         } catch (CameraAccessException e) {
             throw new RuntimeException("Failed to start camera session");
@@ -406,7 +406,7 @@ public class Camera2 extends CameraViewImpl {
             int sensorOrientation = mCameraCharacteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
             captureRequestBuilder.set(CaptureRequest.JPEG_ORIENTATION,
                     (sensorOrientation +
-                            mDisplayOrientation * (mFacing == Constants.FACING_FRONT ? 1 : -1) +
+                            mDisplayOrientation * (mFacing == CameraKit.Constants.FACING_FRONT ? 1 : -1) +
                             360) % 360);
             // Stop preview and capture a still picture.
             mCaptureSession.stopRepeating();
@@ -524,15 +524,20 @@ public class Camera2 extends CameraViewImpl {
 
         @Override
         public void onImageAvailable(ImageReader reader) {
-            try (Image image = reader.acquireNextImage()) {
-                Image.Plane[] planes = image.getPlanes();
-                if (planes.length > 0) {
-                    ByteBuffer buffer = planes[0].getBuffer();
-                    byte[] data = new byte[buffer.remaining()];
-                    buffer.get(data);
-                    getCameraListener().onPictureTaken(data);
-                }
-            }
+            Image image = reader.acquireLatestImage();
+            // Process the image
+            image.close();
+
+//            try (Image image = reader.acquireNextImage()) {
+//                image.close();
+//                Image.Plane[] planes = image.getPlanes();
+//                if (planes.length > 0) {
+//                    ByteBuffer buffer = planes[0].getBuffer();
+//                    byte[] data = new byte[buffer.remaining()];
+//                    buffer.get(data);
+//                    //getCameraListener().onPictureTaken(data);
+//                }
+//            }
         }
 
     };

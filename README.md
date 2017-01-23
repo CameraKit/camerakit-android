@@ -19,6 +19,7 @@ Try out all the unique features using the CameraKit Demo from the Google Play st
     - [`ckFacing`](#ckfacing)
     - [`ckFlash`](#ckflash)
     - [`ckPictureMode`](#ckpicturemode)
+    - [`ckTapToFocus`](#cktaptofocus)
   - [Capturing Images](#capturing-images)
   - [Capturing Video](#capturing-video)
 - [Automatic Permissions Behavior](#automatic-permissions-behavior)
@@ -43,6 +44,7 @@ Try out all the unique features using the CameraKit Demo from the Google Play st
   - `PICTURE_MODE_QUALITY`: an image captured normally using the camera APIs.
   - `PICTURE_MODE_SPEED`: a freeze frame of the `CameraView` preview (similar to SnapChat and Instagram) for devices with slower cameras.
   - Automatic picture mode determination based on measured speed.
+- Built-in tap to focus and auto focus.
 
 ## Setup
 
@@ -119,7 +121,8 @@ camera.setCameraListener(new CameraListener() {
     camerakit:ckCropOutput="true"  
     camerakit:ckFacing="back"
     camerakit:ckFlash="off"
-    camerakit:ckPictureMode="quality" />
+    camerakit:ckPictureMode="quality"
+    camerakit:ckTapToFocus="on" />
 ```
 
 #### `ckCropOutput`
@@ -147,6 +150,14 @@ camera.setCameraListener(new CameraListener() {
 | `auto`        | Default `CameraView` flash to automatic. |
 
 #### `ckPictureMode`
+
+| Value         | Description  |
+| --------------| -------------|
+| `on`          | Tap to focus is enabled and a visible focus circle appears when tapped, similar to the Android built-in camera. |
+| `invisible`   | Tap to focus is enabled, but no focus circle appears. |
+| `off`         | Tap to focus is off. |
+
+#### `ckTapToFocus`
 
 | Value         | Description  |
 | --------------| -------------|
@@ -238,9 +249,15 @@ When you use `PICTURE_MODE_SPEED` (`camerakit:ckPictureMode="speed"`), images wi
 
 [Insert GIF]
 
-## Auto
+### Auto
 
 When you use `PICTURE_MODE_AUTO` (`camerakit:ckPictureMode="speed"`), images will be first be captured using the [quality](#quality) method. If capture consistently takes a long amount of time, the picture mode will fallback to [speed](#speed).
+
+[Insert GIF]
+
+## Tap To Focus
+
+Along with the always on auto-focus, you can enable tap to focus in your `CameraView`. See [`ckTapToFocus`](#cktaptofocus) for usage. You have the option of having it on with a visible focus marker, on with no marker, or off.
 
 [Insert GIF]
 

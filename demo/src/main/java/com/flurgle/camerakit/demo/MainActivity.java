@@ -14,9 +14,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.flurgle.camerakit.CameraKit;
 import com.flurgle.camerakit.CameraListener;
 import com.flurgle.camerakit.CameraView;
-import com.flurgle.camerakit.Constants;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.height)
     EditText height;
 
-    int pictureMode = Constants.PICTURE_MODE_QUALITY;
+    int pictureMode = CameraKit.Constants.PICTURE_MODE_QUALITY;
 
     boolean blockInvalidation;
 
@@ -116,11 +116,11 @@ public class MainActivity extends AppCompatActivity {
     @OnClick(R.id.toggleCamera)
     void toggleCamera() {
         switch (camera.toggleFacing()) {
-            case Constants.FACING_BACK:
+            case CameraKit.Constants.FACING_BACK:
                 Toast.makeText(this, "Switched to back camera!", Toast.LENGTH_SHORT).show();
                 break;
 
-            case Constants.FACING_FRONT:
+            case CameraKit.Constants.FACING_FRONT:
                 Toast.makeText(this, "Switched to front camera!", Toast.LENGTH_SHORT).show();
                 break;
         }
@@ -129,15 +129,15 @@ public class MainActivity extends AppCompatActivity {
     @OnClick(R.id.toggleFlash)
     void toggleFlash() {
         switch (camera.toggleFlash()) {
-            case Constants.FLASH_ON:
+            case CameraKit.Constants.FLASH_ON:
                 Toast.makeText(this, "Flash on!", Toast.LENGTH_SHORT).show();
                 break;
 
-            case Constants.FLASH_OFF:
+            case CameraKit.Constants.FLASH_OFF:
                 Toast.makeText(this, "Flash off!", Toast.LENGTH_SHORT).show();
                 break;
 
-            case Constants.FLASH_AUTO:
+            case CameraKit.Constants.FLASH_AUTO:
                 Toast.makeText(this, "Flash auto!", Toast.LENGTH_SHORT).show();
                 break;
         }
@@ -147,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
     void modeQuality(CompoundButton buttonCompat, boolean checked) {
         modeSpeed.setChecked(false);
         if (checked) {
-            camera.setPictureMode(CameraView.PICTURE_MODE_QUALITY);
+            camera.setPictureMode(CameraKit.Constants.PICTURE_MODE_QUALITY);
         }
 
         invalidateParameters();
@@ -157,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
     void modeSpeed(CompoundButton buttonCompat, boolean checked) {
         modeQuality.setChecked(false);
         if (checked) {
-            camera.setPictureMode(CameraView.PICTURE_MODE_SPEED);
+            camera.setPictureMode(CameraKit.Constants.PICTURE_MODE_SPEED);
         }
 
         invalidateParameters();
