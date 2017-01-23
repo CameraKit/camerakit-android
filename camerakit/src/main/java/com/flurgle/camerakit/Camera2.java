@@ -174,7 +174,9 @@ public class Camera2 extends CameraViewImpl {
 
     @Override
     void captureStill() {
-
+        if (mOnImageAvailableListener != null) {
+            mOnImageAvailableListener.allowCallback();
+        }
     }
 
     @Override
@@ -520,26 +522,40 @@ public class Camera2 extends CameraViewImpl {
 
     };
 
-    private final ImageReader.OnImageAvailableListener mOnImageAvailableListener = new ImageReader.OnImageAvailableListener() {
 
+    private abstract static class VariableCallbackOnImageAvailableListener implements ImageReader.OnImageAvailableListener {
+
+        protected boolean mAllowOneCallback = false;
+
+        @Override
+        public abstract void onImageAvailable(ImageReader reader);
+
+        public void allowCallback() {
+            mAllowOneCallback = true;
+        }
+
+    }
+
+    private VariableCallbackOnImageAvailableListener mOnImageAvailableListener = new VariableCallbackOnImageAvailableListener() {
         @Override
         public void onImageAvailable(ImageReader reader) {
             Image image = reader.acquireLatestImage();
-            // Process the image
+
+            if (image == null) {
+                return;
+            }
+
+            if (!mAllowOneCallback) {
+                image.close();
+                return;
+            }
+
+            mAllowOneCallback = false;
+
+            byte[] out = YuvUtils.createRGB(image);
+            getCameraListener().onPictureTaken(out);
             image.close();
-
-//            try (Image image = reader.acquireNextImage()) {
-//                image.close();
-//                Image.Plane[] planes = image.getPlanes();
-//                if (planes.length > 0) {
-//                    ByteBuffer buffer = planes[0].getBuffer();
-//                    byte[] data = new byte[buffer.remaining()];
-//                    buffer.get(data);
-//                    //getCameraListener().onPictureTaken(data);
-//                }
-//            }
         }
-
     };
 
 }
