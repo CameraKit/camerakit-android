@@ -1,7 +1,8 @@
 ![CameraKit Header](.repo/camerakit-android-header.png)
 
-CameraKit is an extraordinarily easy to use utility to work with the infamous Android Camera and Camera2 APIs. Built by [Dylan McIntyre](https://github.com/dwillmc).
+#####Originally a fork of [Google's CameraView library](https://github.com/google/cameraview).
 
+CameraKit is an extraordinarily easy to use utility to work with the infamous Android Camera and Camera2 APIs. Built by [Dylan McIntyre](https://github.com/dwillmc). 
 
 Try out all the unique features using the CameraKit Demo from the Google Play store!
 
