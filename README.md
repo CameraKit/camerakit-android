@@ -196,7 +196,21 @@ With CameraKit, we will automatically prompt for the `android.permission.CAMERA`
 
 ## Dynamic Sizing Behavior
 
-Dynamic sizing behavior
+You can setup the `CameraView` dimensions however you want. When your dimensions don't match the aspect ratio of the internal preview surface, the surface will be cropped minimally to fill the view. The behavior is the same as the `android:scaleType="centerCrop"` on an `ImageView`.
+
+[Insert GIF]
+
+### `Output Cropping`
+
+When you capture output you can either capture everything - even what is not visible to the user on the `CameraView` - or just the visible preview. See [`ckCropOutput`](#ckcropoutput) above for usage.
+
+[Insert GIF]
+
+### `adjustViewBounds`
+
+You can use a mix of a fixed dimension (a set value or `match_parent`) as well as `wrap_content`. When you do this make sure you set `android:adjustViewBounds="true"` on the `CameraView`.
+
+When you do this the dimension set to `wrap_content` will automatically align with the true aspect ratio of the preview surface. In this case the whole preview will be visible.
 
 ## Capture Mode Behavior
 
