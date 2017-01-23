@@ -30,6 +30,7 @@ Try out all the unique features using the CameraKit Demo from the Google Play st
   - [Quality](#quality)
   - [Speed](#speed)
   - [Auto](#auto)
+- [Tap To Focus](#tap-to-focus)
 - [Credits](#credits)
 - [License](#license)
 
