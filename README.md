@@ -22,6 +22,7 @@ Try out all the unique features using the CameraKit Demo from the Google Play st
     - [`ckPictureMode`](#ckpicturemode)
     - [`ckTapToFocus`](#cktaptofocus)
     - [`ckAutoFocus`](#ckautofocus)
+    - [`ckCaptureSize`](#ckcapturesize)
   - [Capturing Images](#capturing-images)
   - [Capturing Video](#capturing-video)
 - [Automatic Permissions Behavior](#automatic-permissions-behavior)
@@ -126,7 +127,8 @@ camera.setCameraListener(new CameraListener() {
     camerakit:ckFlash="off"
     camerakit:ckPictureMode="quality"
     camerakit:ckTapToFocus="on"
-    camerakit:ckAutoFocus="true" />
+    camerakit:ckAutoFocus="true"
+    camerakit:ckCaptureSize="8" />
 ```
 
 #### `ckCropOutput`
@@ -174,6 +176,13 @@ camera.setCameraListener(new CameraListener() {
 | --------------| -------------|
 | `true`        | Continuously allow the `CameraView` preview to adjust focus automatically. |
 | `false`       | Never adjust focus during preview. |
+
+#### `ckCaptureSize`
+
+| Value         | Description  |
+| --------------| -------------|
+| `n <= 0`      | Capture at the highest quality possible. |
+| `n > 0`       | Capture at a size of approximately `n` megapixels. |
 
 ### Capturing Images
 

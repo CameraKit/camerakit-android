@@ -8,6 +8,8 @@ public abstract class CameraViewImpl {
 
     protected final PreviewImpl mPreview;
 
+    private boolean mCanRecordAudio;
+
     CameraViewImpl(CameraListener callback, PreviewImpl preview) {
         mCameraListener = callback;
         mPreview = preview;
@@ -49,6 +51,14 @@ public abstract class CameraViewImpl {
 
     protected CameraListener getCameraListener() {
         return mCameraListener != null ? mCameraListener : new CameraListener() {};
+    }
+
+    public void setCanRecordAudio(boolean canRecordAudio) {
+        this.mCanRecordAudio = canRecordAudio;
+    }
+
+    protected boolean canRecordAudio() {
+        return mCanRecordAudio;
     }
 
 }

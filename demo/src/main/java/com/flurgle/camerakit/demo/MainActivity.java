@@ -112,14 +112,6 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.captureVideo)
     void captureVideo() {
-        camera.startRecordingVideo();
-        camera.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                camera.stopRecordingVideo();
-            }
-        }, 3000);
-
         camera.setCameraListener(new CameraListener() {
             @Override
             public void onVideoTaken(File video) {
@@ -128,6 +120,14 @@ public class MainActivity extends AppCompatActivity {
                 previewDialog.show();
             }
         });
+
+        camera.startRecordingVideo();
+        camera.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                camera.stopRecordingVideo();
+            }
+        }, 3000);
     }
 
     @OnClick(R.id.toggleCamera)

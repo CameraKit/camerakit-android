@@ -42,6 +42,8 @@ public class CameraView extends FrameLayout {
 
     private static final int PERMISSION_REQUEST_CAMERA = 16;
 
+    private static final int DEFAULT_CAPTURE_SIZE = -1;
+
     @IntDef({FACING_BACK, FACING_FRONT})
     @Retention(RetentionPolicy.SOURCE)
     @interface Facing {
@@ -74,6 +76,8 @@ public class CameraView extends FrameLayout {
 
     private int mTapToFocus;
     private boolean mAutoFocus;
+
+    private float mCaptureSize;
 
     private boolean mAdjustViewBounds;
 
@@ -120,6 +124,10 @@ public class CameraView extends FrameLayout {
 
                 if (attr == R.styleable.CameraView_ckAutoFocus) {
                     mAutoFocus = a.getBoolean(R.styleable.CameraView_ckAutoFocus, true);
+                }
+
+                if (attr == R.styleable.CameraView_ckCaptureSize) {
+                    mCaptureSize = a.getFloat(R.styleable.CameraView_ckCaptureSize, DEFAULT_CAPTURE_SIZE);
                 }
 
                 if (attr == R.styleable.CameraView_android_adjustViewBounds) {
@@ -184,6 +192,7 @@ public class CameraView extends FrameLayout {
         int permissionCheck = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA);
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
             mWaitingForPermission = false;
+            mCameraImpl.setCanRecordAudio(true);
             mCameraImpl.start();
         } else {
             requestCameraPermission();
@@ -254,6 +263,10 @@ public class CameraView extends FrameLayout {
         this.mAutoFocus = autoFocus;
     }
 
+    public void setCaptureSize(float captureSize) {
+        this.mCaptureSize = captureSize;
+    }
+
     public void setCameraListener(CameraListener cameraListener) {
         this.mCameraListener = new CameraListenerMiddleWare(cameraListener);
         mCameraImpl.setCameraListener(mCameraListener);
@@ -276,12 +289,6 @@ public class CameraView extends FrameLayout {
 
     public void stopRecordingVideo() {
         mCameraImpl.endVideo();
-        postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mCameraListener.onVideoTaken(new File(getContext().getExternalFilesDir(null), "video.mp4"));
-            }
-        }, 1000);
     }
 
     private void requestCameraPermission() {
@@ -295,7 +302,7 @@ public class CameraView extends FrameLayout {
         }
 
         if (activity != null) {
-            ActivityCompat.requestPermissions(activity, new String[]{ Manifest.permission.CAMERA }, PERMISSION_REQUEST_CAMERA);
+            ActivityCompat.requestPermissions(activity, new String[]{ Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO }, PERMISSION_REQUEST_CAMERA);
             mWaitingForPermission = true;
         }
     }

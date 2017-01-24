@@ -30,6 +30,8 @@
 
         <attr name="ckAutoFocus" format="boolean" />
 
+        <attr name="ckCaptureSize" format="float" />
+
         <attr name="android:adjustViewBounds" />
 
     </declare-styleable>

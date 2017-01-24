@@ -27,6 +27,8 @@ public class Camera1 extends CameraViewImpl {
         FLASH_MODES.put(CameraKit.Constants.FLASH_AUTO, Camera.Parameters.FLASH_MODE_AUTO);
     }
 
+    private static File VIDEO_FILE;
+
     private int mCameraId;
 
     Camera mCamera;
@@ -36,13 +38,9 @@ public class Camera1 extends CameraViewImpl {
     private final Camera.CameraInfo mCameraInfo = new Camera.CameraInfo();
 
     private boolean mShowingPreview;
-
     private boolean mAutoFocus;
-
     private int mFacing;
-
     private int mFlash;
-
     private int mDisplayOrientation;
 
     private SortedSet<Size> mPreviewSizes;
@@ -62,9 +60,10 @@ public class Camera1 extends CameraViewImpl {
             }
         });
 
-
         mPreviewSizes = new TreeSet<>();
         mCaptureSizes = new TreeSet<>();
+
+        VIDEO_FILE = new File(getView().getContext().getExternalFilesDir(null), "video.mp4");;
     }
 
     @Override
@@ -168,6 +167,8 @@ public class Camera1 extends CameraViewImpl {
 
     @Override
     void startVideo() {
+        if (!canRecordAudio()) return;
+
         try {
             prepareMediaRecorder();
         } catch (IOException e) {
@@ -187,10 +188,10 @@ public class Camera1 extends CameraViewImpl {
 
         mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+        mMediaRecorder.setProfile(CamcorderProfile.get(mFacing == CameraKit.Constants.FACING_BACK ? CamcorderProfile.QUALITY_HIGH : CamcorderProfile.QUALITY_LOW));
 
-        mMediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH));
-
-        mMediaRecorder.setOutputFile(new File(getView().getContext().getExternalFilesDir(null), "video.mp4").getAbsolutePath());
+        mMediaRecorder.setOutputFile(VIDEO_FILE.getAbsolutePath());
+        mMediaRecorder.setOrientationHint(mCameraInfo.orientation);
 
         mMediaRecorder.prepare();
         mMediaRecorder.start();
@@ -200,9 +201,11 @@ public class Camera1 extends CameraViewImpl {
     void endVideo() {
         if (mMediaRecorder != null) {
             mMediaRecorder.stop();
+            mMediaRecorder = null;
         }
 
-        getCameraListener().onVideoTaken(new File(getView().getContext().getExternalFilesDir(null), "video.mp4"));
+        getCameraListener().onVideoTaken(VIDEO_FILE);
+
     }
 
     @Override
@@ -229,7 +232,7 @@ public class Camera1 extends CameraViewImpl {
     private int calcCameraRotation(int rotation) {
         if (mCameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
             return (360 - (mCameraInfo.orientation + rotation) % 360) % 360;
-        } else {  // back-facing
+        } else {
             return (mCameraInfo.orientation - rotation + 360) % 360;
         }
     }
@@ -267,7 +270,10 @@ public class Camera1 extends CameraViewImpl {
             mPreview.setTruePreviewSize(previewSize.getWidth(), previewSize.getHeight());
 
             mCameraParameters.setPictureSize(pictureSize.getWidth(), pictureSize.getHeight());
-            mCameraParameters.setRotation(calcCameraRotation(mDisplayOrientation));
+
+            // TODO: fix this
+            mCameraParameters.setRotation(calcCameraRotation(mDisplayOrientation) + (mFacing == CameraKit.Constants.FACING_FRONT ? 180 : 0));
+            
             setAutoFocusInternal(mAutoFocus);
             setFlashInternal(mFlash);
             mCamera.setParameters(mCameraParameters);

@@ -16,7 +16,7 @@
         <com.flurgle.camerakit.CameraView xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/camera"
             android:layout_width="match_parent"
-            android:layout_height="160dp"
+            android:layout_height="500dp"
             android:layout_gravity="center_horizontal"
             app:ckCropOutput="true"
             app:ckFacing="back"
@@ -235,14 +235,14 @@
                             android:id="@+id/widthWrapContent"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="WRAP_CONTENT" />
+                            android:text="wrap_content" />
 
                         <android.support.v7.widget.AppCompatCheckBox
                             android:id="@+id/widthMatchParent"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="16dp"
-                            android:text="MATCH_PARENT" />
+                            android:text="match_parent" />
 
                     </LinearLayout>
 
