@@ -1,5 +1,7 @@
 package com.flurgle.camerakit;
 
+import android.graphics.Rect;
+import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
@@ -8,7 +10,9 @@ import android.support.v4.util.SparseArrayCompat;
 import android.view.SurfaceHolder;
 
 import com.flurgle.camerakit.utils.Size;
+import com.flurgle.camerakit.utils.YuvUtils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -162,7 +166,42 @@ public class Camera1 extends CameraViewImpl {
 
     @Override
     void captureStill() {
+        mCamera.setOneShotPreviewCallback(new Camera.PreviewCallback() {
+            @Override
+            public void onPreviewFrame(byte[] data, Camera camera) {
+                Camera.Parameters parameters = camera.getParameters();
+                int width = parameters.getPreviewSize().width;
+                int height = parameters.getPreviewSize().height;
+                int rotation = mCameraInfo.orientation;
+                byte[] rotatedData = YuvUtils.rotateNV21(data, width, height, rotation);
 
+                int postWidth;
+                int postHeight;
+
+                switch (rotation) {
+                    case 90:
+                    case 270:
+                        postWidth = height;
+                        postHeight = width;
+                        break;
+
+                    case 0:
+                    case 180:
+                    default:
+                        postWidth = width;
+                        postHeight = height;
+                        break;
+                }
+
+                YuvImage yuv = new YuvImage(rotatedData, parameters.getPreviewFormat(), postWidth, postHeight, null);
+
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                yuv.compressToJpeg(new Rect(0, 0, postWidth, postHeight), 50, out);
+
+                byte[] bytes = out.toByteArray();
+                getCameraListener().onPictureTaken(bytes);
+            }
+        });
     }
 
     @Override
@@ -273,7 +312,7 @@ public class Camera1 extends CameraViewImpl {
 
             // TODO: fix this
             mCameraParameters.setRotation(calcCameraRotation(mDisplayOrientation) + (mFacing == CameraKit.Constants.FACING_FRONT ? 180 : 0));
-            
+
             setAutoFocusInternal(mAutoFocus);
             setFlashInternal(mFlash);
             mCamera.setParameters(mCameraParameters);
