@@ -1,4 +1,4 @@
-package com.flurgle.camerakit;
+package com.flurgle.camerakit.utils;
 
 import android.support.annotation.NonNull;
 

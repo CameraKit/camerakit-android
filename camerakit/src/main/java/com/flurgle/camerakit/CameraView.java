@@ -6,8 +6,6 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.IntDef;
@@ -23,11 +21,22 @@ import android.util.AttributeSet;
 import android.view.Display;
 import android.widget.FrameLayout;
 
+import com.flurgle.camerakit.utils.DisplayOrientationDetector;
+
 import java.io.File;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-import static com.flurgle.camerakit.CameraKit.Constants.*;
+import static com.flurgle.camerakit.CameraKit.Constants.FACING_BACK;
+import static com.flurgle.camerakit.CameraKit.Constants.FACING_FRONT;
+import static com.flurgle.camerakit.CameraKit.Constants.FLASH_AUTO;
+import static com.flurgle.camerakit.CameraKit.Constants.FLASH_OFF;
+import static com.flurgle.camerakit.CameraKit.Constants.FLASH_ON;
+import static com.flurgle.camerakit.CameraKit.Constants.PICTURE_MODE_QUALITY;
+import static com.flurgle.camerakit.CameraKit.Constants.PICTURE_MODE_SPEED;
+import static com.flurgle.camerakit.CameraKit.Constants.TAP_TO_FOCUS_INVISIBLE;
+import static com.flurgle.camerakit.CameraKit.Constants.TAP_TO_FOCUS_OFF;
+import static com.flurgle.camerakit.CameraKit.Constants.TAP_TO_FOCUS_VISIBLE;
 
 public class CameraView extends FrameLayout {
 
@@ -64,6 +73,7 @@ public class CameraView extends FrameLayout {
     private boolean mCropOutput;
 
     private int mTapToFocus;
+    private boolean mAutoFocus;
 
     private boolean mAdjustViewBounds;
 
@@ -108,6 +118,10 @@ public class CameraView extends FrameLayout {
                     mTapToFocus = a.getInteger(R.styleable.CameraView_ckTapToFocus, TAP_TO_FOCUS_VISIBLE);
                 }
 
+                if (attr == R.styleable.CameraView_ckAutoFocus) {
+                    mAutoFocus = a.getBoolean(R.styleable.CameraView_ckAutoFocus, true);
+                }
+
                 if (attr == R.styleable.CameraView_android_adjustViewBounds) {
                     mAdjustViewBounds = a.getBoolean(R.styleable.CameraView_android_adjustViewBounds, false);
                 }
@@ -116,7 +130,7 @@ public class CameraView extends FrameLayout {
         }
 
         final PreviewImpl preview = new TextureViewPreview(context, this);
-        mCameraImpl = new Camera2(context, mCameraListener, preview);
+        mCameraImpl = new Camera1(mCameraListener, preview);
 
         setFacing(mFacing);
         setFlash(mFlash);
@@ -236,6 +250,10 @@ public class CameraView extends FrameLayout {
         this.mTapToFocus = tapToFocus;
     }
 
+    public void setAutoFocus(boolean autoFocus) {
+        this.mAutoFocus = autoFocus;
+    }
+
     public void setCameraListener(CameraListener cameraListener) {
         this.mCameraListener = new CameraListenerMiddleWare(cameraListener);
         mCameraImpl.setCameraListener(mCameraListener);
@@ -253,11 +271,17 @@ public class CameraView extends FrameLayout {
     }
 
     public void startRecordingVideo() {
-
+        mCameraImpl.startVideo();
     }
 
     public void stopRecordingVideo() {
-
+        mCameraImpl.endVideo();
+        postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mCameraListener.onVideoTaken(new File(getContext().getExternalFilesDir(null), "video.mp4"));
+            }
+        }, 1000);
     }
 
     private void requestCameraPermission() {
@@ -351,24 +375,13 @@ public class CameraView extends FrameLayout {
         @Override
         public void onPictureTaken(byte[] picture) {
             super.onPictureTaken(picture);
-            if (mCropOutput) {
-                Bitmap bitmap = BitmapFactory.decodeByteArray(picture, 0, picture.length);
-                int previewWidth = mCameraImpl.mPreview.getWidth();
-                int previewHeight = mCameraImpl.mPreview.getWidth();
-
-                AspectRatio viewRatio = AspectRatio.of(getWidth(), getHeight());
-                AspectRatio previewRatio = AspectRatio.of(previewWidth, previewHeight);
-
-                mCameraListener.onPictureTaken(picture);
-            } else {
-                mCameraListener.onPictureTaken(picture);
-            }
+            mCameraListener.onPictureTaken(picture);
         }
 
         @Override
         public void onVideoTaken(File video) {
             super.onVideoTaken(video);
-            mCameraListener.onCameraOpened();
+            mCameraListener.onVideoTaken(video);
         }
 
     }

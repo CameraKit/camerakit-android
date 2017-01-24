@@ -16,12 +16,12 @@
         <com.flurgle.camerakit.CameraView xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/camera"
             android:layout_width="match_parent"
-            android:layout_height="400dp"
+            android:layout_height="160dp"
             android:layout_gravity="center_horizontal"
             app:ckCropOutput="true"
             app:ckFacing="back"
             app:ckFlash="off"
-            app:ckPictureMode="speed" />
+            app:ckPictureMode="quality" />
 
         <LinearLayout
             android:layout_width="match_parent"

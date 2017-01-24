@@ -1,4 +1,4 @@
-package com.flurgle.camerakit;
+package com.flurgle.camerakit.utils;
 
 import android.content.Context;
 import android.util.SparseIntArray;
@@ -6,7 +6,7 @@ import android.view.Display;
 import android.view.OrientationEventListener;
 import android.view.Surface;
 
-abstract class DisplayOrientationDetector {
+public abstract class DisplayOrientationDetector {
 
     private final OrientationEventListener mOrientationEventListener;
 

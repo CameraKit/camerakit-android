@@ -18,6 +18,8 @@ import com.flurgle.camerakit.CameraKit;
 import com.flurgle.camerakit.CameraListener;
 import com.flurgle.camerakit.CameraView;
 
+import java.io.File;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
@@ -110,7 +112,22 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.captureVideo)
     void captureVideo() {
+        camera.startRecordingVideo();
+        camera.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                camera.stopRecordingVideo();
+            }
+        }, 3000);
 
+        camera.setCameraListener(new CameraListener() {
+            @Override
+            public void onVideoTaken(File video) {
+                super.onVideoTaken(video);
+                PreviewDialog previewDialog = new PreviewDialog(MainActivity.this, video);
+                previewDialog.show();
+            }
+        });
     }
 
     @OnClick(R.id.toggleCamera)
@@ -163,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
         invalidateParameters();
     }
 
-    @OnFocusChange({ R.id.width, R.id.height })
+    @OnFocusChange({R.id.width, R.id.height})
     void inputFocusChanged(View view, boolean f) {
         blockInvalidation = view.isFocused();
     }

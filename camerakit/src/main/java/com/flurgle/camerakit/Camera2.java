@@ -3,6 +3,7 @@ package com.flurgle.camerakit;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.ImageFormat;
+import android.graphics.Rect;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
@@ -13,7 +14,6 @@ import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
-import android.media.MediaRecorder;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
@@ -22,6 +22,12 @@ import android.util.SparseIntArray;
 import android.view.Surface;
 import android.view.View;
 
+import com.flurgle.camerakit.encoding.VideoEncoder;
+import com.flurgle.camerakit.utils.AspectRatio;
+import com.flurgle.camerakit.utils.Size;
+import com.flurgle.camerakit.utils.YuvUtils;
+
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -45,7 +51,7 @@ public class Camera2 extends CameraViewImpl {
     private CameraCaptureSession mCaptureSession;
     private CaptureRequest.Builder mPreviewRequestBuilder;
     private ImageReader mImageReader;
-    private MediaRecorder mMediaRecorder;
+    private VideoEncoder mVideoEncoder;
 
     private Semaphore mCameraOpenCloseLock;
 
@@ -60,6 +66,10 @@ public class Camera2 extends CameraViewImpl {
 
     private HandlerThread mBackgroundThread;
     private Handler mBackgroundHandler;
+
+    private boolean mCropOutput;
+
+    private boolean mIsRecording;
 
     Camera2(Context context, CameraListener cameraListener, PreviewImpl preview) {
         super(cameraListener, preview);
@@ -164,6 +174,11 @@ public class Camera2 extends CameraViewImpl {
     }
 
     @Override
+    boolean getAutoFocus() {
+        return true;
+    }
+
+    @Override
     void capturePicture() {
         if (mFacing == INTERNAL_FACINGS.get(CameraKit.Constants.FACING_BACK)) {
             lockFocus();
@@ -184,11 +199,17 @@ public class Camera2 extends CameraViewImpl {
         if (mCamera == null) {
             return;
         }
+
+        mIsRecording = true;
     }
 
     @Override
     void endVideo() {
-
+        mIsRecording = false;
+        if (mVideoEncoder != null) {
+            mVideoEncoder.stopEncoder();
+            mVideoEncoder = null;
+        }
     }
 
     @Override
@@ -212,6 +233,10 @@ public class Camera2 extends CameraViewImpl {
                 builder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_OFF);
                 break;
         }
+    }
+
+    void setCropOutput(boolean cropOutput) {
+        this.mCropOutput = cropOutput;
     }
 
     private boolean chooseCameraIdByFacing() {
@@ -373,7 +398,7 @@ public class Camera2 extends CameraViewImpl {
 
         Size previewSize = getOptimalPreviewSize();
 
-        mPreview.setBufferSize(previewSize.getWidth(), previewSize.getHeight());
+        mPreview.setTruePreviewSize(previewSize.getWidth(), previewSize.getHeight());
         Surface surface = mPreview.getSurface();
         try {
             mPreviewRequestBuilder = mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
@@ -412,6 +437,8 @@ public class Camera2 extends CameraViewImpl {
                             360) % 360);
             // Stop preview and capture a still picture.
             mCaptureSession.stopRepeating();
+
+            mOnImageAvailableListener.allowCallback();
             mCaptureSession.capture(captureRequestBuilder.build(), new CameraCaptureSession.CaptureCallback() {
                 @Override
                 public void onCaptureCompleted(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, @NonNull TotalCaptureResult result) {
@@ -436,7 +463,6 @@ public class Camera2 extends CameraViewImpl {
             Log.e(TAG, "Failed to restart camera preview.", e);
         }
     }
-
 
     private final CameraDevice.StateCallback mCameraDeviceCallback = new CameraDevice.StateCallback() {
 
@@ -545,15 +571,41 @@ public class Camera2 extends CameraViewImpl {
                 return;
             }
 
-            if (!mAllowOneCallback) {
+            if (!mAllowOneCallback && !mIsRecording) {
                 image.close();
                 return;
             }
 
-            mAllowOneCallback = false;
+            Rect crop = null;
+            if (mCropOutput) {
 
-            byte[] out = YuvUtils.createRGB(image);
-            getCameraListener().onPictureTaken(out);
+            }
+
+            if (mAllowOneCallback) {
+                mAllowOneCallback = false;
+                byte[] out = YuvUtils.createRGB(image, crop);
+                getCameraListener().onPictureTaken(out);
+            }
+
+            if (mIsRecording) {
+                if (mVideoEncoder == null) {
+                    try {
+                        mVideoEncoder = new VideoEncoder(getView().getContext(), mFacing, image.getWidth(), image.getHeight());
+                    } catch (IOException e) {
+
+                    }
+                }
+
+                if (mVideoEncoder != null) {
+                    byte[] out = YuvUtils.getYUVData(image);
+                    try {
+                        mVideoEncoder.encode(out);
+                    } catch (Exception e) {
+
+                    }
+                }
+            }
+
             image.close();
         }
     };

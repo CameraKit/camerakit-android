@@ -90,9 +90,11 @@ public class TextureViewPreview extends PreviewImpl {
 
     @TargetApi(15)
     @Override
-    void setBufferSize(int width, int height) {
-        super.setBufferSize(width, height);
-        mTextureView.getSurfaceTexture().setDefaultBufferSize(width, height);
+    void setTruePreviewSize(int width, int height) {
+        super.setTruePreviewSize(width, height);
+        if (mTextureView.getSurfaceTexture() != null) {
+            mTextureView.getSurfaceTexture().setDefaultBufferSize(width, height);
+        }
     }
 
     void configureTransform() {

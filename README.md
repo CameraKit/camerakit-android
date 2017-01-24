@@ -21,6 +21,7 @@ Try out all the unique features using the CameraKit Demo from the Google Play st
     - [`ckFlash`](#ckflash)
     - [`ckPictureMode`](#ckpicturemode)
     - [`ckTapToFocus`](#cktaptofocus)
+    - [`ckAutoFocus`](#ckautofocus)
   - [Capturing Images](#capturing-images)
   - [Capturing Video](#capturing-video)
 - [Automatic Permissions Behavior](#automatic-permissions-behavior)
@@ -124,7 +125,8 @@ camera.setCameraListener(new CameraListener() {
     camerakit:ckFacing="back"
     camerakit:ckFlash="off"
     camerakit:ckPictureMode="quality"
-    camerakit:ckTapToFocus="on" />
+    camerakit:ckTapToFocus="on"
+    camerakit:ckAutoFocus="true" />
 ```
 
 #### `ckCropOutput`
@@ -133,7 +135,6 @@ camera.setCameraListener(new CameraListener() {
 | --------------| -------------|
 | `true`        | Crop the output image or video to only contain what can be seen on the `CameraView` preview. |
 | `false`       | Output the full image or video regardless of what is visible on the `CameraView` preview. |
-
 
 #### `ckFacing`
 
@@ -166,6 +167,13 @@ camera.setCameraListener(new CameraListener() {
 | `visible`     | Tap to focus is enabled and a visible focus circle appears when tapped, similar to the Android built-in camera. |
 | `invisible`   | Tap to focus is enabled, but no focus circle appears. |
 | `off`         | Tap to focus is off. |
+
+#### `ckAutoFocus`
+
+| Value         | Description  |
+| --------------| -------------|
+| `true`        | Continuously allow the `CameraView` preview to adjust focus automatically. |
+| `false`       | Never adjust focus during preview. |
 
 ### Capturing Images
 

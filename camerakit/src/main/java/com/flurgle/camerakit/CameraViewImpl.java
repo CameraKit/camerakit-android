@@ -2,7 +2,7 @@ package com.flurgle.camerakit;
 
 import android.view.View;
 
-abstract class CameraViewImpl {
+public abstract class CameraViewImpl {
 
     protected CameraListener mCameraListener;
 
@@ -30,6 +30,8 @@ abstract class CameraViewImpl {
     abstract void setFlash(int flash);
 
     abstract int getFlash();
+
+    abstract boolean getAutoFocus();
 
     abstract void capturePicture();
 

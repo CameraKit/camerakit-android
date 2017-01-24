@@ -6,7 +6,7 @@ import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.TotalCaptureResult;
 import android.support.annotation.NonNull;
 
-abstract class PictureCaptureCallback extends CameraCaptureSession.CaptureCallback {
+public abstract class PictureCaptureCallback extends CameraCaptureSession.CaptureCallback {
 
     static final int STATE_PREVIEW = 0;
     static final int STATE_LOCKING = 1;

@@ -1,4 +1,4 @@
-package com.flurgle.camerakit;
+package com.flurgle.camerakit.utils;
 
 import android.os.Parcel;
 import android.os.Parcelable;

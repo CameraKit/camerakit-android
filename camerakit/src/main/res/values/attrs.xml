@@ -28,6 +28,8 @@
             <enum name="off" value="2" />
         </attr>
 
+        <attr name="ckAutoFocus" format="boolean" />
+
         <attr name="android:adjustViewBounds" />
 
     </declare-styleable>
