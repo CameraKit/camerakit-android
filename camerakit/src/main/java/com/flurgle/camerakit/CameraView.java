@@ -8,7 +8,6 @@ import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -21,11 +20,13 @@ import android.util.AttributeSet;
 import android.view.Display;
 import android.widget.FrameLayout;
 
+import com.flurgle.camerakit.annotations.Facing;
+import com.flurgle.camerakit.annotations.Flash;
+import com.flurgle.camerakit.annotations.PictureMode;
+import com.flurgle.camerakit.annotations.TapToFocus;
 import com.flurgle.camerakit.utils.DisplayOrientationDetector;
 
 import java.io.File;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 
 import static com.flurgle.camerakit.CameraKit.Constants.FACING_BACK;
 import static com.flurgle.camerakit.CameraKit.Constants.FACING_FRONT;
@@ -34,8 +35,6 @@ import static com.flurgle.camerakit.CameraKit.Constants.FLASH_OFF;
 import static com.flurgle.camerakit.CameraKit.Constants.FLASH_ON;
 import static com.flurgle.camerakit.CameraKit.Constants.PICTURE_MODE_QUALITY;
 import static com.flurgle.camerakit.CameraKit.Constants.PICTURE_MODE_SPEED;
-import static com.flurgle.camerakit.CameraKit.Constants.TAP_TO_FOCUS_INVISIBLE;
-import static com.flurgle.camerakit.CameraKit.Constants.TAP_TO_FOCUS_OFF;
 import static com.flurgle.camerakit.CameraKit.Constants.TAP_TO_FOCUS_VISIBLE;
 
 public class CameraView extends FrameLayout {
@@ -44,37 +43,24 @@ public class CameraView extends FrameLayout {
 
     private static final int DEFAULT_CAPTURE_SIZE = -1;
 
-    @IntDef({FACING_BACK, FACING_FRONT})
-    @Retention(RetentionPolicy.SOURCE)
-    @interface Facing {
-    }
-
-    @Retention(RetentionPolicy.SOURCE)
-    @IntDef({FLASH_OFF, FLASH_ON, FLASH_AUTO})
-    @interface Flash {
-    }
-
-    @Retention(RetentionPolicy.SOURCE)
-    @IntDef({PICTURE_MODE_QUALITY, PICTURE_MODE_SPEED})
-    @interface PictureMode {
-    }
-
-    @Retention(RetentionPolicy.SOURCE)
-    @IntDef({TAP_TO_FOCUS_VISIBLE, TAP_TO_FOCUS_INVISIBLE, TAP_TO_FOCUS_OFF})
-    @interface TapToFocus {
-    }
-
+    @Facing
     private int mFacing;
+    @Facing
     private int mDefaultFacing;
 
+    @Flash
     private int mFlash;
+    @Flash
     private int mDefaultFlash;
 
+    @PictureMode
     private int mPictureMode;
 
     private boolean mCropOutput;
 
+    @TapToFocus
     private int mTapToFocus;
+
     private boolean mAutoFocus;
 
     private float mCaptureSize;
@@ -142,6 +128,11 @@ public class CameraView extends FrameLayout {
 
         setFacing(mFacing);
         setFlash(mFlash);
+        setPictureMode(mPictureMode);
+        setCropOutput(mCropOutput);
+        setTapToFocus(mTapToFocus);
+        setAutoFocus(mAutoFocus);
+        setCaptureSize(mCaptureSize);
 
         mDisplayOrientationDetector = new DisplayOrientationDetector(context) {
             @Override
@@ -192,7 +183,6 @@ public class CameraView extends FrameLayout {
         int permissionCheck = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA);
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
             mWaitingForPermission = false;
-            mCameraImpl.setCanRecordAudio(true);
             mCameraImpl.start();
         } else {
             requestCameraPermission();

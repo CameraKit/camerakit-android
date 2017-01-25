@@ -21,10 +21,7 @@ import java.util.TreeSet;
 
 public class Camera1 extends CameraViewImpl {
 
-    private static final int INVALID_CAMERA_ID = -1;
-
     private static final SparseArrayCompat<String> FLASH_MODES = new SparseArrayCompat<>();
-
     static {
         FLASH_MODES.put(CameraKit.Constants.FLASH_OFF, Camera.Parameters.FLASH_MODE_OFF);
         FLASH_MODES.put(CameraKit.Constants.FLASH_ON, Camera.Parameters.FLASH_MODE_ON);
@@ -34,11 +31,8 @@ public class Camera1 extends CameraViewImpl {
     private static File VIDEO_FILE;
 
     private int mCameraId;
-
     Camera mCamera;
-
     private Camera.Parameters mCameraParameters;
-
     private final Camera.CameraInfo mCameraInfo = new Camera.CameraInfo();
 
     private boolean mShowingPreview;
@@ -72,7 +66,7 @@ public class Camera1 extends CameraViewImpl {
 
     @Override
     void start() {
-        chooseCamera();
+        setFacingInternal(mFacing);
         openCamera();
         if (mPreview.isReady()) {
             setUpPreview();
@@ -100,11 +94,23 @@ public class Camera1 extends CameraViewImpl {
         if (mFacing == facing) {
             return;
         }
-        mFacing = facing;
-        if (isCameraOpened()) {
+        if (setFacingInternal(facing) && isCameraOpened()) {
             stop();
             start();
         }
+    }
+
+    private boolean setFacingInternal(int facing) {
+        for (int i = 0, count = Camera.getNumberOfCameras(); i < count; i++) {
+            Camera.getCameraInfo(i, mCameraInfo);
+            if (mCameraInfo.facing == facing) {
+                mCameraId = i;
+                mFacing = facing;
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override
@@ -122,9 +128,60 @@ public class Camera1 extends CameraViewImpl {
         }
     }
 
+    private boolean setFlashInternal(int flash) {
+        if (isCameraOpened()) {
+            List<String> modes = mCameraParameters.getSupportedFlashModes();
+            String mode = FLASH_MODES.get(flash);
+            if (modes != null && modes.contains(mode)) {
+                mCameraParameters.setFlashMode(mode);
+                mFlash = flash;
+                return true;
+            }
+            String currentMode = FLASH_MODES.get(mFlash);
+            if (modes == null || !modes.contains(currentMode)) {
+                mCameraParameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+                mFlash = CameraKit.Constants.FLASH_OFF;
+                return true;
+            }
+            return false;
+        } else {
+            mFlash = flash;
+            return false;
+        }
+    }
+
     @Override
     int getFlash() {
         return mFlash;
+    }
+
+    @Override
+    void setAutoFocus(boolean autoFocus) {
+        if (autoFocus == mAutoFocus) {
+            return;
+        }
+        if (setAutoFocusInternal(autoFocus)) {
+            mCamera.setParameters(mCameraParameters);
+        }
+    }
+
+    private boolean setAutoFocusInternal(boolean autoFocus) {
+        mAutoFocus = autoFocus;
+        if (isCameraOpened()) {
+            final List<String> modes = mCameraParameters.getSupportedFocusModes();
+            if (autoFocus && modes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
+                mCameraParameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+            } else if (modes.contains(Camera.Parameters.FOCUS_MODE_FIXED)) {
+                mCameraParameters.setFocusMode(Camera.Parameters.FOCUS_MODE_FIXED);
+            } else if (modes.contains(Camera.Parameters.FOCUS_MODE_INFINITY)) {
+                mCameraParameters.setFocusMode(Camera.Parameters.FOCUS_MODE_INFINITY);
+            } else {
+                mCameraParameters.setFocusMode(modes.get(0));
+            }
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
@@ -206,8 +263,6 @@ public class Camera1 extends CameraViewImpl {
 
     @Override
     void startVideo() {
-        if (!canRecordAudio()) return;
-
         try {
             prepareMediaRecorder();
         } catch (IOException e) {
@@ -227,7 +282,7 @@ public class Camera1 extends CameraViewImpl {
 
         mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-        mMediaRecorder.setProfile(CamcorderProfile.get(mFacing == CameraKit.Constants.FACING_BACK ? CamcorderProfile.QUALITY_HIGH : CamcorderProfile.QUALITY_LOW));
+        mMediaRecorder.setProfile(CamcorderProfile.get(mFacing == CameraKit.Constants.FACING_BACK ? CamcorderProfile.QUALITY_HIGH : CamcorderProfile.QUALITY_480P));
 
         mMediaRecorder.setOutputFile(VIDEO_FILE.getAbsolutePath());
         mMediaRecorder.setOrientationHint(mCameraInfo.orientation);
@@ -349,17 +404,6 @@ public class Camera1 extends CameraViewImpl {
         return result;
     }
 
-    private void chooseCamera() {
-        for (int i = 0, count = Camera.getNumberOfCameras(); i < count; i++) {
-            Camera.getCameraInfo(i, mCameraInfo);
-            if (mCameraInfo.facing == mFacing) {
-                mCameraId = i;
-                return;
-            }
-        }
-        mCameraId = INVALID_CAMERA_ID;
-    }
-
     private void openCamera() {
         if (mCamera != null) {
             releaseCamera();
@@ -388,47 +432,6 @@ public class Camera1 extends CameraViewImpl {
             mCamera.release();
             mCamera = null;
             getCameraListener().onCameraClosed();
-        }
-    }
-
-    private boolean setAutoFocusInternal(boolean autoFocus) {
-        mAutoFocus = autoFocus;
-        if (isCameraOpened()) {
-            final List<String> modes = mCameraParameters.getSupportedFocusModes();
-            if (autoFocus && modes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
-                mCameraParameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
-            } else if (modes.contains(Camera.Parameters.FOCUS_MODE_FIXED)) {
-                mCameraParameters.setFocusMode(Camera.Parameters.FOCUS_MODE_FIXED);
-            } else if (modes.contains(Camera.Parameters.FOCUS_MODE_INFINITY)) {
-                mCameraParameters.setFocusMode(Camera.Parameters.FOCUS_MODE_INFINITY);
-            } else {
-                mCameraParameters.setFocusMode(modes.get(0));
-            }
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    private boolean setFlashInternal(int flash) {
-        if (isCameraOpened()) {
-            List<String> modes = mCameraParameters.getSupportedFlashModes();
-            String mode = FLASH_MODES.get(flash);
-            if (modes != null && modes.contains(mode)) {
-                mCameraParameters.setFlashMode(mode);
-                mFlash = flash;
-                return true;
-            }
-            String currentMode = FLASH_MODES.get(mFlash);
-            if (modes == null || !modes.contains(currentMode)) {
-                mCameraParameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
-                mFlash = CameraKit.Constants.FLASH_OFF;
-                return true;
-            }
-            return false;
-        } else {
-            mFlash = flash;
-            return false;
         }
     }
 

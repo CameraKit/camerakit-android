@@ -2,13 +2,14 @@ package com.flurgle.camerakit;
 
 import android.view.View;
 
+import com.flurgle.camerakit.annotations.Facing;
+import com.flurgle.camerakit.annotations.Flash;
+
 public abstract class CameraViewImpl {
 
     protected CameraListener mCameraListener;
 
     protected final PreviewImpl mPreview;
-
-    private boolean mCanRecordAudio;
 
     CameraViewImpl(CameraListener callback, PreviewImpl preview) {
         mCameraListener = callback;
@@ -25,13 +26,15 @@ public abstract class CameraViewImpl {
 
     abstract boolean isCameraOpened();
 
-    abstract void setFacing(int facing);
+    abstract void setFacing(@Facing int facing);
 
     abstract int getFacing();
 
-    abstract void setFlash(int flash);
+    abstract void setFlash(@Flash int flash);
 
     abstract int getFlash();
+
+    abstract void setAutoFocus(boolean autoFocus);
 
     abstract boolean getAutoFocus();
 
@@ -51,14 +54,6 @@ public abstract class CameraViewImpl {
 
     protected CameraListener getCameraListener() {
         return mCameraListener != null ? mCameraListener : new CameraListener() {};
-    }
-
-    public void setCanRecordAudio(boolean canRecordAudio) {
-        this.mCanRecordAudio = canRecordAudio;
-    }
-
-    protected boolean canRecordAudio() {
-        return mCanRecordAudio;
     }
 
 }
