@@ -316,7 +316,7 @@ public class Camera1 extends CameraViewImpl {
 
         mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-        mMediaRecorder.setProfile(CamcorderProfile.get(mFacing == CameraKit.Constants.FACING_BACK ? CamcorderProfile.QUALITY_HIGH : CamcorderProfile.QUALITY_480P));
+        mMediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_480P));
 
         mMediaRecorder.setOutputFile(VIDEO_FILE.getAbsolutePath());
         mMediaRecorder.setOrientationHint(mCameraInfo.orientation);
