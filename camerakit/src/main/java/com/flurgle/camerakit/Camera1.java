@@ -226,39 +226,73 @@ public class Camera1 extends CameraViewImpl {
         mCamera.setOneShotPreviewCallback(new Camera.PreviewCallback() {
             @Override
             public void onPreviewFrame(byte[] data, Camera camera) {
-                Camera.Parameters parameters = camera.getParameters();
-                int width = parameters.getPreviewSize().width;
-                int height = parameters.getPreviewSize().height;
-                int rotation = mCameraInfo.orientation;
-                byte[] rotatedData = YuvUtils.rotateNV21(data, width, height, rotation);
-
-                int postWidth;
-                int postHeight;
-
-                switch (rotation) {
-                    case 90:
-                    case 270:
-                        postWidth = height;
-                        postHeight = width;
-                        break;
-
-                    case 0:
-                    case 180:
-                    default:
-                        postWidth = width;
-                        postHeight = height;
-                        break;
-                }
-
-                YuvImage yuv = new YuvImage(rotatedData, parameters.getPreviewFormat(), postWidth, postHeight, null);
-
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                yuv.compressToJpeg(new Rect(0, 0, postWidth, postHeight), 50, out);
-
-                byte[] bytes = out.toByteArray();
-                getCameraListener().onPictureTaken(bytes);
+                new Thread(new ProcessStillTask(data, camera, mCameraInfo, new ProcessStillTask.OnStillProcessedListener() {
+                    @Override
+                    public void onStillProcessed(final byte[] data) {
+                        getView().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                getCameraListener().onPictureTaken(data);
+                            }
+                        });
+                    }
+                })).start();
             }
         });
+    }
+
+    static class ProcessStillTask implements Runnable {
+
+        byte[] data;
+        Camera camera;
+        Camera.CameraInfo cameraInfo;
+        OnStillProcessedListener onStillProcessedListener;
+
+        public ProcessStillTask(byte[] data, Camera camera, Camera.CameraInfo cameraInfo, OnStillProcessedListener onStillProcessedListener) {
+            this.data = data;
+            this.camera = camera;
+            this.cameraInfo = cameraInfo;
+            this.onStillProcessedListener = onStillProcessedListener;
+        }
+
+        @Override
+        public void run() {
+            Camera.Parameters parameters = camera.getParameters();
+            int width = parameters.getPreviewSize().width;
+            int height = parameters.getPreviewSize().height;
+            int rotation = cameraInfo.orientation;
+            byte[] rotatedData = YuvUtils.rotateNV21(data, width, height, rotation);
+
+            int postWidth;
+            int postHeight;
+
+            switch (rotation) {
+                case 90:
+                case 270:
+                    postWidth = height;
+                    postHeight = width;
+                    break;
+
+                case 0:
+                case 180:
+                default:
+                    postWidth = width;
+                    postHeight = height;
+                    break;
+            }
+
+            YuvImage yuv = new YuvImage(rotatedData, parameters.getPreviewFormat(), postWidth, postHeight, null);
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            yuv.compressToJpeg(new Rect(0, 0, postWidth, postHeight), 50, out);
+
+            onStillProcessedListener.onStillProcessed(out.toByteArray());
+        }
+
+        interface OnStillProcessedListener {
+            void onStillProcessed(byte[] data);
+        }
+
     }
 
     @Override
