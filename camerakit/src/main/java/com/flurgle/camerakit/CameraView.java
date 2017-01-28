@@ -18,12 +18,14 @@ import android.support.v4.os.ParcelableCompatCreatorCallbacks;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.Display;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.FrameLayout;
 
-import com.flurgle.camerakit.annotations.Facing;
-import com.flurgle.camerakit.annotations.Flash;
-import com.flurgle.camerakit.annotations.PictureMode;
-import com.flurgle.camerakit.annotations.TapToFocus;
+import com.flurgle.camerakit.types.Facing;
+import com.flurgle.camerakit.types.Flash;
+import com.flurgle.camerakit.types.PictureMode;
+import com.flurgle.camerakit.types.TapToFocus;
 import com.flurgle.camerakit.utils.DisplayOrientationDetector;
 
 import java.io.File;
@@ -40,18 +42,13 @@ import static com.flurgle.camerakit.CameraKit.Constants.TAP_TO_FOCUS_VISIBLE;
 public class CameraView extends FrameLayout {
 
     private static final int PERMISSION_REQUEST_CAMERA = 16;
-
     private static final int DEFAULT_CAPTURE_SIZE = -1;
 
     @Facing
     private int mFacing;
-    @Facing
-    private int mDefaultFacing;
 
     @Flash
     private int mFlash;
-    @Flash
-    private int mDefaultFlash;
 
     @PictureMode
     private int mPictureMode;
@@ -69,10 +66,11 @@ public class CameraView extends FrameLayout {
 
     private boolean mWaitingForPermission;
 
-    private CameraListener mCameraListener;
+    private CameraListenerMiddleWare mCameraListener;
     private DisplayOrientationDetector mDisplayOrientationDetector;
 
-    private CameraViewImpl mCameraImpl;
+    private CameraImpl mCameraImpl;
+    private PreviewImpl mPreviewImpl;
 
     public CameraView(@NonNull Context context) {
         super(context, null);
@@ -123,8 +121,10 @@ public class CameraView extends FrameLayout {
             a.recycle();
         }
 
-        final PreviewImpl preview = new TextureViewPreview(context, this);
-        mCameraImpl = new Camera1(mCameraListener, preview);
+        mCameraListener = new CameraListenerMiddleWare();
+
+        mPreviewImpl = new TextureViewPreview(context, this);
+        mCameraImpl = new Camera1(mCameraListener, mPreviewImpl);
 
         setFacing(mFacing);
         setFlash(mFlash);
@@ -247,6 +247,11 @@ public class CameraView extends FrameLayout {
 
     public void setTapToFocus(@TapToFocus int tapToFocus) {
         this.mTapToFocus = tapToFocus;
+        if (tapToFocus == CameraKit.Constants.TAP_TO_FOCUS_OFF) {
+            mPreviewImpl.getView().setOnTouchListener(null);
+        } else {
+            mPreviewImpl.getView().setOnTouchListener(mTapToFocusOnTouchListener);
+        }
     }
 
     public void setAutoFocus(boolean autoFocus) {
@@ -258,8 +263,7 @@ public class CameraView extends FrameLayout {
     }
 
     public void setCameraListener(CameraListener cameraListener) {
-        this.mCameraListener = new CameraListenerMiddleWare(cameraListener);
-        mCameraImpl.setCameraListener(mCameraListener);
+        this.mCameraListener.setCameraListener(cameraListener);
     }
 
     public void capturePicture() {
@@ -292,7 +296,7 @@ public class CameraView extends FrameLayout {
         }
 
         if (activity != null) {
-            ActivityCompat.requestPermissions(activity, new String[]{ Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO }, PERMISSION_REQUEST_CAMERA);
+            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO}, PERMISSION_REQUEST_CAMERA);
             mWaitingForPermission = true;
         }
     }
@@ -306,6 +310,19 @@ public class CameraView extends FrameLayout {
             }
         }
     }
+
+    private OnTouchListener mTapToFocusOnTouchListener = new OnTouchListener() {
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                mCameraImpl.focus();
+            }
+
+            return false;
+        }
+
+    };
+
 
     protected static class SavedState extends BaseSavedState {
 
@@ -349,36 +366,42 @@ public class CameraView extends FrameLayout {
 
     }
 
-    protected class CameraListenerMiddleWare extends CameraListener {
+    private static class CameraListenerMiddleWare extends CameraListener {
 
         private CameraListener mCameraListener;
-
-        public CameraListenerMiddleWare(CameraListener cameraListener) {
-            this.mCameraListener = cameraListener;
-        }
 
         @Override
         public void onCameraOpened() {
             super.onCameraOpened();
-            mCameraListener.onCameraOpened();
+            getCameraListener().onCameraOpened();
         }
 
         @Override
         public void onCameraClosed() {
             super.onCameraClosed();
-            mCameraListener.onCameraClosed();
+            getCameraListener().onCameraClosed();
         }
 
         @Override
         public void onPictureTaken(byte[] picture) {
             super.onPictureTaken(picture);
-            mCameraListener.onPictureTaken(picture);
+            getCameraListener().onPictureTaken(picture);
         }
 
         @Override
         public void onVideoTaken(File video) {
             super.onVideoTaken(video);
-            mCameraListener.onVideoTaken(video);
+            getCameraListener().onVideoTaken(video);
+        }
+
+        public void setCameraListener(@Nullable CameraListener cameraListener) {
+            this.mCameraListener = cameraListener;
+        }
+
+        @NonNull
+        public CameraListener getCameraListener() {
+            return mCameraListener != null ? mCameraListener : new CameraListener() {
+            };
         }
 
     }

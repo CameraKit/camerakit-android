@@ -6,6 +6,7 @@ import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.v4.util.SparseArrayCompat;
 import android.view.SurfaceHolder;
 
@@ -19,7 +20,7 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-public class Camera1 extends CameraViewImpl {
+public class Camera1 extends CameraImpl {
 
     private static final SparseArrayCompat<String> FLASH_MODES = new SparseArrayCompat<>();
     static {
@@ -28,10 +29,10 @@ public class Camera1 extends CameraViewImpl {
         FLASH_MODES.put(CameraKit.Constants.FLASH_AUTO, Camera.Parameters.FLASH_MODE_AUTO);
     }
 
-    private static File VIDEO_FILE;
+    private File mVideoFile;
 
     private int mCameraId;
-    Camera mCamera;
+    private Camera mCamera;
     private Camera.Parameters mCameraParameters;
     private final Camera.CameraInfo mCameraInfo = new Camera.CameraInfo();
 
@@ -46,8 +47,16 @@ public class Camera1 extends CameraViewImpl {
 
     private MediaRecorder mMediaRecorder;
 
-    Camera1(CameraListener callback, PreviewImpl preview) {
-        super(callback, preview);
+    private CameraListener mCameraListener;
+
+    Camera1(@NonNull CameraListener cameraListener, @NonNull PreviewImpl preview) {
+        super(cameraListener, preview);
+        
+        this.mCameraListener = cameraListener;
+        this.mPreviewSizes = new TreeSet<>();
+        this.mCaptureSizes = new TreeSet<>();
+        this.mVideoFile = new File(getView().getContext().getExternalFilesDir(null), "video.mp4");
+
         preview.setCallback(new PreviewImpl.Callback() {
             @Override
             public void onSurfaceChanged() {
@@ -57,11 +66,6 @@ public class Camera1 extends CameraViewImpl {
                 }
             }
         });
-
-        mPreviewSizes = new TreeSet<>();
-        mCaptureSizes = new TreeSet<>();
-
-        VIDEO_FILE = new File(getView().getContext().getExternalFilesDir(null), "video.mp4");;
     }
 
     @Override
@@ -114,11 +118,6 @@ public class Camera1 extends CameraViewImpl {
     }
 
     @Override
-    int getFacing() {
-        return mFacing;
-    }
-
-    @Override
     void setFlash(int flash) {
         if (flash == mFlash) {
             return;
@@ -151,11 +150,6 @@ public class Camera1 extends CameraViewImpl {
     }
 
     @Override
-    int getFlash() {
-        return mFlash;
-    }
-
-    @Override
     void setAutoFocus(boolean autoFocus) {
         if (autoFocus == mAutoFocus) {
             return;
@@ -178,6 +172,8 @@ public class Camera1 extends CameraViewImpl {
             } else {
                 mCameraParameters.setFocusMode(modes.get(0));
             }
+
+            mCameraParameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
             return true;
         } else {
             return false;
@@ -215,7 +211,7 @@ public class Camera1 extends CameraViewImpl {
         mCamera.takePicture(null, null, null, new Camera.PictureCallback() {
             @Override
             public void onPictureTaken(byte[] data, Camera camera) {
-                getCameraListener().onPictureTaken(data);
+                mCameraListener.onPictureTaken(data);
                 camera.startPreview();
             }
         });
@@ -232,7 +228,7 @@ public class Camera1 extends CameraViewImpl {
                         getView().post(new Runnable() {
                             @Override
                             public void run() {
-                                getCameraListener().onPictureTaken(data);
+                                mCameraListener.onPictureTaken(data);
                             }
                         });
                     }
@@ -318,7 +314,7 @@ public class Camera1 extends CameraViewImpl {
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
         mMediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_480P));
 
-        mMediaRecorder.setOutputFile(VIDEO_FILE.getAbsolutePath());
+        mMediaRecorder.setOutputFile(mVideoFile.getAbsolutePath());
         mMediaRecorder.setOrientationHint(mCameraInfo.orientation);
 
         mMediaRecorder.prepare();
@@ -332,8 +328,13 @@ public class Camera1 extends CameraViewImpl {
             mMediaRecorder = null;
         }
 
-        getCameraListener().onVideoTaken(VIDEO_FILE);
+        mCameraListener.onVideoTaken(mVideoFile);
 
+    }
+
+    @Override
+    void focus() {
+        mCamera.autoFocus(null);
     }
 
     @Override
@@ -399,7 +400,6 @@ public class Camera1 extends CameraViewImpl {
 
             mCameraParameters.setPictureSize(pictureSize.getWidth(), pictureSize.getHeight());
 
-            // TODO: fix this
             mCameraParameters.setRotation(calcCameraRotation(mDisplayOrientation) + (mFacing == CameraKit.Constants.FACING_FRONT ? 180 : 0));
 
             setAutoFocusInternal(mAutoFocus);
@@ -458,14 +458,14 @@ public class Camera1 extends CameraViewImpl {
         adjustCameraParameters();
         mCamera.setDisplayOrientation(calcCameraRotation(mDisplayOrientation));
 
-        getCameraListener().onCameraOpened();
+        mCameraListener.onCameraOpened();
     }
 
     private void releaseCamera() {
         if (mCamera != null) {
             mCamera.release();
             mCamera = null;
-            getCameraListener().onCameraClosed();
+            mCameraListener.onCameraClosed();
         }
     }
 

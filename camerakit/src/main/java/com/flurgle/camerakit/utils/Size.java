@@ -42,7 +42,6 @@ public class Size implements Comparable<Size> {
 
     @Override
     public int hashCode() {
-        // assuming most sizes are <2^16, doing a rotate will give us perfect hashing
         return mHeight ^ ((mWidth << (Integer.SIZE / 2)) | (mWidth >>> (Integer.SIZE / 2)));
     }
 

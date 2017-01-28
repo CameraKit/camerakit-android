@@ -2,16 +2,15 @@ package com.flurgle.camerakit;
 
 import android.view.View;
 
-import com.flurgle.camerakit.annotations.Facing;
-import com.flurgle.camerakit.annotations.Flash;
+import com.flurgle.camerakit.types.Facing;
+import com.flurgle.camerakit.types.Flash;
 
-public abstract class CameraViewImpl {
+public abstract class CameraImpl {
 
     protected CameraListener mCameraListener;
-
     protected final PreviewImpl mPreview;
 
-    CameraViewImpl(CameraListener callback, PreviewImpl preview) {
+    CameraImpl(CameraListener callback, PreviewImpl preview) {
         mCameraListener = callback;
         mPreview = preview;
     }
@@ -28,11 +27,7 @@ public abstract class CameraViewImpl {
 
     abstract void setFacing(@Facing int facing);
 
-    abstract int getFacing();
-
     abstract void setFlash(@Flash int flash);
-
-    abstract int getFlash();
 
     abstract void setAutoFocus(boolean autoFocus);
 
@@ -46,14 +41,8 @@ public abstract class CameraViewImpl {
 
     abstract void endVideo();
 
+    abstract void focus();
+
     abstract void setDisplayOrientation(int displayOrientation);
-
-    void setCameraListener(CameraListener cameraListener) {
-        this.mCameraListener = cameraListener;
-    }
-
-    protected CameraListener getCameraListener() {
-        return mCameraListener != null ? mCameraListener : new CameraListener() {};
-    }
 
 }

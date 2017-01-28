@@ -11,7 +11,6 @@ public abstract class DisplayOrientationDetector {
     private final OrientationEventListener mOrientationEventListener;
 
     static final SparseIntArray DISPLAY_ORIENTATIONS = new SparseIntArray();
-
     static {
         DISPLAY_ORIENTATIONS.put(Surface.ROTATION_0, 0);
         DISPLAY_ORIENTATIONS.put(Surface.ROTATION_90, 90);
@@ -30,23 +29,23 @@ public abstract class DisplayOrientationDetector {
 
             @Override
             public void onOrientationChanged(int orientation) {
-                if (orientation == OrientationEventListener.ORIENTATION_UNKNOWN ||
-                        mDisplay == null) {
+                if (orientation == OrientationEventListener.ORIENTATION_UNKNOWN || mDisplay == null) {
                     return;
                 }
+
                 final int rotation = mDisplay.getRotation();
                 if (mLastKnownRotation != rotation) {
                     mLastKnownRotation = rotation;
                     dispatchOnDisplayOrientationChanged(DISPLAY_ORIENTATIONS.get(rotation));
                 }
             }
+
         };
     }
 
     public void enable(Display display) {
         mDisplay = display;
         mOrientationEventListener.enable();
-        // Immediately dispatch the first callback
         dispatchOnDisplayOrientationChanged(DISPLAY_ORIENTATIONS.get(display.getRotation()));
     }
 

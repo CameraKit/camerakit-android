@@ -47,6 +47,22 @@ public abstract class PreviewImpl {
         return null;
     }
 
+    void setSize(int width, int height) {
+        mWidth = width;
+        mHeight = height;
+
+        // Refresh true preview size to adjust scaling
+        setTruePreviewSize(mTrueWidth, mTrueHeight);
+    }
+
+    int getWidth() {
+        return mWidth;
+    }
+
+    int getHeight() {
+        return mHeight;
+    }
+
     void setTruePreviewSize(int width, int height) {
         this.mTrueWidth = width;
         this.mTrueHeight = height;
@@ -67,20 +83,12 @@ public abstract class PreviewImpl {
         }
     }
 
-    void setSize(int width, int height) {
-        mWidth = width;
-        mHeight = height;
-
-        // Refresh true preview size to adjust scaling
-        setTruePreviewSize(mTrueWidth, mTrueHeight);
+    int getTrueWidth() {
+        return mTrueWidth;
     }
 
-    int getWidth() {
-        return mWidth;
-    }
-
-    int getHeight() {
-        return mHeight;
+    int getTrueHeight() {
+        return mTrueHeight;
     }
 
 }
