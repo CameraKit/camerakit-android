@@ -67,19 +67,21 @@ public abstract class PreviewImpl {
         this.mTrueWidth = width;
         this.mTrueHeight = height;
 
-        AspectRatio aspectRatio = AspectRatio.of(width, height);
-        int targetHeight = (int) (getView().getWidth() * aspectRatio.toFloat());
-        float scaleY;
-        if (getView().getHeight() > 0) {
-            scaleY = (float) targetHeight / (float) getView().getHeight();
-        } else {
-            scaleY = 1;
-        }
+        if (width != 0 && height != 0) {
+            AspectRatio aspectRatio = AspectRatio.of(width, height);
+            int targetHeight = (int) (getView().getWidth() * aspectRatio.toFloat());
+            float scaleY;
+            if (getView().getHeight() > 0) {
+                scaleY = (float) targetHeight / (float) getView().getHeight();
+            } else {
+                scaleY = 1;
+            }
 
-        if (scaleY > 1) {
-            getView().setScaleY(scaleY);
-        } else {
-            getView().setScaleX(1 / scaleY);
+            if (scaleY > 1) {
+                getView().setScaleY(scaleY);
+            } else {
+                getView().setScaleX(1 / scaleY);
+            }
         }
     }
 
