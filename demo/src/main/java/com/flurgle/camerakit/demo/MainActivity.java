@@ -8,9 +8,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,7 +24,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
-import butterknife.OnFocusChange;
 import butterknife.OnTextChanged;
 
 public class MainActivity extends AppCompatActivity {
@@ -35,11 +34,11 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.camera)
     CameraView camera;
 
-    @BindView(R.id.modeQuality)
-    CheckBox modeQuality;
+    @BindView(R.id.modeCaptureQuality)
+    RadioButton modeQuality;
 
-    @BindView(R.id.modeSpeed)
-    CheckBox modeSpeed;
+    @BindView(R.id.modeCaptureSpeed)
+    RadioButton modeSpeed;
 
     @BindView(R.id.screenWidth)
     TextView screenWidth;
@@ -48,20 +47,16 @@ public class MainActivity extends AppCompatActivity {
     EditText width;
 
     @BindView(R.id.widthWrapContent)
-    CheckBox widthWrapContent;
+    RadioButton widthWrapContent;
 
     @BindView(R.id.widthMatchParent)
-    CheckBox widthMatchParent;
+    RadioButton widthMatchParent;
 
     @BindView(R.id.screenHeight)
     TextView screenHeight;
 
     @BindView(R.id.height)
     EditText height;
-
-    int pictureMode = CameraKit.Constants.PICTURE_MODE_QUALITY;
-
-    boolean blockInvalidation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -160,29 +155,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @OnCheckedChanged(R.id.modeQuality)
-    void modeQuality(CompoundButton buttonCompat, boolean checked) {
-        modeSpeed.setChecked(false);
-        if (checked) {
-            camera.setPictureMode(CameraKit.Constants.PICTURE_MODE_QUALITY);
-        }
-
-        invalidateParameters();
-    }
-
-    @OnCheckedChanged(R.id.modeSpeed)
-    void modeSpeed(CompoundButton buttonCompat, boolean checked) {
-        modeQuality.setChecked(false);
-        if (checked) {
-            camera.setPictureMode(CameraKit.Constants.PICTURE_MODE_SPEED);
-        }
-
-        invalidateParameters();
-    }
-
-    @OnFocusChange({R.id.width, R.id.height})
-    void inputFocusChanged(View view, boolean f) {
-        blockInvalidation = view.isFocused();
+    @OnCheckedChanged({R.id.modeCaptureQuality, R.id.modeCaptureSpeed})
+    void pictureModeChanged(CompoundButton buttonCompat, boolean checked) {
+        camera.setPictureMode(
+                modeQuality.isChecked() ?
+                        CameraKit.Constants.PICTURE_MODE_QUALITY :
+                        CameraKit.Constants.PICTURE_MODE_SPEED
+        );
     }
 
     @OnTextChanged(value = R.id.width, callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
@@ -192,54 +171,25 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @OnCheckedChanged(R.id.widthWrapContent)
-    void widthWrapContent(CompoundButton buttonCompat, boolean checked) {
-        if (checked) {
-            ViewGroup.LayoutParams layoutParams = camera.getLayoutParams();
-            layoutParams.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-            camera.setLayoutParams(layoutParams);
+    @OnCheckedChanged({R.id.widthCustom, R.id.widthWrapContent, R.id.widthMatchParent})
+    void widthModeChanged(CompoundButton buttonCompat, boolean checked) {
 
-            widthMatchParent.setChecked(false);
-        }
-
-        invalidateParameters();
     }
 
-    @OnCheckedChanged(R.id.widthMatchParent)
-    void widthMatchParent(CompoundButton buttonCompat, boolean checked) {
-        if (checked) {
-            ViewGroup.LayoutParams layoutParams = camera.getLayoutParams();
-            layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
-            camera.setLayoutParams(layoutParams);
-
-            widthWrapContent.setChecked(false);
-        }
-
-        invalidateParameters();
-    }
-
-    @OnTextChanged(value = R.id.height, callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
+    @OnTextChanged(value = R.id.height)
     void heightChanged() {
         if (height.isFocused()) {
             new Handler().postDelayed(new UpdateCameraRunnable(height), 2000);
         }
     }
 
-    @OnCheckedChanged(R.id.heightWrapContent)
-    void heightWrapContent() {
-        invalidateParameters();
+    @OnCheckedChanged({R.id.heightCustom, R.id.heightWrapContent, R.id.heightMatchParent})
+    void heightModeChanged() {
+
     }
 
-    @OnCheckedChanged(R.id.heightMatchParent)
-    void heightMatchParent() {
-        invalidateParameters();
-    }
 
     private void invalidateParameters() {
-        if (blockInvalidation) return;
-
-        blockInvalidation = true;
-
         if (!widthMatchParent.isChecked() && !widthWrapContent.isChecked()) {
             width.setText(String.valueOf(camera.getWidth()));
             width.setHint("pixels");
@@ -252,8 +202,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         height.setText(String.valueOf(camera.getHeight()));
-
-        blockInvalidation = false;
     }
 
     private class UpdateCameraRunnable implements Runnable {

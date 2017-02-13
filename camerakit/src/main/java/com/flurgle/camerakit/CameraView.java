@@ -241,6 +241,11 @@ public class CameraView extends FrameLayout {
         this.mPictureMode = pictureMode;
     }
 
+    @PictureMode
+    public int getPictureMode() {
+        return mPictureMode;
+    }
+
     public void setCropOutput(boolean cropOutput) {
         this.mCropOutput = cropOutput;
     }

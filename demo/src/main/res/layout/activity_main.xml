@@ -3,14 +3,14 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white">
+    android:background="@android:color/white"
+    android:descendantFocusability="beforeDescendants"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:descendantFocusability="beforeDescendants"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
         android:orientation="vertical">
 
         <com.flurgle.camerakit.CameraView xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -21,7 +21,7 @@
             app:ckCropOutput="true"
             app:ckFacing="back"
             app:ckFlash="off"
-            app:ckPictureMode="speed"
+            app:ckPictureMode="quality"
             app:ckTapToFocus="visible" />
 
         <LinearLayout
@@ -109,27 +109,27 @@
                         android:textSize="14dp"
                         android:textStyle="bold" />
 
-                    <LinearLayout
+                    <RadioGroup
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
+                        android:checkedButton="@+id/modeCaptureQuality"
                         android:orientation="horizontal">
 
-                        <android.support.v7.widget.AppCompatCheckBox
-                            android:id="@+id/modeQuality"
+                        <RadioButton
+                            android:id="@+id/modeCaptureQuality"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:checked="true"
                             android:text="Quality" />
 
-                        <android.support.v7.widget.AppCompatCheckBox
-                            android:id="@+id/modeSpeed"
+                        <RadioButton
+                            android:id="@+id/modeCaptureSpeed"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="20dp"
                             android:text="Speed" />
 
-                    </LinearLayout>
+                    </RadioGroup>
 
                 </LinearLayout>
 
@@ -160,25 +160,27 @@
                         android:textSize="14dp"
                         android:textStyle="bold" />
 
-                    <LinearLayout
+                    <RadioGroup
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
+                        android:checkedButton="@+id/modeCropVisible"
                         android:orientation="horizontal">
 
-                        <android.support.v7.widget.AppCompatCheckBox
+                        <RadioButton
+                            android:id="@+id/modeCropVisible"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:checked="true"
                             android:text="Crop to visible" />
 
-                        <android.support.v7.widget.AppCompatCheckBox
+                        <RadioButton
+                            android:id="@+id/modeCropFullSize"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="20dp"
                             android:text="Full size" />
 
-                    </LinearLayout>
+                    </RadioGroup>
 
                 </LinearLayout>
 
@@ -198,6 +200,67 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="3dp"
+                        android:text="TAP TO FOCUS"
+                        android:textColor="@android:color/black"
+                        android:textSize="14dp"
+                        android:textStyle="bold" />
+
+                    <RadioGroup
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:checkedButton="@+id/modeTapToFocusVisible"
+                        android:orientation="horizontal">
+
+                        <RadioButton
+                            android:id="@+id/modeTapToFocusVisible"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Visible" />
+
+                        <RadioButton
+                            android:id="@+id/modeTapToFocusInvisible"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:text="Invisible" />
+
+                        <RadioButton
+                            android:id="@+id/modeTapToFocusOff"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:text="Off" />
+
+                    </RadioGroup>
+
+                </LinearLayout>
+
+            </FrameLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp">
+
+                <View
+                    android:layout_width="2.5dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/colorPrimary" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:descendantFocusability="beforeDescendants"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
                     android:orientation="vertical">
 
                     <TextView
@@ -218,34 +281,41 @@
                         android:textColor="@android:color/black"
                         android:textSize="11dp" />
 
-                    <EditText
+                    <com.flurgle.camerakit.demo.AutoUnFocusEditText
                         android:id="@+id/width"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="pixels"
                         android:inputType="number" />
 
-                    <LinearLayout
-                        android:layout_width="wrap_content"
+                    <RadioGroup
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="3dp"
-                        android:gravity="center"
+                        android:checkedButton="@+id/widthCustom"
                         android:orientation="horizontal">
 
-                        <android.support.v7.widget.AppCompatCheckBox
+                        <RadioButton
+                            android:id="@+id/widthCustom"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Custom" />
+
+                        <RadioButton
                             android:id="@+id/widthWrapContent"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
                             android:text="wrap_content" />
 
-                        <android.support.v7.widget.AppCompatCheckBox
+                        <RadioButton
                             android:id="@+id/widthMatchParent"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="16dp"
+                            android:layout_marginLeft="10dp"
                             android:text="match_parent" />
 
-                    </LinearLayout>
+                    </RadioGroup>
 
                 </LinearLayout>
 
@@ -265,6 +335,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
+                    android:descendantFocusability="beforeDescendants"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
                     android:orientation="vertical">
 
                     <TextView
@@ -285,34 +358,42 @@
                         android:textColor="@android:color/black"
                         android:textSize="11dp" />
 
-                    <EditText
+                    <com.flurgle.camerakit.demo.AutoUnFocusEditText
                         android:id="@+id/height"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="pixels"
                         android:inputType="number" />
 
-                    <LinearLayout
-                        android:layout_width="wrap_content"
+                    <RadioGroup
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="3dp"
-                        android:gravity="center"
+                        android:checkedButton="@+id/heightCustom"
                         android:orientation="horizontal">
 
-                        <android.support.v7.widget.AppCompatCheckBox
+                        <RadioButton
+                            android:id="@+id/heightCustom"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Custom" />
+
+                        <RadioButton
                             android:id="@+id/heightWrapContent"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
                             android:text="wrap_content" />
 
-                        <android.support.v7.widget.AppCompatCheckBox
+                        <RadioButton
                             android:id="@+id/heightMatchParent"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="16dp"
+                            android:layout_marginLeft="10dp"
                             android:text="match_parent" />
 
-                    </LinearLayout>
+                    </RadioGroup>
+
 
                 </LinearLayout>
 
