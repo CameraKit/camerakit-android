@@ -1,5 +1,7 @@
 package com.flurgle.camerakit;
 
+import android.graphics.YuvImage;
+
 import java.io.File;
 
 public abstract class CameraListener {
@@ -12,7 +14,11 @@ public abstract class CameraListener {
 
     }
 
-    public void onPictureTaken(byte[] picture) {
+    public void onPictureTaken(byte[] jpeg) {
+
+    }
+
+    public void onPictureTaken(YuvImage yuv) {
 
     }
 

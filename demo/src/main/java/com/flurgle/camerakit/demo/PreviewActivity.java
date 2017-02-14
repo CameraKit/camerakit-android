@@ -1,11 +1,10 @@
 package com.flurgle.camerakit.demo;
 
-import android.app.Dialog;
-import android.content.Context;
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.VideoView;
@@ -15,32 +14,24 @@ import java.io.File;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class PreviewDialog extends Dialog {
+import static com.flurgle.camerakit.demo.R.id.video;
+
+public class PreviewActivity extends Activity {
 
     @BindView(R.id.image)
     ImageView imageView;
 
-    @BindView(R.id.video)
+    @BindView(video)
     VideoView videoView;
 
-    private Bitmap bitmap;
-    private File video;
-
-    public PreviewDialog(@NonNull Context context, Bitmap bitmap) {
-        super(context);
-        this.bitmap = bitmap;
-    }
-
-    public PreviewDialog(@NonNull Context context, File video) {
-        super(context);
-        this.video = video;
-    }
-
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.dialog_preview);
+        setContentView(R.layout.activity_preview);
         ButterKnife.bind(this);
+
+        Bitmap bitmap = MediaHolder.getImage();
+        File video = MediaHolder.getVideo();
 
         if (bitmap != null) {
             imageView.setImageBitmap(bitmap);

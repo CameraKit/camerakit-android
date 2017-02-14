@@ -19,6 +19,10 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".PreviewActivity"
+            android:screenOrientation="portrait" />
+
     </application>
 
 </manifest>

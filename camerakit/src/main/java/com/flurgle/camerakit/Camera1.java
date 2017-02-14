@@ -1,6 +1,5 @@
 package com.flurgle.camerakit;
 
-import android.graphics.Rect;
 import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
@@ -10,12 +9,13 @@ import android.support.annotation.NonNull;
 import android.support.v4.util.SparseArrayCompat;
 import android.view.SurfaceHolder;
 
+import com.flurgle.camerakit.utils.AspectRatio;
 import com.flurgle.camerakit.utils.Size;
 import com.flurgle.camerakit.utils.YuvUtils;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -27,6 +27,12 @@ public class Camera1 extends CameraImpl {
         FLASH_MODES.put(CameraKit.Constants.FLASH_OFF, Camera.Parameters.FLASH_MODE_OFF);
         FLASH_MODES.put(CameraKit.Constants.FLASH_ON, Camera.Parameters.FLASH_MODE_ON);
         FLASH_MODES.put(CameraKit.Constants.FLASH_AUTO, Camera.Parameters.FLASH_MODE_AUTO);
+    }
+
+    private static final SparseArrayCompat<Integer> FACING_MODES = new SparseArrayCompat<>();
+    static {
+        FACING_MODES.put(CameraKit.Constants.FACING_BACK, Camera.CameraInfo.CAMERA_FACING_BACK);
+        FACING_MODES.put(CameraKit.Constants.FACING_FRONT, Camera.CameraInfo.CAMERA_FACING_FRONT);
     }
 
     private File mVideoFile;
@@ -42,8 +48,8 @@ public class Camera1 extends CameraImpl {
     private int mFlash;
     private int mDisplayOrientation;
 
-    private SortedSet<Size> mPreviewSizes;
-    private SortedSet<Size> mCaptureSizes;
+    private TreeSet<Size> mPreviewSizes;
+    private TreeSet<Size> mCaptureSizes;
 
     private MediaRecorder mMediaRecorder;
 
@@ -105,9 +111,14 @@ public class Camera1 extends CameraImpl {
     }
 
     private boolean setFacingInternal(int facing) {
+        int trueValue = FACING_MODES.get(facing, -1);
+        if (trueValue == -1) {
+            return false;
+        }
+
         for (int i = 0, count = Camera.getNumberOfCameras(); i < count; i++) {
             Camera.getCameraInfo(i, mCameraInfo);
-            if (mCameraInfo.facing == facing) {
+            if (mCameraInfo.facing == trueValue) {
                 mCameraId = i;
                 mFacing = facing;
                 return true;
@@ -224,11 +235,11 @@ public class Camera1 extends CameraImpl {
             public void onPreviewFrame(byte[] data, Camera camera) {
                 new Thread(new ProcessStillTask(data, camera, mCameraInfo, new ProcessStillTask.OnStillProcessedListener() {
                     @Override
-                    public void onStillProcessed(final byte[] data) {
+                    public void onStillProcessed(final YuvImage yuv) {
                         getView().post(new Runnable() {
                             @Override
                             public void run() {
-                                mCameraListener.onPictureTaken(data);
+                                mCameraListener.onPictureTaken(yuv);
                             }
                         });
                     }
@@ -279,14 +290,11 @@ public class Camera1 extends CameraImpl {
 
             YuvImage yuv = new YuvImage(rotatedData, parameters.getPreviewFormat(), postWidth, postHeight, null);
 
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            yuv.compressToJpeg(new Rect(0, 0, postWidth, postHeight), 50, out);
-
-            onStillProcessedListener.onStillProcessed(out.toByteArray());
+            onStillProcessedListener.onStillProcessed(yuv);
         }
 
         interface OnStillProcessedListener {
-            void onStillProcessed(byte[] data);
+            void onStillProcessed(YuvImage yuv);
         }
 
     }
@@ -390,20 +398,31 @@ public class Camera1 extends CameraImpl {
         Size previewSize = chooseOptimalSize(sizes);
         final Camera.Size currentSize = mCameraParameters.getPictureSize();
         if (currentSize.width != previewSize.getWidth() || currentSize.height != previewSize.getHeight()) {
-            final Size pictureSize = mCaptureSizes.last();
+            Iterator<Size> iterator = mCaptureSizes.descendingIterator();
+            Size pictureSize;
+            while ((pictureSize = iterator.next()) != null) {
+                if (AspectRatio.of(previewSize.getWidth(), previewSize.getHeight()).matches(pictureSize)) {
+                    break;
+                }
+            }
+
+            if (pictureSize == null) {
+                pictureSize = mCaptureSizes.last();
+            }
+
             if (mShowingPreview) {
                 mCamera.stopPreview();
             }
 
             mCameraParameters.setPreviewSize(previewSize.getWidth(), previewSize.getHeight());
             mPreview.setTruePreviewSize(previewSize.getWidth(), previewSize.getHeight());
-
             mCameraParameters.setPictureSize(pictureSize.getWidth(), pictureSize.getHeight());
-
             mCameraParameters.setRotation(calcCameraRotation(mDisplayOrientation) + (mFacing == CameraKit.Constants.FACING_FRONT ? 180 : 0));
 
             setAutoFocusInternal(mAutoFocus);
-            setFlashInternal(mFlash);
+
+            //setFlashInternal(mFlash);
+
             mCamera.setParameters(mCameraParameters);
             if (mShowingPreview) {
                 mCamera.startPreview();

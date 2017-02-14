@@ -8,4 +8,8 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="Theme.PreviewActivity" parent="Theme.AppCompat.NoActionBar">
+
+    </style>
+
 </resources>

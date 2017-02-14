@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
+import android.graphics.Rect;
+import android.graphics.YuvImage;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -26,8 +28,11 @@ import com.flurgle.camerakit.types.Facing;
 import com.flurgle.camerakit.types.Flash;
 import com.flurgle.camerakit.types.PictureMode;
 import com.flurgle.camerakit.types.TapToFocus;
+import com.flurgle.camerakit.utils.AspectRatio;
+import com.flurgle.camerakit.utils.CenterCrop;
 import com.flurgle.camerakit.utils.DisplayOrientationDetector;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 
 import static com.flurgle.camerakit.CameraKit.Constants.FACING_BACK;
@@ -371,7 +376,7 @@ public class CameraView extends FrameLayout {
 
     }
 
-    private static class CameraListenerMiddleWare extends CameraListener {
+    private class CameraListenerMiddleWare extends CameraListener {
 
         private CameraListener mCameraListener;
 
@@ -388,9 +393,27 @@ public class CameraView extends FrameLayout {
         }
 
         @Override
-        public void onPictureTaken(byte[] picture) {
-            super.onPictureTaken(picture);
-            getCameraListener().onPictureTaken(picture);
+        public void onPictureTaken(byte[] jpeg) {
+            super.onPictureTaken(jpeg);
+            if (mCropOutput) {
+                AspectRatio outputRatio = AspectRatio.of(getWidth(), getHeight());
+                getCameraListener().onPictureTaken(new CenterCrop(jpeg, outputRatio).getJpeg());
+            } else {
+                getCameraListener().onPictureTaken(jpeg);
+            }
+        }
+
+        @Override
+        public void onPictureTaken(YuvImage yuv) {
+            super.onPictureTaken(yuv);
+            if (mCropOutput) {
+                AspectRatio outputRatio = AspectRatio.of(getWidth(), getHeight());
+                getCameraListener().onPictureTaken(new CenterCrop(yuv, outputRatio).getJpeg());
+            } else {
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                yuv.compressToJpeg(new Rect(0, 0, yuv.getWidth(), yuv.getHeight()), 50, out);
+                getCameraListener().onPictureTaken(out.toByteArray());
+            }
         }
 
         @Override

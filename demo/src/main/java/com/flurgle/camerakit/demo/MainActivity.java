@@ -1,16 +1,18 @@
 package com.flurgle.camerakit.demo;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,6 +28,8 @@ import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
 
+import static com.flurgle.camerakit.demo.R.id.widthCustom;
+
 public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.activity_main)
@@ -34,29 +38,37 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.camera)
     CameraView camera;
 
+    // Capture Mode:
+
     @BindView(R.id.modeCaptureQuality)
     RadioButton modeQuality;
-
     @BindView(R.id.modeCaptureSpeed)
     RadioButton modeSpeed;
 
+    // Width:
+
     @BindView(R.id.screenWidth)
     TextView screenWidth;
-
     @BindView(R.id.width)
     EditText width;
+    @BindView(R.id.widthUpdate)
+    Button widthUpdate;
+    @BindView(R.id.widthRadioGroup)
+    RadioGroup widthRadioGroup;
 
-    @BindView(R.id.widthWrapContent)
-    RadioButton widthWrapContent;
-
-    @BindView(R.id.widthMatchParent)
-    RadioButton widthMatchParent;
+    // Height:
 
     @BindView(R.id.screenHeight)
     TextView screenHeight;
-
     @BindView(R.id.height)
     EditText height;
+    @BindView(R.id.heightUpdate)
+    Button heightUpdate;
+    @BindView(R.id.heightRadioGroup)
+    RadioGroup heightRadioGroup;
+
+    private int mCameraWidth;
+    private int mCameraHeight;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +87,13 @@ public class MainActivity extends AppCompatActivity {
         camera.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
             @Override
             public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                invalidateParameters();
+                mCameraWidth = right - left;
+                mCameraHeight = bottom - top;
+
+                width.setText(String.valueOf(mCameraWidth));
+                height.setText(String.valueOf(mCameraHeight));
+
+                camera.removeOnLayoutChangeListener(this);
             }
         });
     }
@@ -96,10 +114,13 @@ public class MainActivity extends AppCompatActivity {
     void capturePhoto() {
         camera.setCameraListener(new CameraListener() {
             @Override
-            public void onPictureTaken(byte[] picture) {
-                super.onPictureTaken(picture);
-                Bitmap bitmap = BitmapFactory.decodeByteArray(picture, 0, picture.length);
-                new PreviewDialog(MainActivity.this, bitmap).show();
+            public void onPictureTaken(byte[] jpeg) {
+                super.onPictureTaken(jpeg);
+                Bitmap bitmap = BitmapFactory.decodeByteArray(jpeg, 0, jpeg.length);
+                MediaHolder.dispose();
+                MediaHolder.setImage(bitmap);
+                Intent intent = new Intent(MainActivity.this, PreviewActivity.class);
+                startActivity(intent);
             }
         });
         camera.capturePicture();
@@ -111,8 +132,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onVideoTaken(File video) {
                 super.onVideoTaken(video);
-                PreviewDialog previewDialog = new PreviewDialog(MainActivity.this, video);
-                previewDialog.show();
+                MediaHolder.dispose();
+                MediaHolder.setVideo(video);
+                Intent intent = new Intent(MainActivity.this, PreviewActivity.class);
+                startActivity(intent);
             }
         });
 
@@ -166,20 +189,38 @@ public class MainActivity extends AppCompatActivity {
 
     @OnTextChanged(value = R.id.width, callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
     void widthChanged() {
-        if (width.isFocused()) {
-            new Handler().postDelayed(new UpdateCameraRunnable(width), 2000);
+        if (String.valueOf(mCameraWidth).equals(width.getText().toString())) {
+            widthUpdate.setAlpha(.2f);
+        } else {
+            widthUpdate.setAlpha(1f);
         }
     }
 
-    @OnCheckedChanged({R.id.widthCustom, R.id.widthWrapContent, R.id.widthMatchParent})
+    @OnClick(R.id.widthUpdate)
+    void widthUpdateClicked() {
+        if (widthUpdate.getAlpha() >= 1) {
+            updateCamera(true, false);
+        }
+    }
+
+    @OnCheckedChanged({widthCustom, R.id.widthWrapContent, R.id.widthMatchParent})
     void widthModeChanged(CompoundButton buttonCompat, boolean checked) {
 
     }
 
     @OnTextChanged(value = R.id.height)
     void heightChanged() {
-        if (height.isFocused()) {
-            new Handler().postDelayed(new UpdateCameraRunnable(height), 2000);
+        if (String.valueOf(mCameraHeight).equals(height.getText().toString())) {
+            heightUpdate.setAlpha(.2f);
+        } else {
+            heightUpdate.setAlpha(1f);
+        }
+    }
+
+    @OnClick(R.id.heightUpdate)
+    void heightUpdateClicked() {
+        if (heightUpdate.getAlpha() >= 1) {
+            updateCamera(false, true);
         }
     }
 
@@ -188,50 +229,72 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void updateCamera(boolean updateWidth, boolean updateHeight) {
+        ViewGroup.LayoutParams cameraLayoutParams = camera.getLayoutParams();
+        int width = cameraLayoutParams.width;
+        int height = cameraLayoutParams.height;
 
-    private void invalidateParameters() {
-        if (!widthMatchParent.isChecked() && !widthWrapContent.isChecked()) {
-            width.setText(String.valueOf(camera.getWidth()));
-            width.setHint("pixels");
-        } else if (widthMatchParent.isChecked()) {
-            width.setHint("match_parent");
-            width.setText("");
-        } else if (widthWrapContent.isChecked()) {
-            width.setHint("wrap_content");
-            width.setText("");
-        }
+        if (updateWidth) {
+            switch (widthRadioGroup.getCheckedRadioButtonId()) {
+                case R.id.widthCustom:
+                    String widthInput = this.width.getText().toString();
+                    if (widthInput.length() > 0) {
+                        try {
+                            width = Integer.valueOf(widthInput);
+                        } catch (Exception e) {
 
-        height.setText(String.valueOf(camera.getHeight()));
-    }
+                        }
+                    }
 
-    private class UpdateCameraRunnable implements Runnable {
+                    break;
 
-        private EditText editText;
-        private String startText;
+                case R.id.widthWrapContent:
+                    width = ViewGroup.LayoutParams.WRAP_CONTENT;
+                    break;
 
-        public UpdateCameraRunnable(EditText editText) {
-            this.startText = editText.getText().toString();
-        }
-
-        @Override
-        public void run() {
-            if (startText.equals(editText.getText().toString())) {
-                ViewGroup.LayoutParams layoutParams = camera.getLayoutParams();
-                switch (editText.getId()) {
-                    case R.id.width:
-                        layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
-                        break;
-
-                    case R.id.height:
-                        layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT;
-                        break;
-                }
-
-                camera.setLayoutParams(layoutParams);
-
+                case R.id.widthMatchParent:
+                    width = ViewGroup.LayoutParams.MATCH_PARENT;
+                    break;
             }
         }
 
+        if (updateHeight) {
+            switch (heightRadioGroup.getCheckedRadioButtonId()) {
+                case R.id.heightCustom:
+                    String heightInput = this.height.getText().toString();
+                    if (heightInput.length() > 0) {
+                        try {
+                            height = Integer.valueOf(heightInput);
+                        } catch (Exception e) {
+
+                        }
+                    }
+                    break;
+
+                case R.id.heightWrapContent:
+                    height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                    break;
+
+                case R.id.heightMatchParent:
+                    height = parent.getHeight();
+                    break;
+            }
+        }
+
+        cameraLayoutParams.width = width;
+        cameraLayoutParams.height = height;
+
+        camera.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                mCameraWidth = right - left;
+                mCameraHeight = bottom - top;
+                camera.removeOnLayoutChangeListener(this);
+                widthChanged();
+                heightChanged();
+            }
+        });
+        camera.setLayoutParams(cameraLayoutParams);
     }
 
 }

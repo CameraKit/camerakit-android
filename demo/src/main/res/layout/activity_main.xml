@@ -126,7 +126,7 @@
                             android:id="@+id/modeCaptureSpeed"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="20dp"
+                            android:layout_marginLeft="10dp"
                             android:text="Speed" />
 
                     </RadioGroup>
@@ -177,7 +177,7 @@
                             android:id="@+id/modeCropFullSize"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="20dp"
+                            android:layout_marginLeft="10dp"
                             android:text="Full size" />
 
                     </RadioGroup>
@@ -281,14 +281,35 @@
                         android:textColor="@android:color/black"
                         android:textSize="11dp" />
 
-                    <com.flurgle.camerakit.demo.AutoUnFocusEditText
-                        android:id="@+id/width"
+                    <FrameLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="pixels"
-                        android:inputType="number" />
+                        android:layout_height="wrap_content">
+
+                        <com.flurgle.camerakit.demo.AutoUnFocusEditText
+                            android:id="@+id/width"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="120dp"
+                            android:hint="pixels"
+                            android:inputType="number" />
+
+                        <Button
+                            android:id="@+id/widthUpdate"
+                            android:layout_width="90dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical|right"
+                            android:layout_marginRight="15dp"
+                            android:backgroundTint="@color/colorPrimary"
+                            android:gravity="center"
+                            android:text="UPDATE"
+                            android:textColor="@android:color/white"
+                            android:textSize="14dp"
+                            android:textStyle="bold" />
+
+                    </FrameLayout>
 
                     <RadioGroup
+                        android:id="@+id/widthRadioGroup"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="3dp"
@@ -358,14 +379,35 @@
                         android:textColor="@android:color/black"
                         android:textSize="11dp" />
 
-                    <com.flurgle.camerakit.demo.AutoUnFocusEditText
-                        android:id="@+id/height"
+                    <FrameLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="pixels"
-                        android:inputType="number" />
+                        android:layout_height="wrap_content">
+
+                        <com.flurgle.camerakit.demo.AutoUnFocusEditText
+                            android:id="@+id/height"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="120dp"
+                            android:hint="pixels"
+                            android:inputType="number" />
+
+                        <Button
+                            android:id="@+id/heightUpdate"
+                            android:layout_width="90dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical|right"
+                            android:layout_marginRight="15dp"
+                            android:backgroundTint="@color/colorPrimary"
+                            android:gravity="center"
+                            android:text="UPDATE"
+                            android:textColor="@android:color/white"
+                            android:textSize="14dp"
+                            android:textStyle="bold" />
+
+                    </FrameLayout>
 
                     <RadioGroup
+                        android:id="@+id/heightRadioGroup"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="3dp"
@@ -393,7 +435,6 @@
                             android:text="match_parent" />
 
                     </RadioGroup>
-
 
                 </LinearLayout>
 

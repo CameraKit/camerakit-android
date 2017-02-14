@@ -27,6 +27,7 @@ public class AutoUnFocusEditText extends EditText {
             clearFocus();
             return true;
         }
+
         return super.dispatchKeyEvent(event);
     }
 
