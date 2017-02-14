@@ -43,6 +43,11 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.cropModeRadioGroup)
     RadioGroup cropModeRadioGroup;
 
+    // Tap to Focus:
+
+    @BindView(R.id.tapToFocusModeRadioGroup)
+    RadioGroup tapToFocusModeRadioGroup;
+
     // Width:
 
     @BindView(R.id.screenWidth)
@@ -97,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
 
         captureModeRadioGroup.setOnCheckedChangeListener(captureModeChangedListener);
         cropModeRadioGroup.setOnCheckedChangeListener(cropModeChangedListener);
+        tapToFocusModeRadioGroup.setOnCheckedChangeListener(tapToFocusModeChangedListener);
     }
 
     @Override
@@ -195,6 +201,19 @@ public class MainActivity extends AppCompatActivity {
         public void onCheckedChanged(RadioGroup group, int checkedId) {
             camera.setCropOutput(
                     checkedId == R.id.modeCropVisible
+            );
+        }
+    };
+
+    RadioGroup.OnCheckedChangeListener tapToFocusModeChangedListener = new RadioGroup.OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(RadioGroup group, int checkedId) {
+            camera.setTapToFocus(
+                    checkedId == R.id.modeTapToFocusVisible ?
+                            CameraKit.Constants.TAP_TO_FOCUS_VISIBLE :
+                            checkedId == R.id.modeTapToFocusInvisible ?
+                                    CameraKit.Constants.TAP_TO_FOCUS_INVISIBLE :
+                                    CameraKit.Constants.TAP_TO_FOCUS_OFF
             );
         }
     };
