@@ -110,6 +110,7 @@
                         android:textStyle="bold" />
 
                     <RadioGroup
+                        android:id="@+id/captureModeRadioGroup"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
@@ -161,6 +162,7 @@
                         android:textStyle="bold" />
 
                     <RadioGroup
+                        android:id="@+id/cropModeRadioGroup"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
@@ -309,7 +311,7 @@
                     </FrameLayout>
 
                     <RadioGroup
-                        android:id="@+id/widthRadioGroup"
+                        android:id="@+id/widthModeRadioGroup"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="3dp"
@@ -407,7 +409,7 @@
                     </FrameLayout>
 
                     <RadioGroup
-                        android:id="@+id/heightRadioGroup"
+                        android:id="@+id/heightModeRadioGroup"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="3dp"

@@ -9,9 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,11 +22,8 @@ import java.io.File;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
-
-import static com.flurgle.camerakit.demo.R.id.widthCustom;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -40,10 +35,13 @@ public class MainActivity extends AppCompatActivity {
 
     // Capture Mode:
 
-    @BindView(R.id.modeCaptureQuality)
-    RadioButton modeQuality;
-    @BindView(R.id.modeCaptureSpeed)
-    RadioButton modeSpeed;
+    @BindView(R.id.captureModeRadioGroup)
+    RadioGroup captureModeRadioGroup;
+
+    // Crop Mode:
+
+    @BindView(R.id.cropModeRadioGroup)
+    RadioGroup cropModeRadioGroup;
 
     // Width:
 
@@ -53,8 +51,8 @@ public class MainActivity extends AppCompatActivity {
     EditText width;
     @BindView(R.id.widthUpdate)
     Button widthUpdate;
-    @BindView(R.id.widthRadioGroup)
-    RadioGroup widthRadioGroup;
+    @BindView(R.id.widthModeRadioGroup)
+    RadioGroup widthModeRadioGroup;
 
     // Height:
 
@@ -64,8 +62,8 @@ public class MainActivity extends AppCompatActivity {
     EditText height;
     @BindView(R.id.heightUpdate)
     Button heightUpdate;
-    @BindView(R.id.heightRadioGroup)
-    RadioGroup heightRadioGroup;
+    @BindView(R.id.heightModeRadioGroup)
+    RadioGroup heightModeRadioGroup;
 
     private int mCameraWidth;
     private int mCameraHeight;
@@ -96,6 +94,9 @@ public class MainActivity extends AppCompatActivity {
                 camera.removeOnLayoutChangeListener(this);
             }
         });
+
+        captureModeRadioGroup.setOnCheckedChangeListener(captureModeChangedListener);
+        cropModeRadioGroup.setOnCheckedChangeListener(cropModeChangedListener);
     }
 
     @Override
@@ -178,14 +179,25 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @OnCheckedChanged({R.id.modeCaptureQuality, R.id.modeCaptureSpeed})
-    void pictureModeChanged(CompoundButton buttonCompat, boolean checked) {
-        camera.setPictureMode(
-                modeQuality.isChecked() ?
-                        CameraKit.Constants.PICTURE_MODE_QUALITY :
-                        CameraKit.Constants.PICTURE_MODE_SPEED
-        );
-    }
+    RadioGroup.OnCheckedChangeListener captureModeChangedListener = new RadioGroup.OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(RadioGroup group, int checkedId) {
+            camera.setPictureMode(
+                    checkedId == R.id.modeCaptureQuality ?
+                            CameraKit.Constants.PICTURE_MODE_QUALITY :
+                            CameraKit.Constants.PICTURE_MODE_SPEED
+            );
+        }
+    };
+
+    RadioGroup.OnCheckedChangeListener cropModeChangedListener = new RadioGroup.OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(RadioGroup group, int checkedId) {
+            camera.setCropOutput(
+                    checkedId == R.id.modeCropVisible
+            );
+        }
+    };
 
     @OnTextChanged(value = R.id.width, callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
     void widthChanged() {
@@ -201,11 +213,6 @@ public class MainActivity extends AppCompatActivity {
         if (widthUpdate.getAlpha() >= 1) {
             updateCamera(true, false);
         }
-    }
-
-    @OnCheckedChanged({widthCustom, R.id.widthWrapContent, R.id.widthMatchParent})
-    void widthModeChanged(CompoundButton buttonCompat, boolean checked) {
-
     }
 
     @OnTextChanged(value = R.id.height)
@@ -224,18 +231,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @OnCheckedChanged({R.id.heightCustom, R.id.heightWrapContent, R.id.heightMatchParent})
-    void heightModeChanged() {
-
-    }
-
     private void updateCamera(boolean updateWidth, boolean updateHeight) {
         ViewGroup.LayoutParams cameraLayoutParams = camera.getLayoutParams();
         int width = cameraLayoutParams.width;
         int height = cameraLayoutParams.height;
 
         if (updateWidth) {
-            switch (widthRadioGroup.getCheckedRadioButtonId()) {
+            switch (widthModeRadioGroup.getCheckedRadioButtonId()) {
                 case R.id.widthCustom:
                     String widthInput = this.width.getText().toString();
                     if (widthInput.length() > 0) {
@@ -259,7 +261,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (updateHeight) {
-            switch (heightRadioGroup.getCheckedRadioButtonId()) {
+            switch (heightModeRadioGroup.getCheckedRadioButtonId()) {
                 case R.id.heightCustom:
                     String heightInput = this.height.getText().toString();
                     if (heightInput.length() > 0) {
