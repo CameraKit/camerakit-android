@@ -103,6 +103,8 @@ public class MainActivity extends AppCompatActivity {
         captureModeRadioGroup.setOnCheckedChangeListener(captureModeChangedListener);
         cropModeRadioGroup.setOnCheckedChangeListener(cropModeChangedListener);
         tapToFocusModeRadioGroup.setOnCheckedChangeListener(tapToFocusModeChangedListener);
+        widthModeRadioGroup.setOnCheckedChangeListener(widthModeChangedListener);
+        heightModeRadioGroup.setOnCheckedChangeListener(heightModeChangedListener);
     }
 
     @Override
@@ -220,11 +222,7 @@ public class MainActivity extends AppCompatActivity {
 
     @OnTextChanged(value = R.id.width, callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
     void widthChanged() {
-        if (String.valueOf(mCameraWidth).equals(width.getText().toString())) {
-            widthUpdate.setAlpha(.2f);
-        } else {
-            widthUpdate.setAlpha(1f);
-        }
+
     }
 
     @OnClick(R.id.widthUpdate)
@@ -234,13 +232,20 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    RadioGroup.OnCheckedChangeListener widthModeChangedListener = new RadioGroup.OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(RadioGroup group, int checkedId) {
+            widthUpdate.setEnabled(checkedId == R.id.widthCustom);
+            widthUpdate.setAlpha(checkedId == R.id.widthCustom ? 1f : 0.3f);
+            width.clearFocus();
+            width.setEnabled(checkedId == R.id.widthCustom);
+            width.setAlpha(checkedId == R.id.widthCustom ? 1f : 0.5f);
+        }
+    };
+
     @OnTextChanged(value = R.id.height)
     void heightChanged() {
-        if (String.valueOf(mCameraHeight).equals(height.getText().toString())) {
-            heightUpdate.setAlpha(.2f);
-        } else {
-            heightUpdate.setAlpha(1f);
-        }
+
     }
 
     @OnClick(R.id.heightUpdate)
@@ -249,6 +254,17 @@ public class MainActivity extends AppCompatActivity {
             updateCamera(false, true);
         }
     }
+
+    RadioGroup.OnCheckedChangeListener heightModeChangedListener = new RadioGroup.OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(RadioGroup group, int checkedId) {
+            heightUpdate.setEnabled(checkedId == R.id.heightCustom);
+            heightUpdate.setAlpha(checkedId == R.id.heightCustom ? 1f : 0.3f);
+            height.clearFocus();
+            height.setEnabled(checkedId == R.id.heightCustom);
+            height.setAlpha(checkedId == R.id.heightCustom ? 1f : 0.5f);
+        }
+    };
 
     private void updateCamera(boolean updateWidth, boolean updateHeight) {
         ViewGroup.LayoutParams cameraLayoutParams = camera.getLayoutParams();

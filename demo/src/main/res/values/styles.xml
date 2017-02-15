@@ -8,6 +8,10 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="Theme.MainActivity" parent="AppTheme">
+        <item name="android:windowBackground">@drawable/launch_bg</item>
+    </style>
+
     <style name="Theme.PreviewActivity" parent="Theme.AppCompat.NoActionBar">
 
     </style>

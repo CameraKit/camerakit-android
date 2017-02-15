@@ -27,10 +27,6 @@ public class CenterCrop {
         this.croppedJpeg = out.toByteArray();
     }
 
-    public byte[] getJpeg() {
-        return croppedJpeg;
-    }
-
     private static Rect getCrop(int currentWidth, int currentHeight, AspectRatio targetRatio) {
         AspectRatio currentRatio = AspectRatio.of(currentWidth, currentHeight);
 
@@ -46,6 +42,10 @@ public class CenterCrop {
         }
 
         return crop;
+    }
+
+    public byte[] getJpeg() {
+        return croppedJpeg;
     }
 
 }
