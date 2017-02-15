@@ -95,8 +95,6 @@ public class MainActivity extends AppCompatActivity {
 
                 width.setText(String.valueOf(mCameraWidth));
                 height.setText(String.valueOf(mCameraHeight));
-
-                camera.removeOnLayoutChangeListener(this);
             }
         });
 
@@ -195,6 +193,8 @@ public class MainActivity extends AppCompatActivity {
                             CameraKit.Constants.PICTURE_MODE_QUALITY :
                             CameraKit.Constants.PICTURE_MODE_SPEED
             );
+
+            Toast.makeText(MainActivity.this, "Picture capture set to" + (checkedId == R.id.modeCaptureQuality ? " quality!" : " speed!"), Toast.LENGTH_SHORT).show();
         }
     };
 
@@ -204,6 +204,8 @@ public class MainActivity extends AppCompatActivity {
             camera.setCropOutput(
                     checkedId == R.id.modeCropVisible
             );
+
+            Toast.makeText(MainActivity.this, "Picture cropping is" + (checkedId == R.id.modeCropVisible ? " on!" : " off!"), Toast.LENGTH_SHORT).show();
         }
     };
 
@@ -217,6 +219,8 @@ public class MainActivity extends AppCompatActivity {
                                     CameraKit.Constants.TAP_TO_FOCUS_INVISIBLE :
                                     CameraKit.Constants.TAP_TO_FOCUS_OFF
             );
+
+            Toast.makeText(MainActivity.this, "Tap to focus is" + (checkedId == R.id.modeTapToFocusOff ? " off!" : (checkedId == R.id.modeTapToFocusVisible) ? " on and visible!" : " on and invisible!"), Toast.LENGTH_SHORT).show();
         }
     };
 
@@ -240,6 +244,8 @@ public class MainActivity extends AppCompatActivity {
             width.clearFocus();
             width.setEnabled(checkedId == R.id.widthCustom);
             width.setAlpha(checkedId == R.id.widthCustom ? 1f : 0.5f);
+
+            updateCamera(true, false);
         }
     };
 
@@ -263,6 +269,8 @@ public class MainActivity extends AppCompatActivity {
             height.clearFocus();
             height.setEnabled(checkedId == R.id.heightCustom);
             height.setAlpha(checkedId == R.id.heightCustom ? 1f : 0.5f);
+
+            updateCamera(false, true);
         }
     };
 
@@ -332,6 +340,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         camera.setLayoutParams(cameraLayoutParams);
+
+        Toast.makeText(this, (updateWidth && updateHeight ? "Width and height" : updateWidth ? "Width" : "Height") + " updated!", Toast.LENGTH_SHORT).show();
     }
 
 }
