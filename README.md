@@ -1,4 +1,4 @@
-![CameraKit Header](.repo/camerakit-android-header.png)
+<img alt='CameraKit Header' src='.repo/camerakit-android-header.png' height='125'/>
 
 #####Originally a fork of [Google's CameraView library](https://github.com/google/cameraview).
 
