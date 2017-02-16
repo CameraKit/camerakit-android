@@ -18,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="500dp"
             android:layout_gravity="center_horizontal"
-            app:ckCropOutput="true"
+            app:ckCropOutput="false"
             app:ckFacing="back"
             app:ckFlash="off"
             app:ckPictureMode="quality"
@@ -34,7 +34,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:weightSum="4">
+                android:weightSum="3">
 
                 <ImageButton
                     android:id="@+id/capturePhoto"
@@ -54,7 +54,8 @@
                     android:layout_weight="1"
                     android:backgroundTint="@color/colorPrimary"
                     android:src="@drawable/ic_video"
-                    android:tint="@android:color/white" />
+                    android:tint="@android:color/white"
+                    android:visibility="gone" />
 
                 <ImageButton
                     android:id="@+id/toggleFlash"
@@ -166,21 +167,21 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:checkedButton="@+id/modeCropVisible"
+                        android:checkedButton="@+id/modeCropFullSize"
                         android:orientation="horizontal">
-
-                        <RadioButton
-                            android:id="@+id/modeCropVisible"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Crop to visible" />
 
                         <RadioButton
                             android:id="@+id/modeCropFullSize"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="10dp"
                             android:text="Full size" />
+
+                        <RadioButton
+                            android:id="@+id/modeCropVisible"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:text="Crop to visible" />
 
                     </RadioGroup>
 

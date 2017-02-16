@@ -405,6 +405,8 @@ public class CameraView extends FrameLayout {
         public void onPictureTaken(byte[] jpeg) {
             super.onPictureTaken(jpeg);
             if (mCropOutput) {
+                int width = mPictureMode == PICTURE_MODE_QUALITY ? mCameraImpl.getCaptureSize().getWidth() : mCameraImpl.getPreviewSize().getWidth();
+                int height = mPictureMode == PICTURE_MODE_QUALITY ? mCameraImpl.getCaptureSize().getHeight() : mCameraImpl.getPreviewSize().getHeight();
                 AspectRatio outputRatio = AspectRatio.of(getWidth(), getHeight());
                 getCameraListener().onPictureTaken(new CenterCrop(jpeg, outputRatio).getJpeg());
             } else {

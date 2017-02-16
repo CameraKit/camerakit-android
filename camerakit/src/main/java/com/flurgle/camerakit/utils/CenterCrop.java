@@ -2,10 +2,13 @@ package com.flurgle.camerakit.utils;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.BitmapRegionDecoder;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
+import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 public class CenterCrop {
 
@@ -19,12 +22,26 @@ public class CenterCrop {
     }
 
     public CenterCrop(byte[] jpeg, AspectRatio targetRatio) {
-        Bitmap bitmap = BitmapFactory.decodeByteArray(jpeg, 0, jpeg.length);
-        Rect crop = getCrop(bitmap.getWidth(), bitmap.getHeight(), targetRatio);
-        bitmap = Bitmap.createBitmap(bitmap, crop.left, crop.top, crop.width(), crop.height());
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
-        this.croppedJpeg = out.toByteArray();
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeByteArray(jpeg, 0, jpeg.length, options);
+
+        Rect crop = getCrop(options.outWidth, options.outHeight, targetRatio);
+        try {
+            Bitmap bitmap = BitmapRegionDecoder.newInstance(
+                    jpeg,
+                    0,
+                    jpeg.length,
+                    true
+            ).decodeRegion(crop, null);
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+            this.croppedJpeg = out.toByteArray();
+        } catch (IOException e) {
+            Log.e("CameraKit", e.toString());
+            return;
+        }
     }
 
     private static Rect getCrop(int currentWidth, int currentHeight, AspectRatio targetRatio) {
