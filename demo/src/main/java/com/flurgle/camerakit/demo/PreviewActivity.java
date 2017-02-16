@@ -2,27 +2,33 @@ package com.flurgle.camerakit.demo;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.view.View;
 import android.widget.ImageView;
-import android.widget.VideoView;
+import android.widget.TextView;
 
-import java.io.File;
+import com.flurgle.camerakit.utils.AspectRatio;
+import com.flurgle.camerakit.utils.Size;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-
-import static com.flurgle.camerakit.demo.R.id.video;
 
 public class PreviewActivity extends Activity {
 
     @BindView(R.id.image)
     ImageView imageView;
 
-    @BindView(video)
-    VideoView videoView;
+    @BindView(R.id.nativeCaptureResolution)
+    TextView nativeCaptureResolution;
+
+    @BindView(R.id.actualResolution)
+    TextView actualResolution;
+
+    @BindView(R.id.approxUncompressedSize)
+    TextView approxUncompressedSize;
+
+    @BindView(R.id.captureLatency)
+    TextView captureLatency;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -30,23 +36,28 @@ public class PreviewActivity extends Activity {
         setContentView(R.layout.activity_preview);
         ButterKnife.bind(this);
 
-        Bitmap bitmap = MediaHolder.getImage();
-        File video = MediaHolder.getVideo();
-
-        if (bitmap != null) {
-            imageView.setImageBitmap(bitmap);
-        } else if (video != null) {
-            imageView.setVisibility(View.GONE);
-            videoView.setVideoPath(video.getAbsolutePath());
-            videoView.setMediaController(null);
-            videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                @Override
-                public void onPrepared(MediaPlayer mediaPlayer) {
-                    mediaPlayer.setLooping(true);
-                }
-            });
-            videoView.start();
+        Bitmap bitmap = ResultHolder.getImage();
+        if (bitmap == null) {
+            finish();
+            return;
         }
+
+        imageView.setImageBitmap(bitmap);
+
+        Size captureSize = ResultHolder.getNativeCaptureSize();
+        if (captureSize != null) {
+            // Native sizes are landscape, hardcode flip because demo app forced to portrait.
+            AspectRatio aspectRatio = AspectRatio.of(captureSize.getHeight(), captureSize.getWidth());
+            nativeCaptureResolution.setText(captureSize.getHeight() + " x " + captureSize.getWidth() + " (" + aspectRatio.toString() + ")");
+        }
+
+        actualResolution.setText(bitmap.getWidth() + " x " + bitmap.getHeight());
+        approxUncompressedSize.setText(getApproximateFileMegabytes(bitmap) + "MB");
+        captureLatency.setText(ResultHolder.getTimeToCallback() + " milliseconds");
+    }
+
+    private static float getApproximateFileMegabytes(Bitmap bitmap) {
+        return (bitmap.getRowBytes() * bitmap.getHeight()) / 1024 / 1024;
     }
 
 }

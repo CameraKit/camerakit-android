@@ -31,6 +31,7 @@ import com.flurgle.camerakit.types.TapToFocus;
 import com.flurgle.camerakit.utils.AspectRatio;
 import com.flurgle.camerakit.utils.CenterCrop;
 import com.flurgle.camerakit.utils.DisplayOrientationDetector;
+import com.flurgle.camerakit.utils.Size;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -293,6 +294,14 @@ public class CameraView extends FrameLayout {
 
     public void stopRecordingVideo() {
         mCameraImpl.endVideo();
+    }
+
+    public Size getPreviewSize() {
+        return mCameraImpl != null ? mCameraImpl.getPreviewSize() : null;
+    }
+
+    public Size getCaptureSize() {
+        return mCameraImpl != null ? mCameraImpl.getCaptureSize() : null;
     }
 
     private void requestCameraPermission() {

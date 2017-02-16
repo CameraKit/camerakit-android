@@ -41,6 +41,8 @@ public class Camera1 extends CameraImpl {
     private Camera mCamera;
     private Camera.Parameters mCameraParameters;
     private final Camera.CameraInfo mCameraInfo = new Camera.CameraInfo();
+    private Size mPreviewSize;
+    private Size mCaptureSize;
 
     private boolean mShowingPreview;
     private boolean mAutoFocus;
@@ -395,13 +397,13 @@ public class Camera1 extends CameraImpl {
 
     private void adjustCameraParameters() {
         SortedSet<Size> sizes = mPreviewSizes;
-        Size previewSize = chooseOptimalSize(sizes);
+        mPreviewSize = chooseOptimalSize(sizes);
         final Camera.Size currentSize = mCameraParameters.getPictureSize();
-        if (currentSize.width != previewSize.getWidth() || currentSize.height != previewSize.getHeight()) {
+        if (currentSize.width != mPreviewSize.getWidth() || currentSize.height != mPreviewSize.getHeight()) {
             Iterator<Size> iterator = mCaptureSizes.descendingIterator();
             Size pictureSize;
             while ((pictureSize = iterator.next()) != null) {
-                if (AspectRatio.of(previewSize.getWidth(), previewSize.getHeight()).matches(pictureSize)) {
+                if (AspectRatio.of(mPreviewSize.getWidth(), mPreviewSize.getHeight()).matches(pictureSize)) {
                     break;
                 }
             }
@@ -410,12 +412,14 @@ public class Camera1 extends CameraImpl {
                 pictureSize = mCaptureSizes.last();
             }
 
+            mCaptureSize = pictureSize;
+
             if (mShowingPreview) {
                 mCamera.stopPreview();
             }
 
-            mCameraParameters.setPreviewSize(previewSize.getWidth(), previewSize.getHeight());
-            mPreview.setTruePreviewSize(previewSize.getWidth(), previewSize.getHeight());
+            mCameraParameters.setPreviewSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
+            mPreview.setTruePreviewSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
             mCameraParameters.setPictureSize(pictureSize.getWidth(), pictureSize.getHeight());
             mCameraParameters.setRotation(calcCameraRotation(mDisplayOrientation) + (mFacing == CameraKit.Constants.FACING_FRONT ? 180 : 0));
 
@@ -488,4 +492,13 @@ public class Camera1 extends CameraImpl {
         }
     }
 
+    @Override
+    Size getCaptureSize() {
+        return mCaptureSize;
+    }
+
+    @Override
+    Size getPreviewSize() {
+        return mPreviewSize;
+    }
 }

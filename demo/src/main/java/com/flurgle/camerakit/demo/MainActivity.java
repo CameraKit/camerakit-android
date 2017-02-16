@@ -23,7 +23,6 @@ import java.io.File;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.OnTextChanged;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -119,13 +118,20 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.capturePhoto)
     void capturePhoto() {
+        final long startTime = System.currentTimeMillis();
         camera.setCameraListener(new CameraListener() {
             @Override
             public void onPictureTaken(byte[] jpeg) {
                 super.onPictureTaken(jpeg);
+                long callbackTime = System.currentTimeMillis();
                 Bitmap bitmap = BitmapFactory.decodeByteArray(jpeg, 0, jpeg.length);
-                MediaHolder.dispose();
-                MediaHolder.setImage(bitmap);
+                ResultHolder.dispose();
+                ResultHolder.setImage(bitmap);
+                ResultHolder.setNativeCaptureSize(
+                        captureModeRadioGroup.getCheckedRadioButtonId() == R.id.modeCaptureQuality ?
+                                camera.getCaptureSize() : camera.getPreviewSize()
+                );
+                ResultHolder.setTimeToCallback(callbackTime - startTime);
                 Intent intent = new Intent(MainActivity.this, PreviewActivity.class);
                 startActivity(intent);
             }
@@ -139,10 +145,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onVideoTaken(File video) {
                 super.onVideoTaken(video);
-                MediaHolder.dispose();
-                MediaHolder.setVideo(video);
-                Intent intent = new Intent(MainActivity.this, PreviewActivity.class);
-                startActivity(intent);
+
             }
         });
 
@@ -224,11 +227,6 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    @OnTextChanged(value = R.id.width, callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
-    void widthChanged() {
-
-    }
-
     @OnClick(R.id.widthUpdate)
     void widthUpdateClicked() {
         if (widthUpdate.getAlpha() >= 1) {
@@ -248,11 +246,6 @@ public class MainActivity extends AppCompatActivity {
             updateCamera(true, false);
         }
     };
-
-    @OnTextChanged(value = R.id.height)
-    void heightChanged() {
-
-    }
 
     @OnClick(R.id.heightUpdate)
     void heightUpdateClicked() {
@@ -329,16 +322,6 @@ public class MainActivity extends AppCompatActivity {
         cameraLayoutParams.width = width;
         cameraLayoutParams.height = height;
 
-        camera.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-            @Override
-            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                mCameraWidth = right - left;
-                mCameraHeight = bottom - top;
-                camera.removeOnLayoutChangeListener(this);
-                widthChanged();
-                heightChanged();
-            }
-        });
         camera.setLayoutParams(cameraLayoutParams);
 
         Toast.makeText(this, (updateWidth && updateHeight ? "Width and height" : updateWidth ? "Width" : "Height") + " updated!", Toast.LENGTH_SHORT).show();

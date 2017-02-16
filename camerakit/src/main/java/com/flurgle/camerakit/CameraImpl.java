@@ -4,6 +4,7 @@ import android.view.View;
 
 import com.flurgle.camerakit.types.Facing;
 import com.flurgle.camerakit.types.Flash;
+import com.flurgle.camerakit.utils.Size;
 
 public abstract class CameraImpl {
 
@@ -44,5 +45,9 @@ public abstract class CameraImpl {
     abstract void focus();
 
     abstract void setDisplayOrientation(int displayOrientation);
+
+    abstract Size getCaptureSize();
+
+    abstract Size getPreviewSize();
 
 }
