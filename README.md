@@ -8,6 +8,7 @@ Try out all the unique features using the CameraKit Demo from the Google Play st
 
 <a href='https://play.google.com/store/apps/details?id=com.flurgle.camerakit.demo&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png' height='80'/></a>
 
+<img src=".repo/demo1.png" width="120"/>
 
 ## Table of Contents
 
@@ -19,7 +20,7 @@ Try out all the unique features using the CameraKit Demo from the Google Play st
     - [`ckCropOutput`](#ckcropoutput)
     - [`ckFacing`](#ckfacing)
     - [`ckFlash`](#ckflash)
-    - [`ckPictureMode`](#ckpicturemode)
+    - [`ckCaptureMode`](#ckcapturemode)
     - [`ckTapToFocus`](#cktaptofocus)
     - [`ckAutoFocus`](#ckautofocus)
     - [`ckCaptureSize`](#ckcapturesize)
@@ -125,7 +126,7 @@ camera.setCameraListener(new CameraListener() {
     camerakit:ckCropOutput="true"  
     camerakit:ckFacing="back"
     camerakit:ckFlash="off"
-    camerakit:ckPictureMode="quality"
+    camerakit:ckCaptureMode="quality"
     camerakit:ckTapToFocus="on"
     camerakit:ckAutoFocus="true"
     camerakit:ckCaptureSize="8" />
@@ -154,13 +155,13 @@ camera.setCameraListener(new CameraListener() {
 | `on`          | Default `CameraView` flash to on. |
 | `auto`        | Default `CameraView` flash to automatic. |
 
-#### `ckPictureMode`
+#### `ckCaptureMode`
 
 | Value         | Description  |
 | --------------| -------------|
-| `quality`     | Use normal Android Camera API image capturing. |
-| `speed`       | Freeze the `CameraView` preview and grab a `Bitmap` of the frame. |
-| `auto`        | Default picture mode to `quality`, but fallback to `speed` if capturing is determined to be too slow. |
+| `standard`    | Use normal Android Camera API image capturing. |
+| `still`       | Freeze the `CameraView` preview and grab a `Bitmap` of the frame. |
+| `auto` (coming soon) | Default picture mode to `standard`, but fallback to `still` if capturing is determined to be too slow. |
 
 #### `ckTapToFocus`
 

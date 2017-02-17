@@ -14,9 +14,9 @@
             <enum name="auto" value="2" />
         </attr>
 
-        <attr name="ckPictureMode" format="enum">
-            <enum name="quality" value="0" />
-            <enum name="speed" value="1" />
+        <attr name="ckCaptureMode" format="enum">
+            <enum name="standard" value="0" />
+            <enum name="still" value="1" />
             <enum name="auto" value="2" />
         </attr>
 
@@ -31,6 +31,8 @@
         <attr name="ckAutoFocus" format="boolean" />
 
         <attr name="ckCaptureSize" format="float" />
+
+        <attr name="ckJpegCompression" format="integer" />
 
         <attr name="android:adjustViewBounds" />
 

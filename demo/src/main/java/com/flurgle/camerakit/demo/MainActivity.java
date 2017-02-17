@@ -193,8 +193,8 @@ public class MainActivity extends AppCompatActivity {
         public void onCheckedChanged(RadioGroup group, int checkedId) {
             camera.setPictureMode(
                     checkedId == R.id.modeCaptureQuality ?
-                            CameraKit.Constants.PICTURE_MODE_QUALITY :
-                            CameraKit.Constants.PICTURE_MODE_SPEED
+                            CameraKit.Constants.CAPTURE_MODE_STANDARD :
+                            CameraKit.Constants.CAPTURE_MODE_STILL
             );
 
             Toast.makeText(MainActivity.this, "Picture capture set to" + (checkedId == R.id.modeCaptureQuality ? " quality!" : " speed!"), Toast.LENGTH_SHORT).show();

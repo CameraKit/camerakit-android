@@ -1,4 +1,4 @@
-package com.flurgle.camerakit.utils;
+package com.flurgle.camerakit;
 
 import android.content.Context;
 import android.util.SparseIntArray;

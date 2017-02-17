@@ -24,15 +24,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 
-import com.flurgle.camerakit.types.Facing;
-import com.flurgle.camerakit.types.Flash;
-import com.flurgle.camerakit.types.PictureMode;
-import com.flurgle.camerakit.types.TapToFocus;
-import com.flurgle.camerakit.utils.AspectRatio;
-import com.flurgle.camerakit.utils.CenterCrop;
-import com.flurgle.camerakit.utils.DisplayOrientationDetector;
-import com.flurgle.camerakit.utils.Size;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 
@@ -41,14 +32,15 @@ import static com.flurgle.camerakit.CameraKit.Constants.FACING_FRONT;
 import static com.flurgle.camerakit.CameraKit.Constants.FLASH_AUTO;
 import static com.flurgle.camerakit.CameraKit.Constants.FLASH_OFF;
 import static com.flurgle.camerakit.CameraKit.Constants.FLASH_ON;
-import static com.flurgle.camerakit.CameraKit.Constants.PICTURE_MODE_QUALITY;
-import static com.flurgle.camerakit.CameraKit.Constants.PICTURE_MODE_SPEED;
+import static com.flurgle.camerakit.CameraKit.Constants.CAPTURE_MODE_STANDARD;
+import static com.flurgle.camerakit.CameraKit.Constants.CAPTURE_MODE_STILL;
 import static com.flurgle.camerakit.CameraKit.Constants.TAP_TO_FOCUS_VISIBLE;
 
 public class CameraView extends FrameLayout {
 
     private static final int PERMISSION_REQUEST_CAMERA = 16;
     private static final int DEFAULT_CAPTURE_SIZE = -1;
+    private static final int DEFAULT_JPEG_COMPRESSION = 100;
 
     @Facing
     private int mFacing;
@@ -56,17 +48,19 @@ public class CameraView extends FrameLayout {
     @Flash
     private int mFlash;
 
-    @PictureMode
-    private int mPictureMode;
-
-    private boolean mCropOutput;
-
     @TapToFocus
     private int mTapToFocus;
+
+    @CaptureMode
+    private int mCaptureMode;
+
+    private boolean mCropOutput;
 
     private boolean mAutoFocus;
 
     private float mCaptureSize;
+
+    private int mJpegCompression;
 
     private boolean mAdjustViewBounds;
 
@@ -100,16 +94,16 @@ public class CameraView extends FrameLayout {
                     mFlash = a.getInteger(R.styleable.CameraView_ckFlash, FLASH_OFF);
                 }
 
-                if (attr == R.styleable.CameraView_ckPictureMode) {
-                    mPictureMode = a.getInteger(R.styleable.CameraView_ckPictureMode, PICTURE_MODE_QUALITY);
+                if (attr == R.styleable.CameraView_ckTapToFocus) {
+                    mTapToFocus = a.getInteger(R.styleable.CameraView_ckTapToFocus, TAP_TO_FOCUS_VISIBLE);
+                }
+
+                if (attr == R.styleable.CameraView_ckCaptureMode) {
+                    mCaptureMode = a.getInteger(R.styleable.CameraView_ckCaptureMode, CAPTURE_MODE_STANDARD);
                 }
 
                 if (attr == R.styleable.CameraView_ckCropOutput) {
                     mCropOutput = a.getBoolean(R.styleable.CameraView_ckCropOutput, false);
-                }
-
-                if (attr == R.styleable.CameraView_ckTapToFocus) {
-                    mTapToFocus = a.getInteger(R.styleable.CameraView_ckTapToFocus, TAP_TO_FOCUS_VISIBLE);
                 }
 
                 if (attr == R.styleable.CameraView_ckAutoFocus) {
@@ -118,6 +112,10 @@ public class CameraView extends FrameLayout {
 
                 if (attr == R.styleable.CameraView_ckCaptureSize) {
                     mCaptureSize = a.getFloat(R.styleable.CameraView_ckCaptureSize, DEFAULT_CAPTURE_SIZE);
+                }
+
+                if (attr == R.styleable.CameraView_ckJpegCompression) {
+                    mJpegCompression = a.getInteger(R.styleable.CameraView_ckJpegCompression, DEFAULT_JPEG_COMPRESSION);
                 }
 
                 if (attr == R.styleable.CameraView_android_adjustViewBounds) {
@@ -134,7 +132,7 @@ public class CameraView extends FrameLayout {
 
         setFacing(mFacing);
         setFlash(mFlash);
-        setPictureMode(mPictureMode);
+        setPictureMode(mCaptureMode);
         setCropOutput(mCropOutput);
         setTapToFocus(mTapToFocus);
         setAutoFocus(mAutoFocus);
@@ -243,13 +241,13 @@ public class CameraView extends FrameLayout {
         return mFlash;
     }
 
-    public void setPictureMode(@PictureMode int pictureMode) {
-        this.mPictureMode = pictureMode;
+    public void setPictureMode(@CaptureMode int pictureMode) {
+        this.mCaptureMode = pictureMode;
     }
 
-    @PictureMode
+    @CaptureMode
     public int getPictureMode() {
-        return mPictureMode;
+        return mCaptureMode;
     }
 
     public void setCropOutput(boolean cropOutput) {
@@ -278,11 +276,11 @@ public class CameraView extends FrameLayout {
     }
 
     public void capturePicture() {
-        switch (mPictureMode) {
-            case PICTURE_MODE_QUALITY:
-                mCameraImpl.capturePicture();
+        switch (mCaptureMode) {
+            case CAPTURE_MODE_STANDARD:
+                mCameraImpl.captureStandard();
                 break;
-            case PICTURE_MODE_SPEED:
+            case CAPTURE_MODE_STILL:
                 mCameraImpl.captureStill();
                 break;
         }
@@ -297,11 +295,11 @@ public class CameraView extends FrameLayout {
     }
 
     public Size getPreviewSize() {
-        return mCameraImpl != null ? mCameraImpl.getPreviewSize() : null;
+        return mCameraImpl != null ? mCameraImpl.getPreviewResolution() : null;
     }
 
     public Size getCaptureSize() {
-        return mCameraImpl != null ? mCameraImpl.getCaptureSize() : null;
+        return mCameraImpl != null ? mCameraImpl.getCaptureResolution() : null;
     }
 
     private void requestCameraPermission() {
@@ -405,10 +403,10 @@ public class CameraView extends FrameLayout {
         public void onPictureTaken(byte[] jpeg) {
             super.onPictureTaken(jpeg);
             if (mCropOutput) {
-                int width = mPictureMode == PICTURE_MODE_QUALITY ? mCameraImpl.getCaptureSize().getWidth() : mCameraImpl.getPreviewSize().getWidth();
-                int height = mPictureMode == PICTURE_MODE_QUALITY ? mCameraImpl.getCaptureSize().getHeight() : mCameraImpl.getPreviewSize().getHeight();
+                int width = mCaptureMode == CAPTURE_MODE_STANDARD ? mCameraImpl.getCaptureResolution().getWidth() : mCameraImpl.getPreviewResolution().getWidth();
+                int height = mCaptureMode == CAPTURE_MODE_STANDARD ? mCameraImpl.getCaptureResolution().getHeight() : mCameraImpl.getPreviewResolution().getHeight();
                 AspectRatio outputRatio = AspectRatio.of(getWidth(), getHeight());
-                getCameraListener().onPictureTaken(new CenterCrop(jpeg, outputRatio).getJpeg());
+                getCameraListener().onPictureTaken(new CenterCrop(jpeg, outputRatio, mJpegCompression).getJpeg());
             } else {
                 getCameraListener().onPictureTaken(jpeg);
             }
@@ -419,10 +417,10 @@ public class CameraView extends FrameLayout {
             super.onPictureTaken(yuv);
             if (mCropOutput) {
                 AspectRatio outputRatio = AspectRatio.of(getWidth(), getHeight());
-                getCameraListener().onPictureTaken(new CenterCrop(yuv, outputRatio).getJpeg());
+                getCameraListener().onPictureTaken(new CenterCrop(yuv, outputRatio, mJpegCompression).getJpeg());
             } else {
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
-                yuv.compressToJpeg(new Rect(0, 0, yuv.getWidth(), yuv.getHeight()), 50, out);
+                yuv.compressToJpeg(new Rect(0, 0, yuv.getWidth(), yuv.getHeight()), mJpegCompression, out);
                 getCameraListener().onPictureTaken(out.toByteArray());
             }
         }

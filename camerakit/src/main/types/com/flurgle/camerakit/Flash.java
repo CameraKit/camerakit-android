@@ -1,4 +1,4 @@
-package com.flurgle.camerakit.types;
+package com.flurgle.camerakit;
 
 import android.support.annotation.IntDef;
 

@@ -21,7 +21,7 @@
             app:ckCropOutput="false"
             app:ckFacing="back"
             app:ckFlash="off"
-            app:ckPictureMode="quality"
+            app:ckCaptureMode="standard"
             app:ckTapToFocus="visible" />
 
         <LinearLayout

@@ -7,8 +7,8 @@ import android.support.annotation.Nullable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.flurgle.camerakit.utils.AspectRatio;
-import com.flurgle.camerakit.utils.Size;
+import com.flurgle.camerakit.AspectRatio;
+import com.flurgle.camerakit.Size;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

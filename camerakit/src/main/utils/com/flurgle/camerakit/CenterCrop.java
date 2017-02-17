@@ -1,4 +1,4 @@
-package com.flurgle.camerakit.utils;
+package com.flurgle.camerakit;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -14,14 +14,14 @@ public class CenterCrop {
 
     private byte[] croppedJpeg;
 
-    public CenterCrop(YuvImage yuv, AspectRatio targetRatio) {
+    public CenterCrop(YuvImage yuv, AspectRatio targetRatio, int jpegCompression) {
         Rect crop = getCrop(yuv.getWidth(), yuv.getHeight(), targetRatio);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         yuv.compressToJpeg(crop, 100, out);
         this.croppedJpeg = out.toByteArray();
     }
 
-    public CenterCrop(byte[] jpeg, AspectRatio targetRatio) {
+    public CenterCrop(byte[] jpeg, AspectRatio targetRatio, int jpegCompression) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeByteArray(jpeg, 0, jpeg.length, options);

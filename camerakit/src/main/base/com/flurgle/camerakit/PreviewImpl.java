@@ -5,8 +5,6 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.View;
 
-import com.flurgle.camerakit.utils.AspectRatio;
-
 public abstract class PreviewImpl {
 
     interface Callback {

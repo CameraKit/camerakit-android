@@ -3,7 +3,7 @@ package com.flurgle.camerakit.demo;
 import android.graphics.Bitmap;
 import android.support.annotation.Nullable;
 
-import com.flurgle.camerakit.utils.Size;
+import com.flurgle.camerakit.Size;
 
 import java.lang.ref.WeakReference;
 

@@ -11,8 +11,8 @@ public class CameraKit {
         public static final int FLASH_ON = 1;
         public static final int FLASH_AUTO = 2;
 
-        public static final int PICTURE_MODE_QUALITY = 0;
-        public static final int PICTURE_MODE_SPEED = 1;
+        public static final int CAPTURE_MODE_STANDARD = 0;
+        public static final int CAPTURE_MODE_STILL = 1;
         public static final int PICTURE_MODE_AUTO = 2;
 
         public static final int TAP_TO_FOCUS_VISIBLE = 0;

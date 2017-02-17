@@ -1,6 +1,7 @@
-package com.flurgle.camerakit.utils;
+package com.flurgle.camerakit;
 
 import android.media.Image;
+import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -27,7 +28,7 @@ public class YuvUtils {
             outputStream.write(v);
             outputStream.write(u);
         } catch (IOException e) {
-
+            Log.e("CameraKit", e.toString());
         }
         return outputStream.toByteArray();
     }

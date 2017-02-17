@@ -9,10 +9,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.util.SparseArrayCompat;
 import android.view.SurfaceHolder;
 
-import com.flurgle.camerakit.utils.AspectRatio;
-import com.flurgle.camerakit.utils.Size;
-import com.flurgle.camerakit.utils.YuvUtils;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
@@ -20,9 +16,10 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-public class Camera1 extends CameraImpl {
+public class Camera2 extends CameraImpl {
 
     private static final SparseArrayCompat<String> FLASH_MODES = new SparseArrayCompat<>();
+
     static {
         FLASH_MODES.put(CameraKit.Constants.FLASH_OFF, Camera.Parameters.FLASH_MODE_OFF);
         FLASH_MODES.put(CameraKit.Constants.FLASH_ON, Camera.Parameters.FLASH_MODE_ON);
@@ -30,6 +27,7 @@ public class Camera1 extends CameraImpl {
     }
 
     private static final SparseArrayCompat<Integer> FACING_MODES = new SparseArrayCompat<>();
+
     static {
         FACING_MODES.put(CameraKit.Constants.FACING_BACK, Camera.CameraInfo.CAMERA_FACING_BACK);
         FACING_MODES.put(CameraKit.Constants.FACING_FRONT, Camera.CameraInfo.CAMERA_FACING_FRONT);
@@ -57,13 +55,13 @@ public class Camera1 extends CameraImpl {
 
     private CameraListener mCameraListener;
 
-    Camera1(@NonNull CameraListener cameraListener, @NonNull PreviewImpl preview) {
+    Camera2(@NonNull CameraListener cameraListener, @NonNull PreviewImpl preview) {
         super(cameraListener, preview);
-        
+
         this.mCameraListener = cameraListener;
         this.mPreviewSizes = new TreeSet<>();
         this.mCaptureSizes = new TreeSet<>();
-        this.mVideoFile = new File(getView().getContext().getExternalFilesDir(null), "video.mp4");
+        this.mVideoFile = new File(mPreview.getView().getContext().getExternalFilesDir(null), "video.mp4");
 
         preview.setCallback(new PreviewImpl.Callback() {
             @Override
@@ -194,20 +192,11 @@ public class Camera1 extends CameraImpl {
     }
 
     @Override
-    boolean getAutoFocus() {
-        if (!isCameraOpened()) {
-            return mAutoFocus;
-        }
-        String focusMode = mCameraParameters.getFocusMode();
-        return focusMode != null && focusMode.contains("continuous");
-    }
-
-    @Override
-    void capturePicture() {
+    void captureStandard() {
         if (!isCameraOpened()) {
             throw new IllegalStateException("Camera is not ready. Call start() before takePicture().");
         }
-        if (getAutoFocus()) {
+        if (mAutoFocus) {
             mCamera.cancelAutoFocus();
             mCamera.autoFocus(new Camera.AutoFocusCallback() {
                 @Override
@@ -238,7 +227,7 @@ public class Camera1 extends CameraImpl {
                 new Thread(new ProcessStillTask(data, camera, mCameraInfo, new ProcessStillTask.OnStillProcessedListener() {
                     @Override
                     public void onStillProcessed(final YuvImage yuv) {
-                        getView().post(new Runnable() {
+                        mPreview.getView().post(new Runnable() {
                             @Override
                             public void run() {
                                 mCameraListener.onPictureTaken(yuv);
@@ -493,12 +482,12 @@ public class Camera1 extends CameraImpl {
     }
 
     @Override
-    Size getCaptureSize() {
+    Size getCaptureResolution() {
         return mCaptureSize;
     }
 
     @Override
-    Size getPreviewSize() {
+    Size getPreviewResolution() {
         return mPreviewSize;
     }
 }
