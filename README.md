@@ -1,4 +1,4 @@
-![CameraKit Header](.repo/camerakit-android-header.png)
+<img alt='CameraKit Header' src='.repo/camerakit-android-header.png' height='125'/>
 
 #####Originally a fork of [Google's CameraView library](https://github.com/google/cameraview).
 
@@ -8,7 +8,10 @@ Try out all the unique features using the CameraKit Demo from the Google Play st
 
 <a href='https://play.google.com/store/apps/details?id=com.flurgle.camerakit.demo&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png' height='80'/></a>
 
-<img src=".repo/demo1.png" width="120"/>
+<img src='.repo/demo1.png' width='120'/>
+<img src='.repo/demo2.png' width='120'/>
+<img src='.repo/demo3.png' width='120'/>
+<img src='.repo/demo4.png' width='120'/>
 
 ## Table of Contents
 
