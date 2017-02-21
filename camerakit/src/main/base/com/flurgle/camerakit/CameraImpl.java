@@ -1,8 +1,8 @@
 package com.flurgle.camerakit;
 
-public abstract class CameraImpl {
+abstract class CameraImpl {
 
-    protected CameraListener mCameraListener;
+    protected final CameraListener mCameraListener;
     protected final PreviewImpl mPreview;
 
     CameraImpl(CameraListener callback, PreviewImpl preview) {
@@ -13,14 +13,13 @@ public abstract class CameraImpl {
     abstract void start();
     abstract void stop();
 
-    abstract boolean isCameraOpened();
-
     abstract void setFacing(@Facing int facing);
     abstract void setFlash(@Flash int flash);
-    abstract void setAutoFocus(boolean autoFocus);
+    abstract void setContinuousFocus(boolean autoFocus);
 
     abstract void setDisplayOrientation(int displayOrientation);
     abstract void focus();
+    abstract void zoom(float percentZoom);
 
     abstract void captureStandard();
     abstract void captureStill();
@@ -30,5 +29,6 @@ public abstract class CameraImpl {
 
     abstract Size getCaptureResolution();
     abstract Size getPreviewResolution();
+    abstract boolean isCameraOpened();
 
 }

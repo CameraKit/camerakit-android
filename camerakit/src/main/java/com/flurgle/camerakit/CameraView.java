@@ -27,13 +27,13 @@ import android.widget.FrameLayout;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 
+import static com.flurgle.camerakit.CameraKit.Constants.CAPTURE_MODE_STANDARD;
+import static com.flurgle.camerakit.CameraKit.Constants.CAPTURE_MODE_STILL;
 import static com.flurgle.camerakit.CameraKit.Constants.FACING_BACK;
 import static com.flurgle.camerakit.CameraKit.Constants.FACING_FRONT;
 import static com.flurgle.camerakit.CameraKit.Constants.FLASH_AUTO;
 import static com.flurgle.camerakit.CameraKit.Constants.FLASH_OFF;
 import static com.flurgle.camerakit.CameraKit.Constants.FLASH_ON;
-import static com.flurgle.camerakit.CameraKit.Constants.CAPTURE_MODE_STANDARD;
-import static com.flurgle.camerakit.CameraKit.Constants.CAPTURE_MODE_STILL;
 import static com.flurgle.camerakit.CameraKit.Constants.TAP_TO_FOCUS_VISIBLE;
 
 public class CameraView extends FrameLayout {
@@ -56,7 +56,7 @@ public class CameraView extends FrameLayout {
 
     private boolean mCropOutput;
 
-    private boolean mAutoFocus;
+    private boolean mContinuousFocus;
 
     private float mCaptureSize;
 
@@ -80,49 +80,26 @@ public class CameraView extends FrameLayout {
     public CameraView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
 
+
         if (attrs != null) {
-            TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.CameraView);
-            final int n = a.getIndexCount();
-            for (int i = 0; i < n; ++i) {
-                int attr = a.getIndex(i);
+            TypedArray a = context.getTheme().obtainStyledAttributes(
+                    attrs,
+                    R.styleable.CameraView,
+                    0, 0);
 
-                if (attr == R.styleable.CameraView_ckFacing) {
-                    mFacing = a.getInteger(R.styleable.CameraView_ckFacing, FACING_BACK);
-                }
-
-                if (attr == R.styleable.CameraView_ckFlash) {
-                    mFlash = a.getInteger(R.styleable.CameraView_ckFlash, FLASH_OFF);
-                }
-
-                if (attr == R.styleable.CameraView_ckTapToFocus) {
-                    mTapToFocus = a.getInteger(R.styleable.CameraView_ckTapToFocus, TAP_TO_FOCUS_VISIBLE);
-                }
-
-                if (attr == R.styleable.CameraView_ckCaptureMode) {
-                    mCaptureMode = a.getInteger(R.styleable.CameraView_ckCaptureMode, CAPTURE_MODE_STANDARD);
-                }
-
-                if (attr == R.styleable.CameraView_ckCropOutput) {
-                    mCropOutput = a.getBoolean(R.styleable.CameraView_ckCropOutput, false);
-                }
-
-                if (attr == R.styleable.CameraView_ckAutoFocus) {
-                    mAutoFocus = a.getBoolean(R.styleable.CameraView_ckAutoFocus, true);
-                }
-
-                if (attr == R.styleable.CameraView_ckCaptureSize) {
-                    mCaptureSize = a.getFloat(R.styleable.CameraView_ckCaptureSize, DEFAULT_CAPTURE_SIZE);
-                }
-
-                if (attr == R.styleable.CameraView_ckJpegCompression) {
-                    mJpegCompression = a.getInteger(R.styleable.CameraView_ckJpegCompression, DEFAULT_JPEG_COMPRESSION);
-                }
-
-                if (attr == R.styleable.CameraView_android_adjustViewBounds) {
-                    mAdjustViewBounds = a.getBoolean(R.styleable.CameraView_android_adjustViewBounds, false);
-                }
+            try {
+                mFacing = a.getInteger(R.styleable.CameraView_ckFacing, FACING_BACK);
+                mFlash = a.getInteger(R.styleable.CameraView_ckFlash, FLASH_OFF);
+                mTapToFocus = a.getInteger(R.styleable.CameraView_ckTapToFocus, TAP_TO_FOCUS_VISIBLE);
+                mCaptureMode = a.getInteger(R.styleable.CameraView_ckCaptureMode, CAPTURE_MODE_STANDARD);
+                mCropOutput = a.getBoolean(R.styleable.CameraView_ckCropOutput, false);
+                mContinuousFocus = a.getBoolean(R.styleable.CameraView_ckContinuousFocus, true);
+                mCaptureSize = a.getFloat(R.styleable.CameraView_ckCaptureSize, DEFAULT_CAPTURE_SIZE);
+                mJpegCompression = a.getInteger(R.styleable.CameraView_ckJpegCompression, DEFAULT_JPEG_COMPRESSION);
+                mAdjustViewBounds = a.getBoolean(R.styleable.CameraView_android_adjustViewBounds, false);
+            } finally {
+                a.recycle();
             }
-            a.recycle();
         }
 
         mCameraListener = new CameraListenerMiddleWare();
@@ -132,10 +109,10 @@ public class CameraView extends FrameLayout {
 
         setFacing(mFacing);
         setFlash(mFlash);
-        setPictureMode(mCaptureMode);
+        setCaptureMode(mCaptureMode);
         setCropOutput(mCropOutput);
         setTapToFocus(mTapToFocus);
-        setAutoFocus(mAutoFocus);
+        setContinuousFocus(mContinuousFocus);
         setCaptureSize(mCaptureSize);
 
         mDisplayOrientationDetector = new DisplayOrientationDetector(context) {
@@ -241,12 +218,12 @@ public class CameraView extends FrameLayout {
         return mFlash;
     }
 
-    public void setPictureMode(@CaptureMode int pictureMode) {
-        this.mCaptureMode = pictureMode;
+    public void setCaptureMode(@CaptureMode int captureMode) {
+        this.mCaptureMode = captureMode;
     }
 
     @CaptureMode
-    public int getPictureMode() {
+    public int getCaptureMode() {
         return mCaptureMode;
     }
 
@@ -263,8 +240,9 @@ public class CameraView extends FrameLayout {
         }
     }
 
-    public void setAutoFocus(boolean autoFocus) {
-        this.mAutoFocus = autoFocus;
+    public void setContinuousFocus(boolean continuousFocus) {
+        this.mContinuousFocus = continuousFocus;
+        mCameraImpl.setContinuousFocus(continuousFocus);
     }
 
     public void setCaptureSize(float captureSize) {

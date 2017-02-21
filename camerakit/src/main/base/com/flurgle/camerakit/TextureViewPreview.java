@@ -10,7 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 @TargetApi(14)
-public class TextureViewPreview extends PreviewImpl {
+class TextureViewPreview extends PreviewImpl {
 
     private final TextureView mTextureView;
 

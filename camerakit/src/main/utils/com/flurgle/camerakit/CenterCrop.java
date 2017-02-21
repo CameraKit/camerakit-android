@@ -17,7 +17,7 @@ public class CenterCrop {
     public CenterCrop(YuvImage yuv, AspectRatio targetRatio, int jpegCompression) {
         Rect crop = getCrop(yuv.getWidth(), yuv.getHeight(), targetRatio);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        yuv.compressToJpeg(crop, 100, out);
+        yuv.compressToJpeg(crop, jpegCompression, out);
         this.croppedJpeg = out.toByteArray();
     }
 
@@ -36,11 +36,10 @@ public class CenterCrop {
             ).decodeRegion(crop, null);
 
             ByteArrayOutputStream out = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, jpegCompression, out);
             this.croppedJpeg = out.toByteArray();
         } catch (IOException e) {
             Log.e("CameraKit", e.toString());
-            return;
         }
     }
 

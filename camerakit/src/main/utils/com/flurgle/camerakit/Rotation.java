@@ -1,40 +1,11 @@
 package com.flurgle.camerakit;
 
-import android.media.Image;
-import android.util.Log;
+public class Rotation {
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.nio.ByteBuffer;
+    private byte[] rotatedYuv;
 
-public class YuvUtils {
-
-    public static byte[] getYUVData(Image image) {
-        ByteBuffer bufferY = image.getPlanes()[0].getBuffer();
-        byte[] y = new byte[bufferY.remaining()];
-        bufferY.get(y);
-
-        ByteBuffer bufferU = image.getPlanes()[1].getBuffer();
-        byte[] u = new byte[bufferU.remaining()];
-        bufferU.get(u);
-
-        ByteBuffer bufferV = image.getPlanes()[2].getBuffer();
-        byte[] v = new byte[bufferV.remaining()];
-        bufferV.get(v);
-
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        try {
-            outputStream.write(y);
-            outputStream.write(v);
-            outputStream.write(u);
-        } catch (IOException e) {
-            Log.e("CameraKit", e.toString());
-        }
-        return outputStream.toByteArray();
-    }
-
-    public static byte[] rotateNV21(final byte[] yuv, final int width, final int height, final int rotation) {
-        if (rotation == 0) return yuv;
+    public Rotation(final byte[] yuv, final int width, final int height, final int rotation) {
+        if (rotation == 0) this.rotatedYuv = yuv;
         if (rotation % 90 != 0 || rotation < 0 || rotation > 270) {
             throw new IllegalArgumentException("0 <= rotation < 360, rotation % 90 == 0");
         }
@@ -67,7 +38,12 @@ public class YuvUtils {
                 output[vOut] = (byte) (0xff & yuv[vIn]);
             }
         }
-        return output;
+
+        this.rotatedYuv = output;
+    }
+
+    public byte[] getYuv() {
+        return this.rotatedYuv;
     }
 
 }

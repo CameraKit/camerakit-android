@@ -24,9 +24,11 @@ Try out all the unique features using the CameraKit Demo from the Google Play st
     - [`ckFacing`](#ckfacing)
     - [`ckFlash`](#ckflash)
     - [`ckCaptureMode`](#ckcapturemode)
+    - [`ckPinchToZoom`](#ckpinchtozoom)
     - [`ckTapToFocus`](#cktaptofocus)
     - [`ckAutoFocus`](#ckautofocus)
     - [`ckCaptureSize`](#ckcapturesize)
+    - [`ckJpegCompression`](#ckjpegcompression)
   - [Capturing Images](#capturing-images)
   - [Capturing Video](#capturing-video)
 - [Automatic Permissions Behavior](#automatic-permissions-behavior)
@@ -44,15 +46,17 @@ Try out all the unique features using the CameraKit Demo from the Google Play st
 ## Features
 
 - Image and video capture seamlessly working with the same preview session.
+- Automatic use of both Camera and Camera2 APIs.
 - Automatic system permission handling.
 - Automatic preview scaling.
   - Create a `CameraView` of any size (not just presets!).
   - Automatic output cropping to match your `CameraView` bounds.
 - Multiple capture modes.
-  - `PICTURE_MODE_QUALITY`: an image captured normally using the camera APIs.
-  - `PICTURE_MODE_SPEED`: a freeze frame of the `CameraView` preview (similar to SnapChat and Instagram) for devices with slower cameras.
+  - `PICTURE_MODE_STANDARD`: an image captured normally using the camera APIs.
+  - `PICTURE_MODE_STILL`: a freeze frame of the `CameraView` preview (similar to SnapChat and Instagram) for devices with slower cameras.
   - Automatic picture mode determination based on measured speed.
 - Built-in tap to focus and auto focus.
+- Built-in pinch to zoom.
 
 ## Setup
 
@@ -70,7 +74,7 @@ To use CameraKit, simply add a `CameraView` to your layout:
 <com.flurgle.camerakit.CameraView
     android:id="@+id/camera"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" />
+    android:layout_height="wrap_content" />
 ```
 
 Make sure you override `onResume` and `onPause` in your activity, and make calls respectively to `CameraView.start()` and `CameraView.stop()`.
@@ -130,9 +134,11 @@ camera.setCameraListener(new CameraListener() {
     camerakit:ckFacing="back"
     camerakit:ckFlash="off"
     camerakit:ckCaptureMode="quality"
+    camerakit:ckPinchToZoom="true"
     camerakit:ckTapToFocus="on"
     camerakit:ckAutoFocus="true"
-    camerakit:ckCaptureSize="8" />
+    camerakit:ckCaptureSize="8"
+    camerakit:ckJpegCompression="100" />
 ```
 
 #### `ckCropOutput`
@@ -149,7 +155,6 @@ camera.setCameraListener(new CameraListener() {
 | `back`        | Default `CameraView` preview to back camera. |
 | `front`       | Default `CameraView` preview to front camera. |
 
-
 #### `ckFlash`
 
 | Value         | Description  |
@@ -165,6 +170,13 @@ camera.setCameraListener(new CameraListener() {
 | `standard`    | Use normal Android Camera API image capturing. |
 | `still`       | Freeze the `CameraView` preview and grab a `Bitmap` of the frame. |
 | `auto` (coming soon) | Default picture mode to `standard`, but fallback to `still` if capturing is determined to be too slow. |
+
+#### `ckPinchToZoom`
+
+| Value         | Description  |
+| --------------| -------------|
+| `true`        | User can zoom using pinching gestures with their fingers.  |
+| `false`       | Default pinch to zoom behavior disabled. |
 
 #### `ckTapToFocus`
 
@@ -187,6 +199,13 @@ camera.setCameraListener(new CameraListener() {
 | --------------| -------------|
 | `n <= 0`      | Capture at the highest quality possible. |
 | `n > 0`       | Capture at a size of approximately `n` megapixels. |
+
+#### `ckJpegCompression`
+
+| Value         | Description  |
+| --------------| -------------|
+| `0 <= n <= 100`| Percent quality for returned JPEG data. |
+
 
 ### Capturing Images
 

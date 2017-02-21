@@ -18,10 +18,11 @@
             android:layout_width="match_parent"
             android:layout_height="500dp"
             android:layout_gravity="center_horizontal"
+            app:ckCaptureMode="standard"
+            app:ckContinuousFocus="true"
             app:ckCropOutput="false"
             app:ckFacing="back"
             app:ckFlash="off"
-            app:ckCaptureMode="standard"
             app:ckTapToFocus="visible" />
 
         <LinearLayout

@@ -191,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
     RadioGroup.OnCheckedChangeListener captureModeChangedListener = new RadioGroup.OnCheckedChangeListener() {
         @Override
         public void onCheckedChanged(RadioGroup group, int checkedId) {
-            camera.setPictureMode(
+            camera.setCaptureMode(
                     checkedId == R.id.modeCaptureQuality ?
                             CameraKit.Constants.CAPTURE_MODE_STANDARD :
                             CameraKit.Constants.CAPTURE_MODE_STILL

@@ -5,7 +5,7 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.View;
 
-public abstract class PreviewImpl {
+abstract class PreviewImpl {
 
     interface Callback {
         void onSurfaceChanged();

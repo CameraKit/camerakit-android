@@ -1,6 +1,15 @@
 package com.flurgle.camerakit;
 
+import android.content.res.Resources;
+
 public class CameraKit {
+
+    static class Internal {
+
+        static final int screenWidth = Resources.getSystem().getDisplayMetrics().widthPixels;
+        static final int screenHeight = Resources.getSystem().getDisplayMetrics().heightPixels;
+
+    }
 
     public static class Constants {
 
