@@ -17,6 +17,11 @@ class Camera2 extends CameraImpl {
     }
 
     @Override
+    void setDisplayOrientation(int displayOrientation) {
+
+    }
+
+    @Override
     void setFacing(@Facing int facing) {
 
     }
@@ -27,32 +32,22 @@ class Camera2 extends CameraImpl {
     }
 
     @Override
-    void setContinuousFocus(boolean autoFocus) {
+    void setFocus(@Focus int focus) {
 
     }
 
     @Override
-    void setDisplayOrientation(int displayOrientation) {
+    void setMethod(@Method int method) {
 
     }
 
     @Override
-    void focus() {
+    void setZoom(@Zoom int zoom) {
 
     }
 
     @Override
-    void zoom(float percentZoom) {
-
-    }
-
-    @Override
-    void captureStandard() {
-
-    }
-
-    @Override
-    void captureStill() {
+    void captureImage() {
 
     }
 

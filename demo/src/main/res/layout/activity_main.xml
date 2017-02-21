@@ -19,11 +19,11 @@
             android:layout_height="500dp"
             android:layout_gravity="center_horizontal"
             app:ckCaptureMode="standard"
-            app:ckContinuousFocus="true"
             app:ckCropOutput="false"
             app:ckFacing="back"
             app:ckFlash="off"
-            app:ckTapToFocus="visible" />
+            app:ckFocus="continuous"
+            app:ckJpegQuality="100" />
 
         <LinearLayout
             android:layout_width="match_parent"

@@ -1,8 +1,14 @@
 package com.flurgle.camerakit;
 
-/**
- * Created by dylanmcintyre on 2/21/17.
- */
+import android.support.annotation.IntDef;
 
-public class Zoom {
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
+import static com.flurgle.camerakit.CameraKit.Constants.ZOOM_OFF;
+import static com.flurgle.camerakit.CameraKit.Constants.ZOOM_PINCH;
+
+@Retention(RetentionPolicy.SOURCE)
+@IntDef({ZOOM_OFF, ZOOM_PINCH})
+public @interface Zoom {
 }

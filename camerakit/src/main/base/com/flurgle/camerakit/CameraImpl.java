@@ -13,17 +13,15 @@ abstract class CameraImpl {
     abstract void start();
     abstract void stop();
 
+    abstract void setDisplayOrientation(int displayOrientation);
+
     abstract void setFacing(@Facing int facing);
     abstract void setFlash(@Flash int flash);
-    abstract void setContinuousFocus(boolean autoFocus);
+    abstract void setFocus(@Focus int focus);
+    abstract void setMethod(@Method int method);
+    abstract void setZoom(@Zoom int zoom);
 
-    abstract void setDisplayOrientation(int displayOrientation);
-    abstract void focus();
-    abstract void zoom(float percentZoom);
-
-    abstract void captureStandard();
-    abstract void captureStill();
-
+    abstract void captureImage();
     abstract void startVideo();
     abstract void endVideo();
 

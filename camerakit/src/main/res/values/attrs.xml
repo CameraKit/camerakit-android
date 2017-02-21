@@ -14,27 +14,33 @@
             <enum name="auto" value="2" />
         </attr>
 
-        <attr name="ckCaptureMode" format="enum">
+        <attr name="ckFocus" format="enum">
+            <enum name="off" value="0" />
+            <enum name="continuous" value="1" />
+
+            <!-- TODO: Set to unique value when feature added -->
+            <enum name="tap" value="1" />
+        </attr>
+
+        <attr name="ckZoom" format="enum">
+            <enum name="off" value="0" />
+
+            <!-- TODO: Set to unique value when feature added -->
+            <enum name="pinch" value="0" />
+        </attr>
+
+
+        <attr name="ckMethod" format="enum">
             <enum name="standard" value="0" />
             <enum name="still" value="1" />
-            <enum name="auto" value="2" />
+
+            <!-- TODO: Set to unique value when feature added -->
+            <enum name="auto" value="0" />
         </attr>
+
+        <attr name="ckJpegQuality" format="integer" />
 
         <attr name="ckCropOutput" format="boolean" />
-
-        <attr name="ckPinchToZoom" format="boolean" />
-
-        <attr name="ckTapToFocus" format="enum">
-            <enum name="visible" value="0" />
-            <enum name="invisible" value="1" />
-            <enum name="off" value="2" />
-        </attr>
-
-        <attr name="ckContinuousFocus" format="boolean" />
-
-        <attr name="ckCaptureSize" format="float" />
-
-        <attr name="ckJpegCompression" format="integer" />
 
         <attr name="android:adjustViewBounds" />
 

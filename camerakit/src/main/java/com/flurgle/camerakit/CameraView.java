@@ -8,39 +8,27 @@ import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.hardware.display.DisplayManagerCompat;
-import android.support.v4.os.ParcelableCompat;
-import android.support.v4.os.ParcelableCompatCreatorCallbacks;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.Display;
-import android.view.MotionEvent;
-import android.view.View;
 import android.widget.FrameLayout;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 
-import static com.flurgle.camerakit.CameraKit.Constants.CAPTURE_MODE_STANDARD;
-import static com.flurgle.camerakit.CameraKit.Constants.CAPTURE_MODE_STILL;
 import static com.flurgle.camerakit.CameraKit.Constants.FACING_BACK;
 import static com.flurgle.camerakit.CameraKit.Constants.FACING_FRONT;
 import static com.flurgle.camerakit.CameraKit.Constants.FLASH_AUTO;
 import static com.flurgle.camerakit.CameraKit.Constants.FLASH_OFF;
 import static com.flurgle.camerakit.CameraKit.Constants.FLASH_ON;
-import static com.flurgle.camerakit.CameraKit.Constants.TAP_TO_FOCUS_VISIBLE;
+import static com.flurgle.camerakit.CameraKit.Constants.METHOD_STANDARD;
 
 public class CameraView extends FrameLayout {
-
-    private static final int PERMISSION_REQUEST_CAMERA = 16;
-    private static final int DEFAULT_CAPTURE_SIZE = -1;
-    private static final int DEFAULT_JPEG_COMPRESSION = 100;
 
     @Facing
     private int mFacing;
@@ -48,23 +36,18 @@ public class CameraView extends FrameLayout {
     @Flash
     private int mFlash;
 
-    @TapToFocus
-    private int mTapToFocus;
+    @Focus
+    private int mFocus;
 
-    @CaptureMode
-    private int mCaptureMode;
+    @Method
+    private int mMethod;
 
+    @Zoom
+    private int mZoom;
+
+    private int mJpegQuality;
     private boolean mCropOutput;
-
-    private boolean mContinuousFocus;
-
-    private float mCaptureSize;
-
-    private int mJpegCompression;
-
     private boolean mAdjustViewBounds;
-
-    private boolean mWaitingForPermission;
 
     private CameraListenerMiddleWare mCameraListener;
     private DisplayOrientationDetector mDisplayOrientationDetector;
@@ -79,8 +62,6 @@ public class CameraView extends FrameLayout {
     @SuppressWarnings("all")
     public CameraView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-
-
         if (attrs != null) {
             TypedArray a = context.getTheme().obtainStyledAttributes(
                     attrs,
@@ -88,15 +69,15 @@ public class CameraView extends FrameLayout {
                     0, 0);
 
             try {
-                mFacing = a.getInteger(R.styleable.CameraView_ckFacing, FACING_BACK);
-                mFlash = a.getInteger(R.styleable.CameraView_ckFlash, FLASH_OFF);
-                mTapToFocus = a.getInteger(R.styleable.CameraView_ckTapToFocus, TAP_TO_FOCUS_VISIBLE);
-                mCaptureMode = a.getInteger(R.styleable.CameraView_ckCaptureMode, CAPTURE_MODE_STANDARD);
-                mCropOutput = a.getBoolean(R.styleable.CameraView_ckCropOutput, false);
-                mContinuousFocus = a.getBoolean(R.styleable.CameraView_ckContinuousFocus, true);
-                mCaptureSize = a.getFloat(R.styleable.CameraView_ckCaptureSize, DEFAULT_CAPTURE_SIZE);
-                mJpegCompression = a.getInteger(R.styleable.CameraView_ckJpegCompression, DEFAULT_JPEG_COMPRESSION);
-                mAdjustViewBounds = a.getBoolean(R.styleable.CameraView_android_adjustViewBounds, false);
+                mFacing = a.getInteger(R.styleable.CameraView_ckFacing, CameraKit.Defaults.DEFAULT_FACING);
+                mFlash = a.getInteger(R.styleable.CameraView_ckFlash, CameraKit.Defaults.DEFAULT_FLASH);
+                mFocus = a.getInteger(R.styleable.CameraView_ckFocus, CameraKit.Defaults.DEFAULT_FOCUS);
+                mMethod = a.getInteger(R.styleable.CameraView_ckMethod, CameraKit.Defaults.DEFAULT_METHOD);
+                mZoom = a.getInteger(R.styleable.CameraView_ckZoom, CameraKit.Defaults.DEFAULT_ZOOM);
+
+                mJpegQuality = a.getInteger(R.styleable.CameraView_ckJpegQuality, CameraKit.Defaults.DEFAULT_JPEG_QUALITY);
+                mCropOutput = a.getBoolean(R.styleable.CameraView_ckCropOutput, CameraKit.Defaults.DEFAULT_CROP_OUTPUT);
+                mAdjustViewBounds = a.getBoolean(R.styleable.CameraView_android_adjustViewBounds, CameraKit.Defaults.DEFAULT_ADJUST_VIEW_BOUNDS);
             } finally {
                 a.recycle();
             }
@@ -109,11 +90,9 @@ public class CameraView extends FrameLayout {
 
         setFacing(mFacing);
         setFlash(mFlash);
-        setCaptureMode(mCaptureMode);
-        setCropOutput(mCropOutput);
-        setTapToFocus(mTapToFocus);
-        setContinuousFocus(mContinuousFocus);
-        setCaptureSize(mCaptureSize);
+        setFocus(mFocus);
+        setMethod(mMethod);
+        setZoom(mZoom);
 
         mDisplayOrientationDetector = new DisplayOrientationDetector(context) {
             @Override
@@ -140,30 +119,34 @@ public class CameraView extends FrameLayout {
     }
 
     @Override
-    protected Parcelable onSaveInstanceState() {
-        SavedState state = new SavedState(super.onSaveInstanceState());
-        state.facing = mFacing;
-        state.flash = mFlash;
-        return state;
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Parcelable state) {
-        if (!(state instanceof SavedState)) {
-            super.onRestoreInstanceState(state);
-            return;
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        if (mAdjustViewBounds) {
+            Size previewSize = getPreviewSize();
+            if (getLayoutParams().width == LayoutParams.WRAP_CONTENT) {
+                int height = MeasureSpec.getSize(heightMeasureSpec);
+                float ratio = (float) height / (float) previewSize.getWidth();
+                int width = (int) (previewSize.getHeight() * ratio);
+                super.onMeasure(
+                        MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
+                        heightMeasureSpec
+                );
+            } else if (getLayoutParams().height == LayoutParams.WRAP_CONTENT) {
+                int width = MeasureSpec.getSize(widthMeasureSpec);
+                float ratio = (float) width / (float) previewSize.getHeight();
+                int height = (int) (previewSize.getWidth() * ratio);
+                super.onMeasure(
+                        widthMeasureSpec,
+                        MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY)
+                );
+            }
+        } else {
+            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         }
-
-        SavedState ss = (SavedState) state;
-        super.onRestoreInstanceState(ss.getSuperState());
-        setFacing(ss.facing);
-        setFlash(ss.flash);
     }
 
     public void start() {
         int permissionCheck = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA);
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-            mWaitingForPermission = false;
             mCameraImpl.start();
         } else {
             requestCameraPermission();
@@ -179,6 +162,34 @@ public class CameraView extends FrameLayout {
         mCameraImpl.setFacing(facing);
     }
 
+    public void setFlash(@Flash int flash) {
+        this.mFlash = flash;
+        mCameraImpl.setFlash(flash);
+    }
+
+    public void setFocus(@Focus int focus) {
+        this.mFocus = focus;
+        mCameraImpl.setFocus(mFocus);
+    }
+
+    public void setMethod(@Method int method) {
+        this.mMethod = method;
+        mCameraImpl.setMethod(mMethod);
+    }
+
+    public void setZoom(@Zoom int zoom) {
+        this.mZoom = zoom;
+        mCameraImpl.setZoom(mZoom);
+    }
+
+    public void setJpegQuality(int jpegQuality) {
+        this.mJpegQuality = jpegQuality;
+    }
+
+    public void setCropOutput(boolean cropOutput) {
+        this.mCropOutput = cropOutput;
+    }
+
     @Facing
     public int toggleFacing() {
         switch (mFacing) {
@@ -192,11 +203,6 @@ public class CameraView extends FrameLayout {
         }
 
         return mFacing;
-    }
-
-    public void setFlash(@Flash int flash) {
-        this.mFlash = flash;
-        mCameraImpl.setFlash(flash);
     }
 
     @Flash
@@ -218,50 +224,12 @@ public class CameraView extends FrameLayout {
         return mFlash;
     }
 
-    public void setCaptureMode(@CaptureMode int captureMode) {
-        this.mCaptureMode = captureMode;
-    }
-
-    @CaptureMode
-    public int getCaptureMode() {
-        return mCaptureMode;
-    }
-
-    public void setCropOutput(boolean cropOutput) {
-        this.mCropOutput = cropOutput;
-    }
-
-    public void setTapToFocus(@TapToFocus int tapToFocus) {
-        this.mTapToFocus = tapToFocus;
-        if (tapToFocus == CameraKit.Constants.TAP_TO_FOCUS_OFF) {
-            mPreviewImpl.getView().setOnTouchListener(null);
-        } else {
-            mPreviewImpl.getView().setOnTouchListener(mTapToFocusOnTouchListener);
-        }
-    }
-
-    public void setContinuousFocus(boolean continuousFocus) {
-        this.mContinuousFocus = continuousFocus;
-        mCameraImpl.setContinuousFocus(continuousFocus);
-    }
-
-    public void setCaptureSize(float captureSize) {
-        this.mCaptureSize = captureSize;
-    }
-
     public void setCameraListener(CameraListener cameraListener) {
         this.mCameraListener.setCameraListener(cameraListener);
     }
 
-    public void capturePicture() {
-        switch (mCaptureMode) {
-            case CAPTURE_MODE_STANDARD:
-                mCameraImpl.captureStandard();
-                break;
-            case CAPTURE_MODE_STILL:
-                mCameraImpl.captureStill();
-                break;
-        }
+    public void captureImage() {
+        mCameraImpl.captureImage();
     }
 
     public void startRecordingVideo() {
@@ -291,74 +259,11 @@ public class CameraView extends FrameLayout {
         }
 
         if (activity != null) {
-            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO}, PERMISSION_REQUEST_CAMERA);
-            mWaitingForPermission = true;
+            ActivityCompat.requestPermissions(
+                    activity,
+                    new String[]{Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO},
+                    CameraKit.Constants.PERMISSION_REQUEST_CAMERA);
         }
-    }
-
-    @Override
-    public void onWindowFocusChanged(boolean hasWindowFocus) {
-        super.onWindowFocusChanged(hasWindowFocus);
-        if (mWaitingForPermission) {
-            if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-                start();
-            }
-        }
-    }
-
-    private OnTouchListener mTapToFocusOnTouchListener = new OnTouchListener() {
-        @Override
-        public boolean onTouch(View v, MotionEvent event) {
-            if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                mCameraImpl.focus();
-            }
-
-            return false;
-        }
-
-    };
-
-
-    protected static class SavedState extends BaseSavedState {
-
-        @Facing
-        private int facing;
-
-        @Flash
-        private int flash;
-
-        @SuppressWarnings("WrongConstant")
-        public SavedState(Parcel source, ClassLoader loader) {
-            super(source);
-            facing = source.readInt();
-            flash = source.readInt();
-        }
-
-        public SavedState(Parcelable superState) {
-            super(superState);
-        }
-
-        @Override
-        public void writeToParcel(Parcel out, int flags) {
-            super.writeToParcel(out, flags);
-            out.writeInt(facing);
-            out.writeInt(flash);
-        }
-
-        public static final Parcelable.Creator<SavedState> CREATOR = ParcelableCompat.newCreator(new ParcelableCompatCreatorCallbacks<SavedState>() {
-
-            @Override
-            public SavedState createFromParcel(Parcel in, ClassLoader loader) {
-                return new SavedState(in, loader);
-            }
-
-            @Override
-            public SavedState[] newArray(int size) {
-                return new SavedState[size];
-            }
-
-        });
-
     }
 
     private class CameraListenerMiddleWare extends CameraListener {
@@ -381,10 +286,10 @@ public class CameraView extends FrameLayout {
         public void onPictureTaken(byte[] jpeg) {
             super.onPictureTaken(jpeg);
             if (mCropOutput) {
-                int width = mCaptureMode == CAPTURE_MODE_STANDARD ? mCameraImpl.getCaptureResolution().getWidth() : mCameraImpl.getPreviewResolution().getWidth();
-                int height = mCaptureMode == CAPTURE_MODE_STANDARD ? mCameraImpl.getCaptureResolution().getHeight() : mCameraImpl.getPreviewResolution().getHeight();
+                int width = mMethod == METHOD_STANDARD ? mCameraImpl.getCaptureResolution().getWidth() : mCameraImpl.getPreviewResolution().getWidth();
+                int height = mMethod == METHOD_STANDARD ? mCameraImpl.getCaptureResolution().getHeight() : mCameraImpl.getPreviewResolution().getHeight();
                 AspectRatio outputRatio = AspectRatio.of(getWidth(), getHeight());
-                getCameraListener().onPictureTaken(new CenterCrop(jpeg, outputRatio, mJpegCompression).getJpeg());
+                getCameraListener().onPictureTaken(new CenterCrop(jpeg, outputRatio, mJpegQuality).getJpeg());
             } else {
                 getCameraListener().onPictureTaken(jpeg);
             }
@@ -395,10 +300,10 @@ public class CameraView extends FrameLayout {
             super.onPictureTaken(yuv);
             if (mCropOutput) {
                 AspectRatio outputRatio = AspectRatio.of(getWidth(), getHeight());
-                getCameraListener().onPictureTaken(new CenterCrop(yuv, outputRatio, mJpegCompression).getJpeg());
+                getCameraListener().onPictureTaken(new CenterCrop(yuv, outputRatio, mJpegQuality).getJpeg());
             } else {
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
-                yuv.compressToJpeg(new Rect(0, 0, yuv.getWidth(), yuv.getHeight()), mJpegCompression, out);
+                yuv.compressToJpeg(new Rect(0, 0, yuv.getWidth(), yuv.getHeight()), mJpegQuality, out);
                 getCameraListener().onPictureTaken(out.toByteArray());
             }
         }

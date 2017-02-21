@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        camera.capturePicture();
+        camera.captureImage();
     }
 
     @OnClick(R.id.captureVideo)
@@ -191,10 +191,10 @@ public class MainActivity extends AppCompatActivity {
     RadioGroup.OnCheckedChangeListener captureModeChangedListener = new RadioGroup.OnCheckedChangeListener() {
         @Override
         public void onCheckedChanged(RadioGroup group, int checkedId) {
-            camera.setCaptureMode(
+            camera.setMethod(
                     checkedId == R.id.modeCaptureQuality ?
-                            CameraKit.Constants.CAPTURE_MODE_STANDARD :
-                            CameraKit.Constants.CAPTURE_MODE_STILL
+                            CameraKit.Constants.METHOD_STANDARD :
+                            CameraKit.Constants.METHOD_STILL
             );
 
             Toast.makeText(MainActivity.this, "Picture capture set to" + (checkedId == R.id.modeCaptureQuality ? " quality!" : " speed!"), Toast.LENGTH_SHORT).show();
@@ -215,12 +215,12 @@ public class MainActivity extends AppCompatActivity {
     RadioGroup.OnCheckedChangeListener tapToFocusModeChangedListener = new RadioGroup.OnCheckedChangeListener() {
         @Override
         public void onCheckedChanged(RadioGroup group, int checkedId) {
-            camera.setTapToFocus(
+            camera.setFocus(
                     checkedId == R.id.modeTapToFocusVisible ?
-                            CameraKit.Constants.TAP_TO_FOCUS_VISIBLE :
+                            CameraKit.Constants.FOCUS_CONTINUOUS :
                             checkedId == R.id.modeTapToFocusInvisible ?
-                                    CameraKit.Constants.TAP_TO_FOCUS_INVISIBLE :
-                                    CameraKit.Constants.TAP_TO_FOCUS_OFF
+                                    CameraKit.Constants.FOCUS_TAP :
+                                    CameraKit.Constants.FOCUS_OFF
             );
 
             Toast.makeText(MainActivity.this, "Tap to focus is" + (checkedId == R.id.modeTapToFocusOff ? " off!" : (checkedId == R.id.modeTapToFocusVisible) ? " on and visible!" : " on and invisible!"), Toast.LENGTH_SHORT).show();

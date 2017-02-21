@@ -5,11 +5,11 @@ import android.support.annotation.IntDef;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-import static com.flurgle.camerakit.CameraKit.Constants.TAP_TO_FOCUS_INVISIBLE;
-import static com.flurgle.camerakit.CameraKit.Constants.TAP_TO_FOCUS_OFF;
-import static com.flurgle.camerakit.CameraKit.Constants.TAP_TO_FOCUS_VISIBLE;
+import static com.flurgle.camerakit.CameraKit.Constants.FOCUS_TAP;
+import static com.flurgle.camerakit.CameraKit.Constants.FOCUS_OFF;
+import static com.flurgle.camerakit.CameraKit.Constants.FOCUS_CONTINUOUS;
 
 @Retention(RetentionPolicy.SOURCE)
-@IntDef({TAP_TO_FOCUS_VISIBLE, TAP_TO_FOCUS_INVISIBLE, TAP_TO_FOCUS_OFF})
+@IntDef({FOCUS_CONTINUOUS, FOCUS_TAP, FOCUS_OFF})
 public @interface Focus {
 }
