@@ -11,5 +11,5 @@ import static com.flurgle.camerakit.CameraKit.Constants.TAP_TO_FOCUS_VISIBLE;
 
 @Retention(RetentionPolicy.SOURCE)
 @IntDef({TAP_TO_FOCUS_VISIBLE, TAP_TO_FOCUS_INVISIBLE, TAP_TO_FOCUS_OFF})
-public @interface TapToFocus {
+public @interface Focus {
 }

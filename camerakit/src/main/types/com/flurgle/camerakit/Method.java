@@ -10,5 +10,5 @@ import static com.flurgle.camerakit.CameraKit.Constants.CAPTURE_MODE_STILL;
 
 @Retention(RetentionPolicy.SOURCE)
 @IntDef({CAPTURE_MODE_STANDARD, CAPTURE_MODE_STILL})
-public @interface CaptureMode {
+public @interface Method {
 }
