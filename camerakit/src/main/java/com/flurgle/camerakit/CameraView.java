@@ -130,6 +130,7 @@ public class CameraView extends FrameLayout {
                         MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
                         heightMeasureSpec
                 );
+                return;
             } else if (getLayoutParams().height == LayoutParams.WRAP_CONTENT) {
                 int width = MeasureSpec.getSize(widthMeasureSpec);
                 float ratio = (float) width / (float) previewSize.getHeight();
@@ -138,10 +139,11 @@ public class CameraView extends FrameLayout {
                         widthMeasureSpec,
                         MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY)
                 );
+                return;
             }
-        } else {
-            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         }
+
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
     public void start() {

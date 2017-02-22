@@ -18,26 +18,20 @@ Try out all the unique features using the CameraKit Demo from the Google Play st
 - [Features](#features)
 - [Setup](#setup)
 - [Usage](#usage)
-  - [Events](#events)
-  - [Extra Attributes](#extra-attributes)
-    - [`ckFacing`](#ckfacing)
-    - [`ckFlash`](#ckflash)
-    - [`ckFocus`](#ckfocus)
-    - [`ckMethod`](#ckmethod)
-    - [`ckZoom`](#ckzoom)
-    - [`ckCropOutput`](#ckcropoutput)
-    - [`ckJpegQuality`](#ckjpegquality)
   - [Capturing Images](#capturing-images)
   - [Capturing Video](#capturing-video)
+- [Extra Attributes](#extra-attributes)
+  - [`ckFacing`](#ckfacing)
+  - [`ckFlash`](#ckflash)
+  - [`ckFocus`](#ckfocus)
+  - [`ckMethod`](#ckmethod)
+  - [`ckZoom`](#ckzoom)
+  - [`ckCropOutput`](#ckcropoutput)
+  - [`ckJpegQuality`](#ckjpegquality)
 - [Automatic Permissions Behavior](#automatic-permissions-behavior)
 - [Dynamic Sizing Behavior](#dynamic-sizing-behavior)
-  - [Output Cropping](#output-cropping)
   - [`adjustViewBounds`](#adjustviewbounds)
-- [Capture Methods](#capture-methods)
-  - [Standard](#standard)
-  - [Still](#still)
-  - [Auto](#auto)
-- [Focus](#focus)
+- [Events](#events)
 - [Credits](#credits)
 - [License](#license)
 
@@ -52,7 +46,7 @@ Try out all the unique features using the CameraKit Demo from the Google Play st
 - Multiple capture methods.
   - `METHOD_STANDARD`: an image captured normally using the camera APIs.
   - `METHOD_STILL`: a freeze frame of the `CameraView` preview (similar to SnapChat and Instagram) for devices with slower cameras.
-  - Automatic picture mode determination based on measured speed.
+  - `METHOD_AUTO`: automatic capture method determination based on measured speed.
 - Built-in tap to focus and auto focus.
 - Built-in pinch to zoom.
 
@@ -91,105 +85,6 @@ protected void onPause() {
     super.onPause();
 }
 ```
-
-### Events
-
-Make sure you can react to different camera events by setting up a `CameraListener` instance.
-
-```java
-camera.setCameraListener(new CameraListener() {
-
-    @Override
-    public void onCameraOpened() {
-        super.onCameraOpened();
-    }
-
-    @Override
-    public void onCameraClosed() {
-        super.onCameraClosed();
-    }
-
-    @Override
-    public void onPictureTaken(byte[] picture) {
-        super.onPictureTaken(picture);
-    }
-
-    @Override
-    public void onVideoTaken(File video) {
-        super.onVideoTaken(video);
-    }
-
-});
-```
-
-### Extra Attributes
-
-```xml
-<com.flurgle.camerakit.CameraView xmlns:camerakit="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/camera"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    camerakit:ckFacing="back"
-    camerakit:ckFlash="off"
-    camerakit:ckFocus="continuous"
-    camerakit:ckMethod="standard"
-    camerakit:ckZoom="pinch"
-    camerakit:ckCropOutput="true"  
-    camerakit:ckJpegQuality="100"
-    android:adjustViewBounds="true" />
-```
-
-#### `ckFacing`
-
-| Value         | Description  |
-| --------------| -------------|
-| `back`        | Default `CameraView` preview to back camera. |
-| `front`       | Default `CameraView` preview to front camera. |
-
-#### `ckFlash`
-
-| Value         | Description  |
-| --------------| -------------|
-| `off`         | Default `CameraView` flash to off. |
-| `on`          | Default `CameraView` flash to on. |
-| `auto`        | Default `CameraView` flash to automatic. |
-
-#### `ckFocus`
-
-| Value         | Description  |
-| --------------| -------------|
-| `off`         | Tap to focus is enabled and a visible focus circle appears when tapped, similar to the Android built-in camera. |
-| `continuous`  | Tap to focus is enabled, but no focus circle appears. |
-| `tap`         | Tap to focus is off. |
-
-#### `ckMethod`
-
-| Value         | Description  |
-| --------------| -------------|
-| `standard`    | Use normal Android Camera API image capturing. |
-| `still`       | Freeze the `CameraView` preview and grab a `Bitmap` of the frame. |
-| `auto` (coming soon) | Default picture mode to `standard`, but fallback to `still` if capturing is determined to be too slow. |
-
-#### `ckZoom`
-
-| Value         | Description  |
-| --------------| -------------|
-| `off`         | User can zoom using pinching gestures with their fingers.  |
-| `pinch`       | User can zoom in and out using pinching gestures on the `CameraView`. |
-
-#### `ckCropOutput`
-
-| Value         | Description  |
-| --------------| -------------|
-| `true`        | Crop the output image or video to only contain what can be seen on the `CameraView` preview. |
-| `false`       | Output the full image or video regardless of what is visible on the `CameraView` preview. |
-
-#### `ckJpegQuality`
-
-| Value         | Description  |
-| --------------| -------------|
-| `0 <= n <= 100`| Percent quality for returned JPEG data. |
-
 
 ### Capturing Images
 
@@ -231,6 +126,175 @@ camera.postDelayed(new Runnable() {
 }, 2500);
 ```
 
+## Extra Attributes
+
+```xml
+<com.flurgle.camerakit.CameraView xmlns:camerakit="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/camera"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    camerakit:ckFacing="back"
+    camerakit:ckFlash="off"
+    camerakit:ckFocus="continuous"
+    camerakit:ckMethod="standard"
+    camerakit:ckZoom="pinch"
+    camerakit:ckCropOutput="true"  
+    camerakit:ckJpegQuality="100"
+    android:adjustViewBounds="true" />
+```
+
+|Attribute|Values|
+|---------|------|
+|[`ckFacing`](#ckfacing)|[`back`](#back) [`front`](#front)|
+|[`ckFlash`](#ckflash)|[`off`](#off) [`on`](#on) [`auto`](#auto)|
+|[`ckFocus`](#ckfocus)|[`off`](#off-1) [`continuous`](#continuous) [`tap`](#tap)|
+|[`ckMethod`](#ckmethod)|[`standard`](#standard) [`still`](#still) [`speed`](#speed)|
+|[`ckZoom`](#ckzoom)|[`off`](#off-2) [`pinch`](#pinch)|
+|[`ckCropOutput`](#ckcropoutput)|[`true`](#true) [`false`](#false)|
+|[`ckJpegQuality`](#ckjpegquality)|[`0 <= n <= 100`](#ckjpegquality)|
+
+- - -
+
+### `ckFacing`
+[`back`](#back) [`front`](#front)
+
+#### `back`
+
+```java
+cameraView.setFacing(CameraKit.Constants.FACING_BACK);
+```
+
+#### `front`
+
+```java
+cameraView.setFacing(CameraKit.Constants.FACING_FRONT);
+```
+
+- - -
+
+### `ckFlash`
+[`off`](#off) [`on`](#on) [`auto`](#auto)
+
+#### `off`
+
+```java
+cameraView.setFlash(CameraKit.Constants.FLASH_OFF);
+```
+
+#### `on`
+
+```java
+cameraView.setFlash(CameraKit.Constants.FLASH_ON);
+```
+
+#### `auto`
+
+```java
+cameraView.setFlash(CameraKit.Constants.FLASH_AUTO);
+```
+
+- - -
+
+### `ckFocus`
+[`off`](#off-1) [`continuous`](#continuous) [`tap`](#tap)
+
+#### `off`
+
+```java
+cameraView.setFocus(CameraKit.Constants.FOCUS_OFF);
+```
+
+#### `continuous`
+
+```java
+cameraView.setFocus(CameraKit.Constants.FOCUS_CONTINUOUS);
+```
+
+#### `tap`
+
+```java
+cameraView.setFocus(CameraKit.Constants.FOCUS_TAP);
+```
+
+- - -
+
+### `ckMethod`
+[`standard`](#standard) [`still`](#still) [`speed`](#speed)
+
+#### `standard`
+
+```java
+cameraView.setMethod(CameraKit.Constants.METHOD_STANDARD);
+```
+
+When you use `METHOD_STANDARD` (`camerakit:ckMethod="standard"`), images will be captured using the normal camera API capture method using the shutter.
+
+[Insert GIF]
+
+#### `still`
+
+```java
+cameraView.setMethod(CameraKit.Constants.METHOD_STILL);
+```
+
+When you use `METHOD_STILL` (`camerakit:ckMethod="still"`), images will be captured by grabbing a single frame from the preview. This behavior is the same as SnapChat and Instagram. This method has a higher rate of motion blur but can be a better experience for users with slower cameras.
+
+[Insert GIF]
+
+#### `speed`
+
+```java
+cameraView.setMethod(CameraKit.Constants.METHOD_SPEED);
+```
+
+When you use `METHOD_SPEED` (`camerakit:ckMethod="speed"`), images will be first be captured using the [standard](#standard) method. If capture consistently takes a long amount of time, the picture mode will fallback to [still](#still) capture.
+
+[Insert GIF]
+
+- - -
+
+### `ckZoom`
+[`off`](#off-2) [`pinch`](#pinch)
+
+#### `off`
+
+```java
+cameraView.setZoom(CameraKit.Constants.ZOOM_OFF);
+```
+
+#### `pinch`
+
+```java
+cameraView.setZoom(CameraKit.Constants.ZOOM_PINCH);
+```
+
+- - -
+
+### `ckCropOutput`
+[`true`](#true) [`false`](#false)
+
+#### `true`
+
+```java
+cameraView.setCropOutput(true);
+```
+
+#### `false`
+
+```java
+cameraView.setCropOutput(false);
+```
+
+- - -
+
+### `ckJpegQuality`
+
+```java
+cameraView.setJpegQuality(100);
+```
+
+- - -
+
 ## Automatic Permissions Behavior
 
 You can handle permissions yourself in whatever way you want, but if you make a call to `CameraView.start()` without the `android.permission.CAMERA` permission, an exception would normally be thrown and your app would crash.
@@ -243,13 +307,7 @@ With CameraKit, we will automatically prompt for the `android.permission.CAMERA`
 
 You can setup the `CameraView` dimensions however you want. When your dimensions don't match the aspect ratio of the internal preview surface, the surface will be cropped minimally to fill the view. The behavior is the same as the `android:scaleType="centerCrop"` on an `ImageView`.
 
-[Insert GIF]
-
-### Output Cropping
-
-When you capture output you can either capture everything - even what is not visible to the user on the `CameraView` - or just the visible preview. See [`ckCropOutput`](#ckcropoutput) above for usage.
-
-[Insert GIF]
+![Dynamic sizing gif](.repo/sizing.gif)
 
 ### `adjustViewBounds`
 
@@ -257,35 +315,35 @@ You can use a mix of a fixed dimension (a set value or `match_parent`) as well a
 
 When you do this the dimension set to `wrap_content` will automatically align with the true aspect ratio of the preview surface. In this case the whole preview will be visible with no cropping.
 
-## Capture Methods
+## Events
 
-We decided to add multiple capture modes to CameraKit to allow you to give a better image capturing experience to users with slower cameras when appropriate.
+Make sure you can react to different camera events by setting up a `CameraListener` instance.
 
-See [`ckMethod`](#ckmethod) above for usage.
+```java
+camera.setCameraListener(new CameraListener() {
 
-### Standard
+    @Override
+    public void onCameraOpened() {
+        super.onCameraOpened();
+    }
 
-When you use `METHOD_STANDARD` (`camerakit:ckMethod="standard"`), images will be captured using the normal camera API capture method using the shutter.
+    @Override
+    public void onCameraClosed() {
+        super.onCameraClosed();
+    }
 
-[Insert GIF]
+    @Override
+    public void onPictureTaken(byte[] picture) {
+        super.onPictureTaken(picture);
+    }
 
-### Still
+    @Override
+    public void onVideoTaken(File video) {
+        super.onVideoTaken(video);
+    }
 
-When you use `METHOD_STILL` (`camerakit:ckMethod="still"`), images will be captured by grabbing a single frame from the preview. This behavior is the same as SnapChat and Instagram. This method has a higher rate of motion blur but can be a better experience for users with slower cameras.
-
-[Insert GIF]
-
-### Auto
-
-When you use `METHOD_AUTO` (`camerakit:ckMethod="auto"`), images will be first be captured using the [standard](#standard) method. If capture consistently takes a long amount of time, the picture mode will fallback to [still](#still) capture.
-
-[Insert GIF]
-
-## Focus
-
-Along with the always on auto-focus, you can enable tap to focus in your `CameraView`. See [`ckFocus`](#ckFocus) for usage. You have the option of having it on with a visible focus marker, on with no marker, or off.
-
-[Insert GIF]
+});
+```
 
 ## Credits
 

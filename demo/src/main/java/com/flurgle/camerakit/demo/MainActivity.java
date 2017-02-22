@@ -24,7 +24,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnLayoutChangeListener {
 
     @BindView(R.id.activity_main)
     ViewGroup parent;
@@ -41,11 +41,6 @@ public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.cropModeRadioGroup)
     RadioGroup cropModeRadioGroup;
-
-    // Tap to Focus:
-
-    @BindView(R.id.tapToFocusModeRadioGroup)
-    RadioGroup tapToFocusModeRadioGroup;
 
     // Width:
 
@@ -86,20 +81,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        camera.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-            @Override
-            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                mCameraWidth = right - left;
-                mCameraHeight = bottom - top;
-
-                width.setText(String.valueOf(mCameraWidth));
-                height.setText(String.valueOf(mCameraHeight));
-            }
-        });
+        camera.addOnLayoutChangeListener(this);
 
         captureModeRadioGroup.setOnCheckedChangeListener(captureModeChangedListener);
         cropModeRadioGroup.setOnCheckedChangeListener(cropModeChangedListener);
-        tapToFocusModeRadioGroup.setOnCheckedChangeListener(tapToFocusModeChangedListener);
         widthModeRadioGroup.setOnCheckedChangeListener(widthModeChangedListener);
         heightModeRadioGroup.setOnCheckedChangeListener(heightModeChangedListener);
     }
@@ -128,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
                 ResultHolder.dispose();
                 ResultHolder.setImage(bitmap);
                 ResultHolder.setNativeCaptureSize(
-                        captureModeRadioGroup.getCheckedRadioButtonId() == R.id.modeCaptureQuality ?
+                        captureModeRadioGroup.getCheckedRadioButtonId() == R.id.modeCaptureStandard ?
                                 camera.getCaptureSize() : camera.getPreviewSize()
                 );
                 ResultHolder.setTimeToCallback(callbackTime - startTime);
@@ -192,12 +177,12 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onCheckedChanged(RadioGroup group, int checkedId) {
             camera.setMethod(
-                    checkedId == R.id.modeCaptureQuality ?
+                    checkedId == R.id.modeCaptureStandard ?
                             CameraKit.Constants.METHOD_STANDARD :
                             CameraKit.Constants.METHOD_STILL
             );
 
-            Toast.makeText(MainActivity.this, "Picture capture set to" + (checkedId == R.id.modeCaptureQuality ? " quality!" : " speed!"), Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, "Picture capture set to" + (checkedId == R.id.modeCaptureStandard ? " quality!" : " speed!"), Toast.LENGTH_SHORT).show();
         }
     };
 
@@ -209,21 +194,6 @@ public class MainActivity extends AppCompatActivity {
             );
 
             Toast.makeText(MainActivity.this, "Picture cropping is" + (checkedId == R.id.modeCropVisible ? " on!" : " off!"), Toast.LENGTH_SHORT).show();
-        }
-    };
-
-    RadioGroup.OnCheckedChangeListener tapToFocusModeChangedListener = new RadioGroup.OnCheckedChangeListener() {
-        @Override
-        public void onCheckedChanged(RadioGroup group, int checkedId) {
-            camera.setFocus(
-                    checkedId == R.id.modeTapToFocusVisible ?
-                            CameraKit.Constants.FOCUS_CONTINUOUS :
-                            checkedId == R.id.modeTapToFocusInvisible ?
-                                    CameraKit.Constants.FOCUS_TAP :
-                                    CameraKit.Constants.FOCUS_OFF
-            );
-
-            Toast.makeText(MainActivity.this, "Tap to focus is" + (checkedId == R.id.modeTapToFocusOff ? " off!" : (checkedId == R.id.modeTapToFocusVisible) ? " on and visible!" : " on and invisible!"), Toast.LENGTH_SHORT).show();
         }
     };
 
@@ -322,9 +292,20 @@ public class MainActivity extends AppCompatActivity {
         cameraLayoutParams.width = width;
         cameraLayoutParams.height = height;
 
+        camera.addOnLayoutChangeListener(this);
         camera.setLayoutParams(cameraLayoutParams);
 
         Toast.makeText(this, (updateWidth && updateHeight ? "Width and height" : updateWidth ? "Width" : "Height") + " updated!", Toast.LENGTH_SHORT).show();
     }
 
+    @Override
+    public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+        mCameraWidth = right - left;
+        mCameraHeight = bottom - top;
+
+        width.setText(String.valueOf(mCameraWidth));
+        height.setText(String.valueOf(mCameraHeight));
+
+        camera.removeOnLayoutChangeListener(this);
+    }
 }

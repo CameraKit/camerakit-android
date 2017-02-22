@@ -18,12 +18,13 @@
             android:layout_width="match_parent"
             android:layout_height="500dp"
             android:layout_gravity="center_horizontal"
-            app:ckCaptureMode="standard"
+            android:adjustViewBounds="true"
             app:ckCropOutput="false"
             app:ckFacing="back"
             app:ckFlash="off"
             app:ckFocus="continuous"
-            app:ckJpegQuality="100" />
+            app:ckJpegQuality="100"
+            app:ckMethod="standard" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -106,7 +107,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="3dp"
-                        android:text="PICTURE MODE"
+                        android:text="CAPTURE METHOD"
                         android:textColor="@android:color/black"
                         android:textSize="14dp"
                         android:textStyle="bold" />
@@ -116,21 +117,21 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:checkedButton="@+id/modeCaptureQuality"
+                        android:checkedButton="@+id/modeCaptureStandard"
                         android:orientation="horizontal">
 
                         <RadioButton
-                            android:id="@+id/modeCaptureQuality"
+                            android:id="@+id/modeCaptureStandard"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Quality" />
+                            android:text="Standard" />
 
                         <RadioButton
-                            android:id="@+id/modeCaptureSpeed"
+                            android:id="@+id/modeCaptureStill"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
-                            android:text="Speed" />
+                            android:text="Still" />
 
                     </RadioGroup>
 
@@ -158,7 +159,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="3dp"
-                        android:text="OUTPUT"
+                        android:text="CROP OUTPUT"
                         android:textColor="@android:color/black"
                         android:textSize="14dp"
                         android:textStyle="bold" />
@@ -175,73 +176,14 @@
                             android:id="@+id/modeCropFullSize"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Full size" />
+                            android:text="Off" />
 
                         <RadioButton
                             android:id="@+id/modeCropVisible"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
-                            android:text="Crop to visible" />
-
-                    </RadioGroup>
-
-                </LinearLayout>
-
-            </FrameLayout>
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp">
-
-                <View
-                    android:layout_width="2.5dp"
-                    android:layout_height="match_parent"
-                    android:background="@color/colorPrimary" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="3dp"
-                        android:text="TAP TO FOCUS"
-                        android:textColor="@android:color/black"
-                        android:textSize="14dp"
-                        android:textStyle="bold" />
-
-                    <RadioGroup
-                        android:id="@+id/tapToFocusModeRadioGroup"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:checkedButton="@+id/modeTapToFocusVisible"
-                        android:orientation="horizontal">
-
-                        <RadioButton
-                            android:id="@+id/modeTapToFocusVisible"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Visible" />
-
-                        <RadioButton
-                            android:id="@+id/modeTapToFocusInvisible"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="10dp"
-                            android:text="Invisible" />
-
-                        <RadioButton
-                            android:id="@+id/modeTapToFocusOff"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="10dp"
-                            android:text="Off" />
+                            android:text="On" />
 
                     </RadioGroup>
 

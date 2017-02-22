@@ -16,8 +16,8 @@ abstract class PreviewImpl {
     private int mWidth;
     private int mHeight;
 
-    private int mTrueWidth;
-    private int mTrueHeight;
+    protected int mTrueWidth;
+    protected int mTrueHeight;
 
     void setCallback(Callback callback) {
         mCallback = callback;
@@ -76,9 +76,11 @@ abstract class PreviewImpl {
             }
 
             if (scaleY > 1) {
+                getView().setScaleX(1);
                 getView().setScaleY(scaleY);
             } else {
                 getView().setScaleX(1 / scaleY);
+                getView().setScaleY(1);
             }
         }
     }

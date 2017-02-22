@@ -24,7 +24,7 @@ public class CameraKit {
 
         public static final int METHOD_STANDARD = 0;
         public static final int METHOD_STILL = 1;
-        public static final int METHOD_AUTO = 2;
+        public static final int METHOD_SPEED = 2;
 
         public static final int FOCUS_OFF = 0;
         public static final int FOCUS_CONTINUOUS = 1;

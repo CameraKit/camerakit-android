@@ -33,6 +33,7 @@ class TextureViewPreview extends PreviewImpl {
                 setSize(width, height);
                 configureTransform();
                 dispatchSurfaceChanged();
+                setTruePreviewSize(mTrueWidth, mTrueHeight);
             }
 
             @Override

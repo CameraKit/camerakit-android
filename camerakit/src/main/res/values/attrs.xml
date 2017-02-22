@@ -35,7 +35,7 @@
             <enum name="still" value="1" />
 
             <!-- TODO: Set to unique value when feature added -->
-            <enum name="auto" value="0" />
+            <enum name="speed" value="0" />
         </attr>
 
         <attr name="ckJpegQuality" format="integer" />
