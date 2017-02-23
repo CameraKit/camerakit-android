@@ -303,6 +303,9 @@ public class Camera1 extends CameraImpl {
         if (mCamera != null) {
             mCamera.release();
             mCamera = null;
+            mCameraParameters = null;
+            mPreviewSize = null;
+            mCaptureSize = null;
             mCameraListener.onCameraClosed();
         }
     }
@@ -316,12 +319,12 @@ public class Camera1 extends CameraImpl {
     }
 
     private void adjustCameraParameters() {
-        mCameraParameters.setPreviewSize(
+        mPreview.setTruePreviewSize(
                 getPreviewResolution().getWidth(),
                 getPreviewResolution().getHeight()
         );
 
-        mPreview.setTruePreviewSize(
+        mCameraParameters.setPreviewSize(
                 getPreviewResolution().getWidth(),
                 getPreviewResolution().getHeight()
         );
