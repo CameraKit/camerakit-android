@@ -2,8 +2,11 @@ package com.flurgle.camerakit;
 
 import android.graphics.YuvImage;
 import android.hardware.Camera;
+import android.media.CamcorderProfile;
+import android.media.MediaRecorder;
 import android.view.SurfaceHolder;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -27,6 +30,8 @@ public class Camera1 extends CameraImpl {
     private Camera.CameraInfo mCameraInfo;
     private Size mPreviewSize;
     private Size mCaptureSize;
+    private MediaRecorder mMediaRecorder;
+    private File mVideoFile;
 
     private int mDisplayOrientation;
 
@@ -58,6 +63,7 @@ public class Camera1 extends CameraImpl {
         });
 
         mCameraInfo = new Camera.CameraInfo();
+
     }
 
     // CameraImpl:
@@ -200,12 +206,16 @@ public class Camera1 extends CameraImpl {
 
     @Override
     void startVideo() {
-
+        initMediaRecorder();
+        prepareMediaRecorder();
+        mMediaRecorder.start();
     }
 
     @Override
     void endVideo() {
-
+        mMediaRecorder.stop();
+        mMediaRecorder = null;
+        mCameraListener.onVideoTaken(mVideoFile);
     }
 
     @Override
@@ -366,6 +376,35 @@ public class Camera1 extends CameraImpl {
         }
 
         return output;
+    }
+
+    private void initMediaRecorder() {
+        mMediaRecorder = new MediaRecorder();
+        mCamera.unlock();
+
+        mMediaRecorder.setCamera(mCamera);
+        mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+        mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
+        mMediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_480P));
+
+        mVideoFile = new File(mPreview.getView().getContext().getExternalFilesDir(null), "video.mp4");
+        mMediaRecorder.setOutputFile(mVideoFile.getAbsolutePath());
+
+        mMediaRecorder.setMaxDuration(20000);
+        mMediaRecorder.setMaxFileSize(5000000);
+        mMediaRecorder.setOrientationHint(mCameraInfo.orientation);
+    }
+
+    private void prepareMediaRecorder() {
+       // mMediaRecorder.setPreviewDisplay(mPreview.getSurface());
+
+        try {
+            mMediaRecorder.prepare();
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }
