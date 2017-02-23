@@ -3,7 +3,7 @@ apply plugin: 'com.android.library'
 ext {
     PUBLISH_GROUP_ID = 'com.flurgle'
     PUBLISH_ARTIFACT_ID = 'camerakit'
-    PUBLISH_VERSION = '0.9.10'
+    PUBLISH_VERSION = '0.9.11'
 }
 
 android {
