@@ -230,13 +230,13 @@ public class Camera1 extends CameraImpl {
                     mCameraParameters.getSupportedPreviewSizes(),
                     mCameraParameters.getSupportedPictureSizes()
             );
-            AspectRatio targetRatio = aspectRatios.last();
+            AspectRatio targetRatio = aspectRatios.size() > 0 ? aspectRatios.last() : null;
 
             Iterator<Size> descendingSizes = sizes.descendingIterator();
             Size size;
             while (descendingSizes.hasNext() && mCaptureSize == null) {
                 size = descendingSizes.next();
-                if (targetRatio.matches(size)) {
+                if (targetRatio == null || targetRatio.matches(size)) {
                     mCaptureSize = size;
                     break;
                 }
@@ -258,13 +258,13 @@ public class Camera1 extends CameraImpl {
                     mCameraParameters.getSupportedPreviewSizes(),
                     mCameraParameters.getSupportedPictureSizes()
             );
-            AspectRatio targetRatio = aspectRatios.last();
+            AspectRatio targetRatio = aspectRatios.size() > 0 ? aspectRatios.last() : null;
 
             Iterator<Size> descendingSizes = sizes.descendingIterator();
             Size size;
             while (descendingSizes.hasNext() && mPreviewSize == null) {
                 size = descendingSizes.next();
-                if (targetRatio.matches(size)) {
+                if (targetRatio == null || targetRatio.matches(size)) {
                     mPreviewSize = size;
                     break;
                 }
