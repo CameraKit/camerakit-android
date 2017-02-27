@@ -396,8 +396,6 @@ public class Camera1 extends CameraImpl {
     }
 
     private void prepareMediaRecorder() {
-       // mMediaRecorder.setPreviewDisplay(mPreview.getSurface());
-
         try {
             mMediaRecorder.prepare();
         } catch (IllegalStateException e) {

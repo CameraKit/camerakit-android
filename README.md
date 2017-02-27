@@ -38,7 +38,6 @@ Try out all the unique features using the CameraKit Demo from the Google Play st
 ## Features
 
 - Image and video capture seamlessly working with the same preview session.
-- Automatic use of both Camera and Camera2 APIs.
 - Automatic system permission handling.
 - Automatic preview scaling.
   - Create a `CameraView` of any size (not just presets!).
@@ -46,16 +45,17 @@ Try out all the unique features using the CameraKit Demo from the Google Play st
 - Multiple capture methods.
   - `METHOD_STANDARD`: an image captured normally using the camera APIs.
   - `METHOD_STILL`: a freeze frame of the `CameraView` preview (similar to SnapChat and Instagram) for devices with slower cameras.
-  - `METHOD_AUTO`: automatic capture method determination based on measured speed.
-- Built-in tap to focus and auto focus.
-- Built-in pinch to zoom.
+  - **Coming soon:** `METHOD_SPEED`: automatic capture method determination based on measured speed.
+- Built-in continuous focus.
+- **Coming soon:** Built-in tap to focus.
+- **Coming soon:** Built-in pinch to zoom.
 
 ## Setup
 
 Add __CameraKit__ to the dependencies block in your `app` level `build.gradle`:
 
 ```groovy
-compile 'com.flurgle:camerakit:1.0.0'
+compile 'com.flurgle:camerakit:0.9.12'
 ```
 
 ## Usage
@@ -229,8 +229,6 @@ cameraView.setMethod(CameraKit.Constants.METHOD_STANDARD);
 
 When you use `METHOD_STANDARD` (`camerakit:ckMethod="standard"`), images will be captured using the normal camera API capture method using the shutter.
 
-[Insert GIF]
-
 #### `still`
 
 ```java
@@ -239,17 +237,15 @@ cameraView.setMethod(CameraKit.Constants.METHOD_STILL);
 
 When you use `METHOD_STILL` (`camerakit:ckMethod="still"`), images will be captured by grabbing a single frame from the preview. This behavior is the same as SnapChat and Instagram. This method has a higher rate of motion blur but can be a better experience for users with slower cameras.
 
-[Insert GIF]
-
 #### `speed`
+
+**Coming soon**
 
 ```java
 cameraView.setMethod(CameraKit.Constants.METHOD_SPEED);
 ```
 
-When you use `METHOD_SPEED` (`camerakit:ckMethod="speed"`), images will be first be captured using the [standard](#standard) method. If capture consistently takes a long amount of time, the picture mode will fallback to [still](#still) capture.
-
-[Insert GIF]
+When you use `METHOD_SPEED` (`camerakit:ckMethod="speed"`), images will be captured using both `METHOD_STANDARD` and `METHOD_SPEED`. After 6 image captures the camera will set itself to `METHOD_STANDARD` or `METHOD_STILL` permanently based on whichever is faster.
 
 - - -
 
