@@ -343,7 +343,7 @@ camera.setCameraListener(new CameraListener() {
 
 ## Credits
 
-Dylan McIntyre
+[Dylan McIntyre](https://github.com/dwillmc)
 
 ## License
 
