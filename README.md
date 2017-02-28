@@ -143,15 +143,15 @@ camera.postDelayed(new Runnable() {
     android:adjustViewBounds="true" />
 ```
 
-|Attribute|Values|
-|---------|------|
-|[`ckFacing`](#ckfacing)|[`back`](#back) [`front`](#front)|
-|[`ckFlash`](#ckflash)|[`off`](#off) [`on`](#on) [`auto`](#auto)|
-|[`ckFocus`](#ckfocus)|[`off`](#off-1) [`continuous`](#continuous) [`tap`](#tap)|
-|[`ckMethod`](#ckmethod)|[`standard`](#standard) [`still`](#still) [`speed`](#speed)|
-|[`ckZoom`](#ckzoom)|[`off`](#off-2) [`pinch`](#pinch)|
-|[`ckCropOutput`](#ckcropoutput)|[`true`](#true) [`false`](#false)|
-|[`ckJpegQuality`](#ckjpegquality)|[`0 <= n <= 100`](#ckjpegquality)|
+|Attribute|Values|Default Value|
+|---------|------|-------------|
+|[`ckFacing`](#ckfacing)|[`back`](#back) [`front`](#front)|`back`|
+|[`ckFlash`](#ckflash)|[`off`](#off) [`on`](#on) [`auto`](#auto)|`off`|
+|[`ckFocus`](#ckfocus)|[`off`](#off-1) [`continuous`](#continuous) [`tap`](#tap)|`continuous`|
+|[`ckMethod`](#ckmethod)|[`standard`](#standard) [`still`](#still) [`speed`](#speed)|`standard`|
+|[`ckZoom`](#ckzoom)|[`off`](#off-2) [`pinch`](#pinch)|`off`|
+|[`ckCropOutput`](#ckcropoutput)|[`true`](#true) [`false`](#false)|`false`|
+|[`ckJpegQuality`](#ckjpegquality)|[`0 <= n <= 100`](#ckjpegquality)|`100`|
 
 - - -
 
