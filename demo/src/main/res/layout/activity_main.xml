@@ -232,7 +232,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
-                        <com.flurgle.camerakit.demo.AutoUnFocusEditText
+                        <com.flurgle.camerakit.demo.AutoUnfocusEditText
                             android:id="@+id/width"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -330,7 +330,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
-                        <com.flurgle.camerakit.demo.AutoUnFocusEditText
+                        <com.flurgle.camerakit.demo.AutoUnfocusEditText
                             android:id="@+id/height"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"

@@ -6,17 +6,17 @@ import android.view.KeyEvent;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
-public class AutoUnFocusEditText extends EditText {
+public class AutoUnfocusEditText extends EditText {
 
-    public AutoUnFocusEditText(Context context) {
+    public AutoUnfocusEditText(Context context) {
         super(context);
     }
 
-    public AutoUnFocusEditText(Context context, AttributeSet attrs) {
+    public AutoUnfocusEditText(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public AutoUnFocusEditText(Context context, AttributeSet attrs, int defStyleAttr) {
+    public AutoUnfocusEditText(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
