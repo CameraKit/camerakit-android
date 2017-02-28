@@ -1,7 +1,10 @@
 package com.flurgle.camerakit;
 
+import android.annotation.TargetApi;
 import android.hardware.Camera;
+import android.hardware.camera2.CameraCharacteristics;
 import android.support.v4.util.SparseArrayCompat;
+import android.util.SparseIntArray;
 
 public class ConstantMapper {
 
@@ -17,7 +20,7 @@ public class ConstantMapper {
 
     }
 
-    public static class Flash extends BaseMapper<String> {
+    static class Flash extends BaseMapper<String> {
 
         private static final SparseArrayCompat<String> FLASH_MODES = new SparseArrayCompat<>();
 
@@ -38,7 +41,21 @@ public class ConstantMapper {
 
     }
 
-    public static class Facing extends BaseMapper<Integer> {
+    @TargetApi(21)
+    static class Flash2 extends BaseMapper<String> {
+
+        protected Flash2(int cameraKitConstant) {
+            super(cameraKitConstant);
+        }
+
+        @Override
+        String map() {
+            return null;
+        }
+
+    }
+
+    static class Facing extends BaseMapper<Integer> {
 
         private static final SparseArrayCompat<Integer> FACING_MODES = new SparseArrayCompat<>();
 
@@ -53,7 +70,28 @@ public class ConstantMapper {
 
         @Override
         Integer map() {
-            return FACING_MODES.get(mCameraKitConstant, FACING_MODES.get(Camera.CameraInfo.CAMERA_FACING_BACK));
+            return FACING_MODES.get(mCameraKitConstant, FACING_MODES.get(CameraKit.Constants.FACING_BACK));
+        }
+
+    }
+
+    @TargetApi(21)
+    static class Facing2 extends BaseMapper<Integer> {
+
+        private static final SparseIntArray FACING_MODES = new SparseIntArray();
+
+        static {
+            FACING_MODES.put(CameraKit.Constants.FACING_BACK, CameraCharacteristics.LENS_FACING_BACK);
+            FACING_MODES.put(CameraKit.Constants.FACING_FRONT, CameraCharacteristics.LENS_FACING_FRONT);
+        }
+
+        protected Facing2(int cameraKitConstant) {
+            super(cameraKitConstant);
+        }
+
+        @Override
+        Integer map() {
+            return FACING_MODES.get(mCameraKitConstant, FACING_MODES.get(CameraKit.Constants.FACING_BACK));
         }
 
     }
