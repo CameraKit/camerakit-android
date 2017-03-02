@@ -50,7 +50,7 @@
                         android:layout_marginLeft="3dp"
                         android:text="NATIVE CAPTURE RESOLUTION"
                         android:textColor="@android:color/black"
-                        android:textSize="18dp"
+                        android:textSize="18sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -59,7 +59,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="3dp"
                         android:textColor="@android:color/black"
-                        android:textSize="14.5dp" />
+                        android:textSize="14.5sp" />
 
                 </LinearLayout>
 
@@ -87,7 +87,7 @@
                         android:layout_marginLeft="3dp"
                         android:text="ACTUAL RESOLUTION"
                         android:textColor="@android:color/black"
-                        android:textSize="18dp"
+                        android:textSize="18sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -96,7 +96,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="3dp"
                         android:textColor="@android:color/black"
-                        android:textSize="14.5dp" />
+                        android:textSize="14.5sp" />
 
                 </LinearLayout>
 
@@ -124,7 +124,7 @@
                         android:layout_marginLeft="3dp"
                         android:text="APPROX. UNCOMPRESSED SIZE"
                         android:textColor="@android:color/black"
-                        android:textSize="18dp"
+                        android:textSize="18sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -161,7 +161,7 @@
                         android:layout_marginLeft="3dp"
                         android:text="CAPTURE LATENCY"
                         android:textColor="@android:color/black"
-                        android:textSize="18dp"
+                        android:textSize="18sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -170,7 +170,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="3dp"
                         android:textColor="@android:color/black"
-                        android:textSize="14.5dp" />
+                        android:textSize="14.5sp" />
 
                 </LinearLayout>
 
