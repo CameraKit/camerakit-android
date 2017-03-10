@@ -109,7 +109,7 @@
                         android:layout_marginLeft="3dp"
                         android:text="CAPTURE METHOD"
                         android:textColor="@android:color/black"
-                        android:textSize="14dp"
+                        android:textSize="14sp"
                         android:textStyle="bold" />
 
                     <RadioGroup
@@ -161,7 +161,7 @@
                         android:layout_marginLeft="3dp"
                         android:text="CROP OUTPUT"
                         android:textColor="@android:color/black"
-                        android:textSize="14dp"
+                        android:textSize="14sp"
                         android:textStyle="bold" />
 
                     <RadioGroup
@@ -216,7 +216,7 @@
                         android:layout_marginLeft="3dp"
                         android:text="WIDTH"
                         android:textColor="@android:color/black"
-                        android:textSize="14dp"
+                        android:textSize="14sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -226,7 +226,7 @@
                         android:layout_marginLeft="3dp"
                         android:text="screen: 1080px"
                         android:textColor="@android:color/black"
-                        android:textSize="11dp" />
+                        android:textSize="11sp" />
 
                     <FrameLayout
                         android:layout_width="match_parent"
@@ -250,7 +250,7 @@
                             android:gravity="center"
                             android:text="UPDATE"
                             android:textColor="@android:color/white"
-                            android:textSize="14dp"
+                            android:textSize="14sp"
                             android:textStyle="bold" />
 
                     </FrameLayout>
@@ -314,7 +314,7 @@
                         android:layout_marginLeft="3dp"
                         android:text="HEIGHT"
                         android:textColor="@android:color/black"
-                        android:textSize="14dp"
+                        android:textSize="14sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -324,7 +324,7 @@
                         android:layout_marginLeft="3dp"
                         android:text="screen: 1920px"
                         android:textColor="@android:color/black"
-                        android:textSize="11dp" />
+                        android:textSize="11sp" />
 
                     <FrameLayout
                         android:layout_width="match_parent"
@@ -348,7 +348,7 @@
                             android:gravity="center"
                             android:text="UPDATE"
                             android:textColor="@android:color/white"
-                            android:textSize="14dp"
+                            android:textSize="14sp"
                             android:textStyle="bold" />
 
                     </FrameLayout>
