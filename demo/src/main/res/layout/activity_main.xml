@@ -13,18 +13,33 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <com.flurgle.camerakit.CameraView xmlns:app="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/camera"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="500dp"
-            android:layout_gravity="center_horizontal"
-            android:adjustViewBounds="true"
-            app:ckCropOutput="false"
-            app:ckFacing="back"
-            app:ckFlash="off"
-            app:ckFocus="continuous"
-            app:ckJpegQuality="100"
-            app:ckMethod="standard" />
+            android:layout_height="wrap_content">
+
+            <com.flurgle.camerakit.CameraView xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/camera"
+                android:layout_width="match_parent"
+                android:layout_height="400dp"
+                android:layout_gravity="center_horizontal"
+                android:adjustViewBounds="true"
+                app:ckCropOutput="false"
+                app:ckFacing="back"
+                app:ckFlash="off"
+                app:ckFocus="tap"
+                app:ckJpegQuality="100"
+                app:ckMethod="standard" />
+
+            <com.flurgle.camerakit.demo.FocusMarkerLayout
+                android:id="@+id/focusMarker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/camera"
+                android:layout_alignLeft="@+id/camera"
+                android:layout_alignRight="@+id/camera"
+                android:layout_alignTop="@+id/camera" />
+
+        </RelativeLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
