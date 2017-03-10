@@ -19,7 +19,7 @@
             <enum name="continuous" value="1" />
 
             <!-- TODO: Set to unique value when feature added -->
-            <enum name="tap" value="1" />
+            <enum name="tap" value="2" />
         </attr>
 
         <attr name="ckZoom" format="enum">
