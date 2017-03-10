@@ -61,28 +61,32 @@ abstract class PreviewImpl {
         return mHeight;
     }
 
-    void setTruePreviewSize(int width, int height) {
+    void setTruePreviewSize(final int width, final int height) {
         this.mTrueWidth = width;
         this.mTrueHeight = height;
+        getView().post(new Runnable() {
+            @Override
+            public void run() {
+                if (width != 0 && height != 0) {
+                    AspectRatio aspectRatio = AspectRatio.of(width, height);
+                    int targetHeight = (int) (getView().getWidth() * aspectRatio.toFloat());
+                    float scaleY;
+                    if (getView().getHeight() > 0) {
+                        scaleY = (float) targetHeight / (float) getView().getHeight();
+                    } else {
+                        scaleY = 1;
+                    }
 
-        if (width != 0 && height != 0) {
-            AspectRatio aspectRatio = AspectRatio.of(width, height);
-            int targetHeight = (int) (getView().getWidth() * aspectRatio.toFloat());
-            float scaleY;
-            if (getView().getHeight() > 0) {
-                scaleY = (float) targetHeight / (float) getView().getHeight();
-            } else {
-                scaleY = 1;
+                    if (scaleY > 1) {
+                        getView().setScaleX(1);
+                        getView().setScaleY(scaleY);
+                    } else {
+                        getView().setScaleX(1 / scaleY);
+                        getView().setScaleY(1);
+                    }
+                }
             }
-
-            if (scaleY > 1) {
-                getView().setScaleX(1);
-                getView().setScaleY(scaleY);
-            } else {
-                getView().setScaleX(1 / scaleY);
-                getView().setScaleY(1);
-            }
-        }
+        });
     }
 
     int getTrueWidth() {
