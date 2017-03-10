@@ -122,23 +122,28 @@ public class CameraView extends FrameLayout {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         if (mAdjustViewBounds) {
             Size previewSize = getPreviewSize();
-            if (getLayoutParams().width == LayoutParams.WRAP_CONTENT) {
-                int height = MeasureSpec.getSize(heightMeasureSpec);
-                float ratio = (float) height / (float) previewSize.getWidth();
-                int width = (int) (previewSize.getHeight() * ratio);
-                super.onMeasure(
-                        MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
-                        heightMeasureSpec
-                );
-                return;
-            } else if (getLayoutParams().height == LayoutParams.WRAP_CONTENT) {
-                int width = MeasureSpec.getSize(widthMeasureSpec);
-                float ratio = (float) width / (float) previewSize.getHeight();
-                int height = (int) (previewSize.getWidth() * ratio);
-                super.onMeasure(
-                        widthMeasureSpec,
-                        MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY)
-                );
+            if(previewSize != null) {
+                if (getLayoutParams().width == LayoutParams.WRAP_CONTENT) {
+                    int height = MeasureSpec.getSize(heightMeasureSpec);
+                    float ratio = (float) height / (float) previewSize.getWidth();
+                    int width = (int) (previewSize.getHeight() * ratio);
+                    super.onMeasure(
+                            MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
+                            heightMeasureSpec
+                    );
+                    return;
+                } else if (getLayoutParams().height == LayoutParams.WRAP_CONTENT) {
+                    int width = MeasureSpec.getSize(widthMeasureSpec);
+                    float ratio = (float) width / (float) previewSize.getHeight();
+                    int height = (int) (previewSize.getWidth() * ratio);
+                    super.onMeasure(
+                            widthMeasureSpec,
+                            MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY)
+                    );
+                    return;
+                }
+            }else{
+                super.onMeasure(widthMeasureSpec, heightMeasureSpec);
                 return;
             }
         }
