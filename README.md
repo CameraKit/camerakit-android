@@ -47,7 +47,7 @@ Try out all the unique features using the CameraKit Demo from the Google Play st
   - `METHOD_STILL`: a freeze frame of the `CameraView` preview (similar to SnapChat and Instagram) for devices with slower cameras.
   - **Coming soon:** `METHOD_SPEED`: automatic capture method determination based on measured speed.
 - Built-in continuous focus.
-- **Coming soon:** Built-in tap to focus.
+- Built-in tap to focus.
 - **Coming soon:** Built-in pinch to zoom.
 
 ## Setup
@@ -55,7 +55,7 @@ Try out all the unique features using the CameraKit Demo from the Google Play st
 Add __CameraKit__ to the dependencies block in your `app` level `build.gradle`:
 
 ```groovy
-compile 'com.flurgle:camerakit:0.9.14'
+compile 'com.flurgle:camerakit:0.9.15'
 ```
 
 ## Usage
