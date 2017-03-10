@@ -149,7 +149,12 @@ public class CameraView extends FrameLayout {
     public void start() {
         int permissionCheck = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA);
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-            mCameraImpl.start();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    mCameraImpl.start();
+                }
+            }).start();
         } else {
             requestCameraPermission();
         }
@@ -159,9 +164,15 @@ public class CameraView extends FrameLayout {
         mCameraImpl.stop();
     }
 
-    public void setFacing(@Facing int facing) {
+    public void setFacing(@Facing final int facing) {
         this.mFacing = facing;
-        mCameraImpl.setFacing(facing);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mCameraImpl.setFacing(facing);
+            }
+        }).start();
     }
 
     public void setFlash(@Flash int flash) {
