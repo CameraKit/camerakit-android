@@ -64,7 +64,7 @@ abstract class PreviewImpl {
     void setTruePreviewSize(final int width, final int height) {
         this.mTrueWidth = width;
         this.mTrueHeight = height;
-        ((Activity) getView().getContext()).runOnUiThread(new Runnable() {
+        getView().post(new Runnable() {
             @Override
             public void run() {
                 if (width != 0 && height != 0) {
