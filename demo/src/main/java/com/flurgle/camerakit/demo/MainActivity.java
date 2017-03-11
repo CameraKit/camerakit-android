@@ -18,6 +18,7 @@ import android.widget.Toast;
 import com.flurgle.camerakit.CameraKit;
 import com.flurgle.camerakit.CameraListener;
 import com.flurgle.camerakit.CameraView;
+import com.flurgle.camerakit.Config;
 
 import java.io.File;
 
@@ -87,6 +88,10 @@ public class MainActivity extends AppCompatActivity implements View.OnLayoutChan
         });
 
         camera.addOnLayoutChangeListener(this);
+        
+        camera.setConfig(new Config.Builder()
+                .setMirrorYAxisForFrontCamera(true)
+                .build());
 
         captureModeRadioGroup.setOnCheckedChangeListener(captureModeChangedListener);
         cropModeRadioGroup.setOnCheckedChangeListener(cropModeChangedListener);

@@ -198,7 +198,7 @@ public class Camera1 extends CameraImpl {
                 mCamera.takePicture(null, null, null, new Camera.PictureCallback() {
                     @Override
                     public void onPictureTaken(byte[] data, final Camera camera) {
-                        if (mFacing == CameraKit.Constants.FACING_FRONT) {
+                        if (mConfig.mMirrorYAxisForFrontCamera && mFacing == CameraKit.Constants.FACING_FRONT) {
                             new Thread(new MirrorYTask(data, new MirrorYTask.OnMirrorYDoneListener() {
                                 @Override
                                 public void onMirrorYDone(byte[] correctedData) {

@@ -208,6 +208,10 @@ public class CameraView extends FrameLayout {
         this.mCropOutput = cropOutput;
     }
 
+    public void setConfig(Config config) {
+        mCameraImpl.setConfig(config);
+    }
+
     @Facing
     public int toggleFacing() {
         switch (mFacing) {
