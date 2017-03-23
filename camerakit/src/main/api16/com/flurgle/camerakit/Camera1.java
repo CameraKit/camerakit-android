@@ -42,6 +42,7 @@ public class Camera1 extends CameraImpl {
     private Camera.AutoFocusCallback mAutofocusCallback;
 
     private int mDisplayOrientation;
+    private int mCameraRotation;
 
     @Facing
     private int mFacing;
@@ -295,6 +296,11 @@ public class Camera1 extends CameraImpl {
         return mCamera != null;
     }
 
+    @Override
+    int getCameraRotation() {
+        return mCameraRotation;
+    }
+
     // Internal:
 
     private void openCamera() {
@@ -306,9 +312,7 @@ public class Camera1 extends CameraImpl {
         mCameraParameters = mCamera.getParameters();
 
         adjustCameraParameters();
-        mCamera.setDisplayOrientation(
-                calculateCameraRotation(mDisplayOrientation)
-        );
+        updateRotation();
 
         mCameraListener.onCameraOpened();
     }
@@ -336,12 +340,16 @@ public class Camera1 extends CameraImpl {
         }
     }
 
-    private int calculateCameraRotation(int rotation) {
+    private void updateRotation() {
+        int rotation;
         if (mCameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-            return (360 - (mCameraInfo.orientation + rotation) % 360) % 360;
+            rotation = (360 - (mCameraInfo.orientation + mDisplayOrientation) % 360) % 360;
+            mCameraRotation = rotation + 180;
         } else {
-            return (mCameraInfo.orientation - rotation + 360) % 360;
+            rotation = (mCameraInfo.orientation - mDisplayOrientation + 360) % 360;
+            mCameraRotation = rotation;
         }
+        mCamera.setDisplayOrientation(rotation);
     }
 
     private void adjustCameraParameters() {

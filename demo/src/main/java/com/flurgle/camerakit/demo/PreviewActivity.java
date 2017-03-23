@@ -63,9 +63,7 @@ public class PreviewActivity extends Activity {
 
     private Bitmap rotateBitmap(Bitmap bitmap) {
         Matrix matrix = new Matrix();
-        // because this case only support portrait,
-        // so here we can just simply rotate back 90 degree
-        matrix.setRotate(90);
+        matrix.setRotate(ResultHolder.getCameraRotation());
         return Bitmap.createBitmap(bitmap, 0, 0,
                 bitmap.getWidth(), bitmap.getHeight(),
                 matrix, true);
