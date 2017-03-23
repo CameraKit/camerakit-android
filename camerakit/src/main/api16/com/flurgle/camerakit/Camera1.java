@@ -354,9 +354,10 @@ public class Camera1 extends CameraImpl {
     }
 
     private void adjustCameraParameters() {
+        boolean invertPreviewSizes = mDisplayOrientation%180 != 0;
         mPreview.setTruePreviewSize(
-                getPreviewResolution().getWidth(),
-                getPreviewResolution().getHeight()
+                invertPreviewSizes? getPreviewResolution().getHeight() : getPreviewResolution().getWidth(),
+                invertPreviewSizes? getPreviewResolution().getWidth() : getPreviewResolution().getHeight()
         );
 
         mCameraParameters.setPreviewSize(

@@ -2,7 +2,6 @@ package com.flurgle.camerakit;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.graphics.Matrix;
 import android.graphics.SurfaceTexture;
 import android.view.Surface;
 import android.view.TextureView;
@@ -24,14 +23,12 @@ class TextureViewPreview extends PreviewImpl {
             @Override
             public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
                 setSize(width, height);
-                configureTransform();
                 dispatchSurfaceChanged();
             }
 
             @Override
             public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
                 setSize(width, height);
-                configureTransform();
                 dispatchSurfaceChanged();
                 setTruePreviewSize(mTrueWidth, mTrueHeight);
             }
@@ -71,7 +68,6 @@ class TextureViewPreview extends PreviewImpl {
     @Override
     void setDisplayOrientation(int displayOrientation) {
         mDisplayOrientation = displayOrientation;
-        configureTransform();
     }
 
     @Override
@@ -96,39 +92,6 @@ class TextureViewPreview extends PreviewImpl {
         if (mTextureView.getSurfaceTexture() != null) {
             mTextureView.getSurfaceTexture().setDefaultBufferSize(width, height);
         }
-    }
-
-    void configureTransform() {
-        Matrix matrix = new Matrix();
-        if (mDisplayOrientation % 180 == 90) {
-            final int width = getWidth();
-            final int height = getHeight();
-            // Rotate the camera preview when the screen is landscape.
-            matrix.setPolyToPoly(
-                    new float[]{
-                            0.f, 0.f, // top left
-                            width, 0.f, // top right
-                            0.f, height, // bottom left
-                            width, height, // bottom right
-                    }, 0,
-                    mDisplayOrientation == 90 ?
-                            // Clockwise
-                            new float[]{
-                                    0.f, height, // top left
-                                    0.f, 0.f, // top right
-                                    width, height, // bottom left
-                                    width, 0.f, // bottom right
-                            } : // mDisplayOrientation == 270
-                            // Counter-clockwise
-                            new float[]{
-                                    width, 0.f, // top left
-                                    width, height, // top right
-                                    0.f, 0.f, // bottom left
-                                    0.f, height, // bottom right
-                            }, 0,
-                    4);
-        }
-        mTextureView.setTransform(matrix);
     }
 
 }
