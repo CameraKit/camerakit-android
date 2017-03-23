@@ -359,9 +359,9 @@ public class Camera1 extends CameraImpl {
                 getCaptureResolution().getWidth(),
                 getCaptureResolution().getHeight()
         );
-        int rotation = (calculateCameraRotation(mDisplayOrientation)
-                + (mFacing == CameraKit.Constants.FACING_FRONT ? 180 : 0) ) % 360;
-        mCameraParameters.setRotation(rotation);
+        // int rotation = (calculateCameraRotation(mDisplayOrientation)
+        //         + (mFacing == CameraKit.Constants.FACING_FRONT ? 180 : 0) ) % 360;
+        // mCameraParameters.setRotation(rotation);
 
         setFocus(mFocus);
         setFlash(mFlash);
