@@ -16,6 +16,8 @@ import android.support.v4.hardware.display.DisplayManagerCompat;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.Display;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.FrameLayout;
 
 import java.io.ByteArrayOutputStream;
@@ -100,6 +102,21 @@ public class CameraView extends FrameLayout {
                 mPreviewImpl.setDisplayOrientation(displayOrientation);
             }
         };
+
+        final FocusMarkerLayout focusMarkerLayout = new FocusMarkerLayout(getContext());
+        addView(focusMarkerLayout);
+        focusMarkerLayout.setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent motionEvent) {
+                int action = motionEvent.getAction();
+                if (motionEvent.getAction() == MotionEvent.ACTION_UP && mFocus == CameraKit.Constants.FOCUS_TAP_WITH_MARKER) {
+                    focusMarkerLayout.focus(motionEvent.getX(), motionEvent.getY());
+                }
+
+                mPreviewImpl.getView().dispatchTouchEvent(motionEvent);
+                return true;
+            }
+        });
     }
 
     @Override
@@ -187,6 +204,11 @@ public class CameraView extends FrameLayout {
 
     public void setFocus(@Focus int focus) {
         this.mFocus = focus;
+        if (this.mFocus == CameraKit.Constants.FOCUS_TAP_WITH_MARKER) {
+            mCameraImpl.setFocus(CameraKit.Constants.FOCUS_TAP);
+            return;
+        }
+
         mCameraImpl.setFocus(mFocus);
     }
 

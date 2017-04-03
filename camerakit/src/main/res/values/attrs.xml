@@ -17,9 +17,8 @@
         <attr name="ckFocus" format="enum">
             <enum name="off" value="0" />
             <enum name="continuous" value="1" />
-
-            <!-- TODO: Set to unique value when feature added -->
             <enum name="tap" value="2" />
+            <enum name="tapWithMarker" value="3" />
         </attr>
 
         <attr name="ckZoom" format="enum">

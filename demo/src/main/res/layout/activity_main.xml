@@ -26,18 +26,9 @@
                 app:ckCropOutput="false"
                 app:ckFacing="back"
                 app:ckFlash="off"
-                app:ckFocus="tap"
+                app:ckFocus="tapWithMarker"
                 app:ckJpegQuality="100"
                 app:ckMethod="standard" />
-
-            <com.flurgle.camerakit.demo.FocusMarkerLayout
-                android:id="@+id/focusMarker"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignBottom="@+id/camera"
-                android:layout_alignLeft="@+id/camera"
-                android:layout_alignRight="@+id/camera"
-                android:layout_alignTop="@+id/camera" />
 
         </RelativeLayout>
 

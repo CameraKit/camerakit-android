@@ -8,6 +8,7 @@ import android.media.MediaRecorder;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.View;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
@@ -444,7 +445,6 @@ public class Camera1 extends CameraImpl {
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_UP) {
                     if (mCamera != null) {
-
                         Camera.Parameters parameters = mCamera.getParameters();
                         if (parameters.getMaxNumMeteringAreas() > 0) {
                             Rect rect = calculateFocusArea(event.getX(), event.getY());

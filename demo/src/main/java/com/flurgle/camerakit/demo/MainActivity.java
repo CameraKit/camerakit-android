@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -24,7 +23,6 @@ import java.io.File;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.OnTouch;
 
 public class MainActivity extends AppCompatActivity implements View.OnLayoutChangeListener {
 
@@ -33,9 +31,6 @@ public class MainActivity extends AppCompatActivity implements View.OnLayoutChan
 
     @BindView(R.id.camera)
     CameraView camera;
-
-    @BindView(R.id.focusMarker)
-    FocusMarkerLayout focusMarker;
 
     // Capture Mode:
 
@@ -311,12 +306,6 @@ public class MainActivity extends AppCompatActivity implements View.OnLayoutChan
         height.setText(String.valueOf(mCameraHeight));
 
         camera.removeOnLayoutChangeListener(this);
-    }
-
-    @OnTouch(R.id.focusMarker)
-    boolean onTouchCamera(View view, MotionEvent motionEvent) {
-        focusMarker.focus(motionEvent.getX(), motionEvent.getY());
-        return false;
     }
 
 }

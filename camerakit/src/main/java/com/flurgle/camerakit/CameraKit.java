@@ -29,6 +29,7 @@ public class CameraKit {
         public static final int FOCUS_OFF = 0;
         public static final int FOCUS_CONTINUOUS = 1;
         public static final int FOCUS_TAP = 2;
+        public static final int FOCUS_TAP_WITH_MARKER = 3;
 
         public static final int ZOOM_OFF = 0;
         public static final int ZOOM_PINCH = 1;

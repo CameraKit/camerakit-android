@@ -1,4 +1,4 @@
-package com.flurgle.camerakit.demo;
+package com.flurgle.camerakit;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -16,7 +16,7 @@ public class FocusMarkerLayout extends FrameLayout {
     private ImageView mFill;
 
     public FocusMarkerLayout(@NonNull Context context) {
-        super(context, null);
+        this(context, null);
     }
 
     public FocusMarkerLayout(@NonNull Context context, @Nullable AttributeSet attrs) {
