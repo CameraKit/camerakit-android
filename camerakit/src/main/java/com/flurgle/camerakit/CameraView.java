@@ -29,6 +29,9 @@ import static com.flurgle.camerakit.CameraKit.Constants.FLASH_AUTO;
 import static com.flurgle.camerakit.CameraKit.Constants.FLASH_OFF;
 import static com.flurgle.camerakit.CameraKit.Constants.FLASH_ON;
 import static com.flurgle.camerakit.CameraKit.Constants.METHOD_STANDARD;
+import static com.flurgle.camerakit.CameraKit.Constants.PERMISSIONS_LAZY;
+import static com.flurgle.camerakit.CameraKit.Constants.PERMISSIONS_PICTURE;
+import static com.flurgle.camerakit.CameraKit.Constants.PERMISSIONS_STRICT;
 
 public class CameraView extends FrameLayout {
 
@@ -46,6 +49,9 @@ public class CameraView extends FrameLayout {
 
     @Zoom
     private int mZoom;
+
+    @Permissions
+    private int mPermissions;
 
     private int mJpegQuality;
     private boolean mCropOutput;
@@ -76,6 +82,7 @@ public class CameraView extends FrameLayout {
                 mFocus = a.getInteger(R.styleable.CameraView_ckFocus, CameraKit.Defaults.DEFAULT_FOCUS);
                 mMethod = a.getInteger(R.styleable.CameraView_ckMethod, CameraKit.Defaults.DEFAULT_METHOD);
                 mZoom = a.getInteger(R.styleable.CameraView_ckZoom, CameraKit.Defaults.DEFAULT_ZOOM);
+                mPermissions = a.getInteger(R.styleable.CameraView_ckPermissions, CameraKit.Defaults.DEFAULT_PERMISSIONS);
                 mJpegQuality = a.getInteger(R.styleable.CameraView_ckJpegQuality, CameraKit.Defaults.DEFAULT_JPEG_QUALITY);
                 mCropOutput = a.getBoolean(R.styleable.CameraView_ckCropOutput, CameraKit.Defaults.DEFAULT_CROP_OUTPUT);
                 mAdjustViewBounds = a.getBoolean(R.styleable.CameraView_android_adjustViewBounds, CameraKit.Defaults.DEFAULT_ADJUST_VIEW_BOUNDS);
@@ -139,7 +146,7 @@ public class CameraView extends FrameLayout {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         if (mAdjustViewBounds) {
             Size previewSize = getPreviewSize();
-            if(previewSize != null) {
+            if (previewSize != null) {
                 if (getLayoutParams().width == LayoutParams.WRAP_CONTENT) {
                     int height = MeasureSpec.getSize(heightMeasureSpec);
                     float ratio = (float) height / (float) previewSize.getWidth();
@@ -159,7 +166,7 @@ public class CameraView extends FrameLayout {
                     );
                     return;
                 }
-            }else{
+            } else {
                 super.onMeasure(widthMeasureSpec, heightMeasureSpec);
                 return;
             }
@@ -169,24 +176,46 @@ public class CameraView extends FrameLayout {
     }
 
     public void start() {
-        int permissionCheck = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA);
-        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    mCameraImpl.start();
+        int cameraCheck = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA);
+        int audioCheck = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.RECORD_AUDIO);
+
+        switch (mPermissions) {
+            case PERMISSIONS_STRICT:
+                if (cameraCheck != PackageManager.PERMISSION_GRANTED || audioCheck != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(true, true);
+                    return;
                 }
-            }).start();
-        } else {
-            requestCameraPermission();
+                break;
+
+            case PERMISSIONS_LAZY:
+                if (cameraCheck != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(true, true);
+                    return;
+                }
+                break;
+
+            case PERMISSIONS_PICTURE:
+                if (cameraCheck != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(true, false);
+                    return;
+                }
+                break;
         }
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mCameraImpl.start();
+            }
+        }).start();
     }
 
     public void stop() {
         mCameraImpl.stop();
     }
 
-    public void setFacing(@Facing final int facing) {
+    public void setFacing(@Facing
+                          final int facing) {
         this.mFacing = facing;
 
         new Thread(new Runnable() {
@@ -288,7 +317,7 @@ public class CameraView extends FrameLayout {
         return mCameraImpl != null ? mCameraImpl.getCaptureResolution() : null;
     }
 
-    private void requestCameraPermission() {
+    private void requestPermissions(boolean requestCamera, boolean requestAudio) {
         Activity activity = null;
         Context context = getContext();
         while (context instanceof ContextWrapper) {

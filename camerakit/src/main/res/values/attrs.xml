@@ -37,6 +37,12 @@
             <enum name="speed" value="0" />
         </attr>
 
+        <attr name="ckPermissions" format="enum">
+            <enum name="strict" value="0" />
+            <enum name="lazy" value="1" />
+            <enum name="picture" value="2" />
+        </attr>
+
         <attr name="ckJpegQuality" format="integer" />
 
         <attr name="ckCropOutput" format="boolean" />

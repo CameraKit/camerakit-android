@@ -22,10 +22,6 @@ public class CameraKit {
         public static final int FLASH_ON = 1;
         public static final int FLASH_AUTO = 2;
 
-        public static final int METHOD_STANDARD = 0;
-        public static final int METHOD_STILL = 1;
-        public static final int METHOD_SPEED = 2;
-
         public static final int FOCUS_OFF = 0;
         public static final int FOCUS_CONTINUOUS = 1;
         public static final int FOCUS_TAP = 2;
@@ -34,6 +30,14 @@ public class CameraKit {
         public static final int ZOOM_OFF = 0;
         public static final int ZOOM_PINCH = 1;
 
+        public static final int METHOD_STANDARD = 0;
+        public static final int METHOD_STILL = 1;
+        public static final int METHOD_SPEED = 2;
+
+        public static final int PERMISSIONS_STRICT = 0;
+        public static final int PERMISSIONS_LAZY = 1;
+        public static final int PERMISSIONS_PICTURE = 2;
+
     }
 
     static class Defaults {
@@ -41,8 +45,9 @@ public class CameraKit {
         static final int DEFAULT_FACING = Constants.FACING_BACK;
         static final int DEFAULT_FLASH = Constants.FLASH_OFF;
         static final int DEFAULT_FOCUS = Constants.FOCUS_CONTINUOUS;
-        static final int DEFAULT_METHOD = Constants.METHOD_STANDARD;
         static final int DEFAULT_ZOOM = Constants.ZOOM_OFF;
+        static final int DEFAULT_METHOD = Constants.METHOD_STANDARD;
+        static final int DEFAULT_PERMISSIONS = Constants.PERMISSIONS_STRICT;
 
         static final int DEFAULT_JPEG_QUALITY = 100;
         static final boolean DEFAULT_CROP_OUTPUT = false;
