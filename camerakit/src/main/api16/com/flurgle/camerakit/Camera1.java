@@ -230,6 +230,7 @@ public class Camera1 extends CameraImpl {
     @Override
     void endVideo() {
         mMediaRecorder.stop();
+        mMediaRecorder.release();
         mMediaRecorder = null;
         mCameraListener.onVideoTaken(mVideoFile);
     }
