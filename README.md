@@ -1,6 +1,6 @@
 <img alt='CameraKit Header' src='.repo/camerakit-android-header.png' height='125'/>
 
-#####Originally a fork of [Google's CameraView library](https://github.com/google/cameraview).
+##### Originally a fork of [Google's CameraView library](https://github.com/google/cameraview).
 
 CameraKit is an extraordinarily easy to use utility to work with the infamous Android Camera and Camera2 APIs. Built by [Dylan McIntyre](https://github.com/dwillmc).
 
