@@ -111,6 +111,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLayoutChan
                 long callbackTime = System.currentTimeMillis();
                 Bitmap bitmap = BitmapFactory.decodeByteArray(jpeg, 0, jpeg.length);
                 ResultHolder.dispose();
+                ResultHolder.setCameraRotation(camera.getCameraRotation());
                 ResultHolder.setImage(bitmap);
                 ResultHolder.setNativeCaptureSize(
                         captureModeRadioGroup.getCheckedRadioButtonId() == R.id.modeCaptureStandard ?

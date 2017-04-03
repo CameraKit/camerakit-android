@@ -12,7 +12,7 @@ public class ResultHolder {
     private static WeakReference<Bitmap> image;
     private static Size nativeCaptureSize;
     private static long timeToCallback;
-
+    private static int cameraRotation;
 
     public static void setImage(@Nullable Bitmap image) {
         ResultHolder.image = image != null ? new WeakReference<>(image) : null;
@@ -40,10 +40,19 @@ public class ResultHolder {
         return timeToCallback;
     }
 
+    public static void setCameraRotation(int cameraRotation) {
+        ResultHolder.cameraRotation = cameraRotation;
+    }
+
+    public static int getCameraRotation() {
+        return cameraRotation;
+    }
+
     public static void dispose() {
         setImage(null);
         setNativeCaptureSize(null);
         setTimeToCallback(0);
+        setCameraRotation(0);
     }
 
 }

@@ -2,6 +2,7 @@ package com.flurgle.camerakit.demo;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.widget.ImageView;
@@ -42,7 +43,7 @@ public class PreviewActivity extends Activity {
             return;
         }
 
-        imageView.setImageBitmap(bitmap);
+        imageView.setImageBitmap(rotateBitmap(bitmap));
 
         Size captureSize = ResultHolder.getNativeCaptureSize();
         if (captureSize != null) {
@@ -60,4 +61,11 @@ public class PreviewActivity extends Activity {
         return (bitmap.getRowBytes() * bitmap.getHeight()) / 1024 / 1024;
     }
 
+    private Bitmap rotateBitmap(Bitmap bitmap) {
+        Matrix matrix = new Matrix();
+        matrix.setRotate(ResultHolder.getCameraRotation());
+        return Bitmap.createBitmap(bitmap, 0, 0,
+                bitmap.getWidth(), bitmap.getHeight(),
+                matrix, true);
+    }
 }
