@@ -39,7 +39,7 @@ public class CameraKit {
 
         static final int DEFAULT_FACING = Constants.FACING_BACK;
         static final int DEFAULT_FLASH = Constants.FLASH_OFF;
-        static final int DEFAULT_FOCUS = Constants.FOCUS_OFF;
+        static final int DEFAULT_FOCUS = Constants.FOCUS_CONTINUOUS;
         static final int DEFAULT_METHOD = Constants.METHOD_STANDARD;
         static final int DEFAULT_ZOOM = Constants.ZOOM_OFF;
 
