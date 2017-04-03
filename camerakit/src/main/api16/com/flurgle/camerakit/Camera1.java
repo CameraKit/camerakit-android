@@ -448,7 +448,9 @@ public class Camera1 extends CameraImpl {
                         Camera.Parameters parameters = mCamera.getParameters();
                         if (parameters.getMaxNumMeteringAreas() > 0) {
                             Rect rect = calculateFocusArea(event.getX(), event.getY());
-
+                            if(!parameters.getSupportedFocusModes().contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
+                                return false; //cannot autoFocus
+                            }
                             parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
                             List<Camera.Area> meteringAreas = new ArrayList<>();
                             meteringAreas.add(new Camera.Area(rect, getFocusMeteringAreaWeight()));
