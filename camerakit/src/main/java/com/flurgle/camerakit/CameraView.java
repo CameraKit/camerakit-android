@@ -101,6 +101,7 @@ public class CameraView extends FrameLayout {
         setFocus(mFocus);
         setMethod(mMethod);
         setZoom(mZoom);
+        setPermissions(mPermissions);
 
         mDisplayOrientationDetector = new DisplayOrientationDetector(context) {
             @Override
@@ -249,6 +250,10 @@ public class CameraView extends FrameLayout {
     public void setZoom(@Zoom int zoom) {
         this.mZoom = zoom;
         mCameraImpl.setZoom(mZoom);
+    }
+
+    public void setPermissions(@Permissions int permissions) {
+        this.mPermissions = permissions;
     }
 
     public void setJpegQuality(int jpegQuality) {
