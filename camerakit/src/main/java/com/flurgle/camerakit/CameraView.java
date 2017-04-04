@@ -22,6 +22,8 @@ import android.widget.FrameLayout;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.flurgle.camerakit.CameraKit.Constants.FACING_BACK;
 import static com.flurgle.camerakit.CameraKit.Constants.FACING_FRONT;
@@ -342,10 +344,14 @@ public class CameraView extends FrameLayout {
             context = ((ContextWrapper) context).getBaseContext();
         }
 
+        List<String> permissions = new ArrayList<>();
+        if (requestCamera) permissions.add(Manifest.permission.CAMERA);
+        if (requestAudio) permissions.add(Manifest.permission.RECORD_AUDIO);
+
         if (activity != null) {
             ActivityCompat.requestPermissions(
                     activity,
-                    new String[]{Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO},
+                    permissions.toArray(new String[permissions.size()]),
                     CameraKit.Constants.PERMISSION_REQUEST_CAMERA);
         }
     }
