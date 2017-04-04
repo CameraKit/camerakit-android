@@ -135,8 +135,10 @@ camera.postDelayed(new Runnable() {
     camerakit:ckFocus="continuous"
     camerakit:ckMethod="standard"
     camerakit:ckZoom="pinch"
+    camerakit:ckPermissions="strict"
     camerakit:ckCropOutput="true"  
     camerakit:ckJpegQuality="100"
+    camerakit:ckVideoQuality="480p"
     android:adjustViewBounds="true" />
 ```
 
@@ -147,8 +149,10 @@ camera.postDelayed(new Runnable() {
 |[`ckFocus`](#ckfocus)|[`off`](#off-1) [`continuous`](#continuous) [`tap`](#tap)|`continuous`|
 |[`ckMethod`](#ckmethod)|[`standard`](#standard) [`still`](#still) [`speed`](#speed)|`standard`|
 |[`ckZoom`](#ckzoom)|[`off`](#off-2) [`pinch`](#pinch)|`off`|
+|[`ckPermissions`](#ckpermissions)|[`strict`](#strict) [`lazy`](#lazy) [`picture`](#picture`)|`strict`|
 |[`ckCropOutput`](#ckcropoutput)|[`true`](#true) [`false`](#false)|`false`|
 |[`ckJpegQuality`](#ckjpegquality)|[`0 <= n <= 100`](#ckjpegquality)|`100`|
+|[`ckVideoQuality`](#ckvideoquality)|[`max480p`](#max480p) [`max720p`](#max720p) [`max1080p`](#max1080p) [`max2160p`](#max2160p) [`highest`](#highest) [`lowest`](#lowest)|`max480p`|
 
 - - -
 
@@ -263,6 +267,29 @@ cameraView.setZoom(CameraKit.Constants.ZOOM_PINCH);
 
 - - -
 
+### `ckPermissions`
+[`strict`](#strict) [`lazy`](#lazy) [`picture`](#picture`)
+
+#### `strict`
+
+```java
+cameraView.setPermissions(CameraKit.Constants.PERMISSIONS_STRICT);
+```
+
+#### `lazy`
+
+```java
+cameraView.setPermissions(CameraKit.Constants.PERMISSIONS_LAZY);
+```
+
+#### `picture`
+
+```java
+cameraView.setPermissions(CameraKit.Constants.PERMISSIONS_PICTURE);
+```
+
+- - -
+
 ### `ckCropOutput`
 [`true`](#true) [`false`](#false)
 
@@ -284,6 +311,47 @@ cameraView.setCropOutput(false);
 
 ```java
 cameraView.setJpegQuality(100);
+```
+
+- - -
+
+### `ckVideoQuality`
+[`max480p`](#max480p) [`max720p`](#max720p) [`max1080p`](#max1080p) [`max2160p`](#max2160p) [`highest`](#highest) [`lowest`](#lowest)
+
+#### `max480p`
+
+```java
+cameraView.setVideoQuality(CameraKit.Constants.VIDEO_QUALITY_480P);
+```
+
+#### `max720p`
+
+```java
+cameraView.setVideoQuality(CameraKit.Constants.VIDEO_QUALITY_720P);
+```
+
+#### `max1080p`
+
+```java
+cameraView.setVideoQuality(CameraKit.Constants.VIDEO_QUALITY_1080P);
+```
+
+#### `max2160p`
+
+```java
+cameraView.setVideoQuality(CameraKit.Constants.VIDEO_QUALITY_2160P);
+```
+
+#### `lowest`
+
+```java
+cameraView.setVideoQuality(CameraKit.Constants.VIDEO_QUALITY_LOWEST);
+```
+
+#### `highest`
+
+```java
+cameraView.setVideoQuality(CameraKit.Constants.VIDEO_QUALITY_HIGHEST);
 ```
 
 - - -
