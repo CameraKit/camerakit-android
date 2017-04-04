@@ -43,6 +43,15 @@
             <enum name="picture" value="2" />
         </attr>
 
+        <attr name="ckVideoQuality" format="enum">
+            <enum name="max480p" value="0" />
+            <enum name="max720p" value="1" />
+            <enum name="max1080p" value="2" />
+            <enum name="max2160p" value="3" />
+            <enum name="highest" value="4" />
+            <enum name="lowest" value="5" />
+        </attr>
+
         <attr name="ckJpegQuality" format="integer" />
 
         <attr name="ckCropOutput" format="boolean" />

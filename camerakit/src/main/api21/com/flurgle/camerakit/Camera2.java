@@ -120,6 +120,11 @@ class Camera2 extends CameraImpl {
     }
 
     @Override
+    void setVideoQuality(int videoQuality) {
+
+    }
+
+    @Override
     void captureImage() {
 
     }

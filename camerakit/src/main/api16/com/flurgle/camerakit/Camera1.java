@@ -8,7 +8,6 @@ import android.media.MediaRecorder;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.View;
-import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,6 +57,9 @@ public class Camera1 extends CameraImpl {
 
     @Zoom
     private int mZoom;
+
+    @VideoQuality
+    private int mVideoQuality;
 
     Camera1(CameraListener callback, PreviewImpl preview) {
         super(callback, preview);
@@ -190,6 +192,11 @@ public class Camera1 extends CameraImpl {
     @Override
     void setZoom(@Zoom int zoom) {
         this.mZoom = zoom;
+    }
+
+    @Override
+    void setVideoQuality(int videoQuality) {
+        this.mVideoQuality = videoQuality;
     }
 
     @Override
@@ -402,7 +409,8 @@ public class Camera1 extends CameraImpl {
 
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
         mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
-        mMediaRecorder.setProfile(CamcorderProfile.get(mCameraId, CamcorderProfile.QUALITY_HIGH));
+
+        mMediaRecorder.setProfile(getCamcorderProfile(mVideoQuality));
 
         mVideoFile = new File(mPreview.getView().getContext().getExternalFilesDir(null), "video.mp4");
         mMediaRecorder.setOutputFile(mVideoFile.getAbsolutePath());
@@ -417,6 +425,53 @@ public class Camera1 extends CameraImpl {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private CamcorderProfile getCamcorderProfile(@VideoQuality int videoQuality) {
+        CamcorderProfile camcorderProfile = null;
+        switch (videoQuality) {
+            case CameraKit.Constants.VIDEO_QUALITY_480P:
+                if (CamcorderProfile.hasProfile(mCameraId, CamcorderProfile.QUALITY_480P)) {
+                    camcorderProfile = CamcorderProfile.get(mCameraId, CamcorderProfile.QUALITY_480P);
+                } else {
+                    return getCamcorderProfile(CameraKit.Constants.VIDEO_QUALITY_LOWEST);
+                }
+                break;
+
+            case CameraKit.Constants.VIDEO_QUALITY_720P:
+                if (CamcorderProfile.hasProfile(mCameraId, CamcorderProfile.QUALITY_720P)) {
+                    camcorderProfile = CamcorderProfile.get(mCameraId, CamcorderProfile.QUALITY_720P);
+                } else {
+                    return getCamcorderProfile(CameraKit.Constants.VIDEO_QUALITY_480P);
+                }
+                break;
+
+            case CameraKit.Constants.VIDEO_QUALITY_1080P:
+                if (CamcorderProfile.hasProfile(mCameraId, CamcorderProfile.QUALITY_1080P)) {
+                    camcorderProfile = CamcorderProfile.get(mCameraId, CamcorderProfile.QUALITY_1080P);
+                } else {
+                    return getCamcorderProfile(CameraKit.Constants.VIDEO_QUALITY_720P);
+                }
+                break;
+
+            case CameraKit.Constants.VIDEO_QUALITY_2160P:
+                try {
+                    camcorderProfile = CamcorderProfile.get(mCameraId, CamcorderProfile.QUALITY_2160P);
+                } catch (Exception e) {
+                    return getCamcorderProfile(CameraKit.Constants.VIDEO_QUALITY_HIGHEST);
+                }
+                break;
+
+            case CameraKit.Constants.VIDEO_QUALITY_HIGHEST:
+                camcorderProfile = CamcorderProfile.get(mCameraId, CamcorderProfile.QUALITY_HIGH);
+                break;
+
+            case CameraKit.Constants.VIDEO_QUALITY_LOWEST:
+                camcorderProfile = CamcorderProfile.get(mCameraId, CamcorderProfile.QUALITY_LOW);
+                break;
+        }
+
+        return camcorderProfile;
     }
 
     void setTapToAutofocusListener(Camera.AutoFocusCallback callback) {

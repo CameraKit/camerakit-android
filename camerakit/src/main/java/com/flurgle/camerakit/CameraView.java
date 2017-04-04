@@ -53,6 +53,9 @@ public class CameraView extends FrameLayout {
     @Permissions
     private int mPermissions;
 
+    @VideoQuality
+    private int mVideoQuality;
+
     private int mJpegQuality;
     private boolean mCropOutput;
     private boolean mAdjustViewBounds;
@@ -83,6 +86,7 @@ public class CameraView extends FrameLayout {
                 mMethod = a.getInteger(R.styleable.CameraView_ckMethod, CameraKit.Defaults.DEFAULT_METHOD);
                 mZoom = a.getInteger(R.styleable.CameraView_ckZoom, CameraKit.Defaults.DEFAULT_ZOOM);
                 mPermissions = a.getInteger(R.styleable.CameraView_ckPermissions, CameraKit.Defaults.DEFAULT_PERMISSIONS);
+                mVideoQuality = a.getInteger(R.styleable.CameraView_ckVideoQuality, CameraKit.Defaults.DEFAULT_VIDEO_QUALITY);
                 mJpegQuality = a.getInteger(R.styleable.CameraView_ckJpegQuality, CameraKit.Defaults.DEFAULT_JPEG_QUALITY);
                 mCropOutput = a.getBoolean(R.styleable.CameraView_ckCropOutput, CameraKit.Defaults.DEFAULT_CROP_OUTPUT);
                 mAdjustViewBounds = a.getBoolean(R.styleable.CameraView_android_adjustViewBounds, CameraKit.Defaults.DEFAULT_ADJUST_VIEW_BOUNDS);
@@ -102,6 +106,7 @@ public class CameraView extends FrameLayout {
         setMethod(mMethod);
         setZoom(mZoom);
         setPermissions(mPermissions);
+        setVideoQuality(mVideoQuality);
 
         mDisplayOrientationDetector = new DisplayOrientationDetector(context) {
             @Override
@@ -254,6 +259,11 @@ public class CameraView extends FrameLayout {
 
     public void setPermissions(@Permissions int permissions) {
         this.mPermissions = permissions;
+    }
+
+    public void setVideoQuality(@VideoQuality int videoQuality) {
+        this.mVideoQuality = videoQuality;
+        mCameraImpl.setVideoQuality(mVideoQuality);
     }
 
     public void setJpegQuality(int jpegQuality) {
