@@ -7,13 +7,13 @@ class ProcessStillTask implements Runnable {
 
     private byte[] data;
     private Camera camera;
-    private Camera.CameraInfo cameraInfo;
+    private int rotation;
     private OnStillProcessedListener onStillProcessedListener;
 
-    public ProcessStillTask(byte[] data, Camera camera, Camera.CameraInfo cameraInfo, OnStillProcessedListener onStillProcessedListener) {
+    public ProcessStillTask(byte[] data, Camera camera, int rotation, OnStillProcessedListener onStillProcessedListener) {
         this.data = data;
         this.camera = camera;
-        this.cameraInfo = cameraInfo;
+        this.rotation = rotation;
         this.onStillProcessedListener = onStillProcessedListener;
     }
 
@@ -22,7 +22,6 @@ class ProcessStillTask implements Runnable {
         Camera.Parameters parameters = camera.getParameters();
         int width = parameters.getPreviewSize().width;
         int height = parameters.getPreviewSize().height;
-        int rotation = cameraInfo.orientation;
         byte[] rotatedData = new Rotation(data, width, height, rotation).getYuv();
 
         int postWidth;
