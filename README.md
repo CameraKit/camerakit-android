@@ -52,7 +52,7 @@ Try out all the unique features using the CameraKit Demo from the Google Play st
 Add __CameraKit__ to the dependencies block in your `app` level `build.gradle`:
 
 ```groovy
-compile 'com.flurgle:camerakit:0.9.15'
+compile 'com.flurgle:camerakit:0.9.17'
 ```
 
 ## Usage
