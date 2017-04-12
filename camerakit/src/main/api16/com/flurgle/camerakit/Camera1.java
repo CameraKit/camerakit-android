@@ -210,9 +210,19 @@ public class Camera1 extends CameraImpl {
             case METHOD_STANDARD:
                 mCamera.takePicture(null, null, null, new Camera.PictureCallback() {
                     @Override
-                    public void onPictureTaken(byte[] data, Camera camera) {
-                        mCameraListener.onPictureTaken(data);
-                        camera.startPreview();
+                    public void onPictureTaken(byte[] data, final Camera camera) {
+                        if (mConfig.mMirrorYAxisForFrontCamera && mFacing == CameraKit.Constants.FACING_FRONT) {
+                            new Thread(new MirrorYTask(data, new MirrorYTask.OnMirrorYDoneListener() {
+                                @Override
+                                public void onMirrorYDone(byte[] correctedData) {
+                                    mCameraListener.onPictureTaken(correctedData);
+                                    camera.startPreview();
+                                }
+                            })).start();
+                        } else {
+                            mCameraListener.onPictureTaken(data);
+                            camera.startPreview();
+                        }
                     }
                 });
                 break;
@@ -374,7 +384,7 @@ public class Camera1 extends CameraImpl {
                 getCaptureResolution().getHeight()
         );
         int rotation = (calculateCameraRotation(mDisplayOrientation)
-                + (mFacing == CameraKit.Constants.FACING_FRONT ? 180 : 0) ) % 360;
+                + (mFacing == CameraKit.Constants.FACING_FRONT ? 180 : 0)) % 360;
         mCameraParameters.setRotation(rotation);
 
         setFocus(mFocus);
