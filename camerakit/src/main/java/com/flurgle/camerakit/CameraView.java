@@ -213,7 +213,11 @@ public class CameraView extends FrameLayout {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                mCameraImpl.start();
+                try {
+                    mCameraImpl.start();
+                } catch (Exception e) {
+                    mCameraListener.onCameraError(e);
+                }
             }
         }).start();
     }
@@ -370,6 +374,12 @@ public class CameraView extends FrameLayout {
         public void onCameraClosed() {
             super.onCameraClosed();
             getCameraListener().onCameraClosed();
+        }
+
+        @Override
+        public void onCameraError(Throwable throwable) {
+            super.onCameraError(throwable);
+            getCameraListener().onCameraError(throwable);
         }
 
         @Override
