@@ -146,7 +146,7 @@ camera.postDelayed(new Runnable() {
 |---------|------|-------------|
 |[`ckFacing`](#ckfacing)|[`back`](#back) [`front`](#front)|`back`|
 |[`ckFlash`](#ckflash)|[`off`](#off) [`on`](#on) [`auto`](#auto)|`off`|
-|[`ckFocus`](#ckfocus)|[`off`](#off-1) [`continuous`](#continuous) [`tap`](#tap)|`continuous`|
+|[`ckFocus`](#ckfocus)|[`off`](#off-1) [`continuous`](#continuous) [`tap`](#tap)|`off`|
 |[`ckMethod`](#ckmethod)|[`standard`](#standard) [`still`](#still) [`speed`](#speed)|`standard`|
 |[`ckZoom`](#ckzoom)|[`off`](#off-2) [`pinch`](#pinch)|`off`|
 |[`ckPermissions`](#ckpermissions)|[`strict`](#strict) [`lazy`](#lazy) [`picture`](#picture`)|`strict`|
