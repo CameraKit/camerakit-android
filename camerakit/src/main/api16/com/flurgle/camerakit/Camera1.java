@@ -221,7 +221,7 @@ public class Camera1 extends CameraImpl {
                 mCamera.setOneShotPreviewCallback(new Camera.PreviewCallback() {
                     @Override
                     public void onPreviewFrame(byte[] data, Camera camera) {
-                        new Thread(new ProcessStillTask(data, camera, mCameraInfo, new ProcessStillTask.OnStillProcessedListener() {
+                        new Thread(new ProcessStillTask(data, camera, calculateCaptureRotation(), new ProcessStillTask.OnStillProcessedListener() {
                             @Override
                             public void onStillProcessed(final YuvImage yuv) {
                                 mCameraListener.onPictureTaken(yuv);
@@ -320,9 +320,7 @@ public class Camera1 extends CameraImpl {
         mCameraParameters = mCamera.getParameters();
 
         adjustCameraParameters();
-        mCamera.setDisplayOrientation(
-                calculateCameraRotation(mDisplayOrientation)
-        );
+        mCamera.setDisplayOrientation(calculatePreviewRotation());
 
         mCameraListener.onCameraOpened();
     }
@@ -350,18 +348,29 @@ public class Camera1 extends CameraImpl {
         }
     }
 
-    private int calculateCameraRotation(int rotation) {
+    private int calculatePreviewRotation() {
         if (mCameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-            return (360 - (mCameraInfo.orientation + rotation) % 360) % 360;
+            return ((mCameraInfo.orientation - mDisplayOrientation) + 360 + 180) % 360;
         } else {
-            return (mCameraInfo.orientation - rotation + 360) % 360;
+            return (mCameraInfo.orientation - mDisplayOrientation + 360) % 360;
+        }
+    }
+
+    private int calculateCaptureRotation() {
+        int previewRotation = calculatePreviewRotation();
+        if (mCameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+            //Front is flipped
+            return (previewRotation + 180 + 2*mDisplayOrientation + 720) %360;
+        } else {
+            return previewRotation;
         }
     }
 
     private void adjustCameraParameters() {
+        boolean invertPreviewSizes = mDisplayOrientation%180 != 0;
         mPreview.setTruePreviewSize(
-                getPreviewResolution().getWidth(),
-                getPreviewResolution().getHeight()
+                invertPreviewSizes? getPreviewResolution().getHeight() : getPreviewResolution().getWidth(),
+                invertPreviewSizes? getPreviewResolution().getWidth() : getPreviewResolution().getHeight()
         );
 
         mCameraParameters.setPreviewSize(
@@ -373,8 +382,7 @@ public class Camera1 extends CameraImpl {
                 getCaptureResolution().getWidth(),
                 getCaptureResolution().getHeight()
         );
-        int rotation = (calculateCameraRotation(mDisplayOrientation)
-                + (mFacing == CameraKit.Constants.FACING_FRONT ? 180 : 0) ) % 360;
+        int rotation = calculateCaptureRotation();
         mCameraParameters.setRotation(rotation);
 
         setFocus(mFocus);
