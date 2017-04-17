@@ -10,6 +10,7 @@ import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.util.Log;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -136,6 +137,11 @@ class Camera2 extends CameraImpl {
 
     @Override
     void endVideo() {
+
+    }
+
+    @Override
+    void setVideoOutputFile(File outputFile) {
 
     }
 

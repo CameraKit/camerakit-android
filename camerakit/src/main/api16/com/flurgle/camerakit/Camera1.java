@@ -205,6 +205,11 @@ public class Camera1 extends CameraImpl {
     }
 
     @Override
+    void setVideoOutputFile(File outputFile) {
+        mVideoFile = outputFile;
+    }
+
+    @Override
     void captureImage() {
         switch (mMethod) {
             case METHOD_STANDARD:
@@ -425,7 +430,10 @@ public class Camera1 extends CameraImpl {
 
         mMediaRecorder.setProfile(getCamcorderProfile(mVideoQuality));
 
-        mVideoFile = new File(mPreview.getView().getContext().getExternalFilesDir(null), "video.mp4");
+        if(mVideoFile == null) {
+            mVideoFile = new File(mPreview.getView().getContext().getExternalFilesDir(null), "video.mp4");
+        }
+
         mMediaRecorder.setOutputFile(mVideoFile.getAbsolutePath());
         mMediaRecorder.setOrientationHint(mCameraInfo.orientation);
     }
