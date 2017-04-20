@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
+import android.hardware.Camera;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -67,6 +68,8 @@ public class CameraView extends FrameLayout {
 
     private CameraImpl mCameraImpl;
     private PreviewImpl mPreviewImpl;
+    
+    private float mDist = 0;
 
     public CameraView(@NonNull Context context) {
         super(context, null);
@@ -354,6 +357,66 @@ public class CameraView extends FrameLayout {
                     permissions.toArray(new String[permissions.size()]),
                     CameraKit.Constants.PERMISSION_REQUEST_CAMERA);
         }
+    }
+    
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        Camera.Parameters params = mCameraImpl.getCamera().getParameters();
+        int action = event.getAction();
+
+        if (event.getPointerCount() > 1) {
+            if (action == MotionEvent.ACTION_POINTER_DOWN) {
+                mDist = getFingerSpacing(event);
+            } else if (action == MotionEvent.ACTION_MOVE && params.isZoomSupported()) {
+                mCameraImpl.getCamera().cancelAutoFocus();
+                handleZoom(event, params);
+            }
+        } else {
+            if (action == MotionEvent.ACTION_UP) {
+                handleFocus(event, params);
+            }
+        }
+        return true;
+    }
+
+    private void handleZoom(MotionEvent event, Camera.Parameters params) {
+        int maxZoom = params.getMaxZoom();
+        int zoom = params.getZoom();
+        float newDist = getFingerSpacing(event);
+        if (newDist > mDist) {
+            if (zoom < maxZoom)
+                zoom++;
+        } else if (newDist < mDist) {
+            if (zoom > 0)
+                zoom--;
+        }
+        mDist = newDist;
+        params.setZoom(zoom);
+        mCameraImpl.getCamera().setParameters(params);
+    }
+
+    public void handleFocus(MotionEvent event, Camera.Parameters params) {
+        int pointerId = event.getPointerId(0);
+        int pointerIndex = event.findPointerIndex(pointerId);
+        float x = event.getX(pointerIndex);
+        float y = event.getY(pointerIndex);
+
+        List<String> supportedFocusModes = params.getSupportedFocusModes();
+        if (supportedFocusModes != null && supportedFocusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
+            mCameraImpl.getCamera().autoFocus(new Camera.AutoFocusCallback() {
+                @Override
+                public void onAutoFocus(boolean b, Camera camera) {
+                    // focus on touch
+                }
+            });
+        }
+    }
+
+    private float getFingerSpacing(MotionEvent event) {
+        // ...
+        float x = event.getX(0) - event.getX(1);
+        float y = event.getY(0) - event.getY(1);
+        return (float)Math.sqrt(x * x + y * y);
     }
 
     private class CameraListenerMiddleWare extends CameraListener {
