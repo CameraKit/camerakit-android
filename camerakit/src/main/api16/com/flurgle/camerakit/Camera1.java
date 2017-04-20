@@ -84,6 +84,11 @@ public class Camera1 extends CameraImpl {
     // CameraImpl:
 
     @Override
+    Camera getCamera() {
+        return mCamera;
+    }
+    
+    @Override
     void start() {
         setFacing(mFacing);
         openCamera();
