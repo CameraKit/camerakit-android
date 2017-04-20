@@ -1,5 +1,7 @@
 package com.flurgle.camerakit;
 
+import android.hardware.Camera;
+
 abstract class CameraImpl {
 
     protected final CameraListener mCameraListener;
@@ -12,6 +14,7 @@ abstract class CameraImpl {
 
     abstract void start();
     abstract void stop();
+    abstract Camera getCamera();
 
     abstract void setDisplayOrientation(int displayOrientation);
 
