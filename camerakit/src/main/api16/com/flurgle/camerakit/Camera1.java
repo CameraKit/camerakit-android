@@ -443,11 +443,19 @@ public class Camera1 extends CameraImpl {
     private CamcorderProfile getCamcorderProfile(@VideoQuality int videoQuality) {
         CamcorderProfile camcorderProfile = null;
         switch (videoQuality) {
+            case CameraKit.Constants.VIDEO_QUALITY_QVGA:
+                if (CamcorderProfile.hasProfile(mCameraId, CamcorderProfile.QUALITY_QVGA)) {
+                    camcorderProfile = CamcorderProfile.get(mCameraId, CamcorderProfile.QUALITY_QVGA);
+                } else {
+                    return getCamcorderProfile(CameraKit.Constants.VIDEO_QUALITY_LOWEST);
+                }
+                break;
+
             case CameraKit.Constants.VIDEO_QUALITY_480P:
                 if (CamcorderProfile.hasProfile(mCameraId, CamcorderProfile.QUALITY_480P)) {
                     camcorderProfile = CamcorderProfile.get(mCameraId, CamcorderProfile.QUALITY_480P);
                 } else {
-                    return getCamcorderProfile(CameraKit.Constants.VIDEO_QUALITY_LOWEST);
+                    return getCamcorderProfile(CameraKit.Constants.VIDEO_QUALITY_QVGA);
                 }
                 break;
 
