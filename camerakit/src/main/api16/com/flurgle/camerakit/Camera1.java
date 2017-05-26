@@ -6,6 +6,7 @@ import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.os.Handler;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.View;
@@ -29,6 +30,8 @@ import static com.flurgle.camerakit.CameraKit.Constants.METHOD_STILL;
 @SuppressWarnings("deprecation")
 public class Camera1 extends CameraImpl {
 
+    private static final String TAG = Camera1.class.getSimpleName();
+
     private static final int FOCUS_AREA_SIZE_DEFAULT = 300;
     private static final int FOCUS_METERING_AREA_WEIGHT_DEFAULT = 1000;
     private static final int DELAY_MILLIS_BEFORE_RESETTING_FOCUS = 3000;
@@ -42,6 +45,7 @@ public class Camera1 extends CameraImpl {
     private MediaRecorder mMediaRecorder;
     private File mVideoFile;
     private Camera.AutoFocusCallback mAutofocusCallback;
+    private boolean capturingImage = false;
 
     private int mDisplayOrientation;
 
@@ -208,13 +212,31 @@ public class Camera1 extends CameraImpl {
     void captureImage() {
         switch (mMethod) {
             case METHOD_STANDARD:
-                mCamera.takePicture(null, null, null, new Camera.PictureCallback() {
-                    @Override
-                    public void onPictureTaken(byte[] data, Camera camera) {
-                        mCameraListener.onPictureTaken(data);
-                        camera.startPreview();
-                    }
-                });
+
+                // Null check required for camera here as is briefly null when View is detached
+                if (!capturingImage && mCamera != null) {
+
+                    // Set boolean to wait for image callback
+                    capturingImage = true;
+
+                    mCamera.takePicture(null, null, null,
+                        new Camera.PictureCallback() {
+
+                            @Override
+                            public void onPictureTaken(byte[] data, Camera camera) {
+
+                                mCameraListener.onPictureTaken(data);
+
+                                // Reset capturing state to allow photos to be taken
+                                capturingImage = false;
+
+                                camera.startPreview();
+                            }
+                        });
+                }
+                else {
+                    Log.w(TAG, "Unable, waiting for picture to be taken");
+                }
                 break;
 
             case METHOD_STILL:
