@@ -110,13 +110,15 @@ public class CameraView extends FrameLayout {
         setPermissions(mPermissions);
         setVideoQuality(mVideoQuality);
 
-        mDisplayOrientationDetector = new DisplayOrientationDetector(context) {
-            @Override
-            public void onDisplayOrientationChanged(int displayOrientation) {
-                mCameraImpl.setDisplayOrientation(displayOrientation);
-                mPreviewImpl.setDisplayOrientation(displayOrientation);
-            }
-        };
+        if(!isInEditMode()){
+            mDisplayOrientationDetector = new DisplayOrientationDetector(context) {
+                @Override
+                public void onDisplayOrientationChanged(int displayOrientation) {
+                    mCameraImpl.setDisplayOrientation(displayOrientation);
+                    mPreviewImpl.setDisplayOrientation(displayOrientation);
+                }
+            };
+        }
 
         final FocusMarkerLayout focusMarkerLayout = new FocusMarkerLayout(getContext());
         addView(focusMarkerLayout);
@@ -137,11 +139,15 @@ public class CameraView extends FrameLayout {
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        mDisplayOrientationDetector.enable(
+
+        if(!isInEditMode()) {
+            mDisplayOrientationDetector.enable(
                 ViewCompat.isAttachedToWindow(this)
-                        ? DisplayManagerCompat.getInstance(getContext()).getDisplay(Display.DEFAULT_DISPLAY)
-                        : null
-        );
+                    ? DisplayManagerCompat.getInstance(getContext())
+                    .getDisplay(Display.DEFAULT_DISPLAY)
+                    : null
+            );
+        }
     }
 
     @Override
