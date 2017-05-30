@@ -595,28 +595,28 @@ public class Camera1 extends CameraImpl {
     }
 
     private Rect calculateFocusArea(float x, float y) {
-        int centerX = clamp(Float.valueOf((x / mPreview.getView().getWidth()) * 2000 - 1000).intValue(), getFocusAreaSize());
-        int centerY = clamp(Float.valueOf((y / mPreview.getView().getHeight()) * 2000 - 1000).intValue(), getFocusAreaSize());
+        int buffer = getFocusAreaSize() / 2;
+        int centerX = calculateCenter(x, mPreview.getView().getWidth(), buffer);
+        int centerY = calculateCenter(y, mPreview.getView().getHeight(), buffer);
         return new Rect(
-                centerX - getFocusAreaSize() / 2,
-                centerY - getFocusAreaSize() / 2,
-                centerX + getFocusAreaSize() / 2,
-                centerY + getFocusAreaSize() / 2
+                centerX - buffer,
+                centerY - buffer,
+                centerX + buffer,
+                centerY + buffer
         );
     }
 
-    private int clamp(int touchCoordinateInCameraReper, int focusAreaSize) {
-        int result;
-        if (Math.abs(touchCoordinateInCameraReper) + focusAreaSize / 2 > 1000) {
-            if (touchCoordinateInCameraReper > 0) {
-                result = 1000 - focusAreaSize / 2;
+    private static int calculateCenter(float coord, int dimen, int buffer) {
+        int normalized = (int) ((coord / dimen) * 2000 - 1000);
+        if (Math.abs(normalized) + buffer > 1000) {
+            if (normalized > 0) {
+                return 1000 - buffer;
             } else {
-                result = -1000 + focusAreaSize / 2;
+                return -1000 + buffer;
             }
         } else {
-            result = touchCoordinateInCameraReper - focusAreaSize / 2;
+            return normalized;
         }
-        return result;
     }
 
 }
