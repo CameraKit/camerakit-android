@@ -321,6 +321,12 @@ public class Camera1 extends CameraImpl {
 
         adjustCameraParameters();
         mCamera.setDisplayOrientation(calculatePreviewRotation());
+        mCamera.setOneShotPreviewCallback(new Camera.PreviewCallback() {
+            @Override
+            public void onPreviewFrame(byte[] data, Camera camera) {
+                mCameraListener.onPreviewStarted();
+            }
+        });
 
         mCameraListener.onCameraOpened();
     }

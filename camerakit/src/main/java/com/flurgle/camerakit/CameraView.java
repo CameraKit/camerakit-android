@@ -209,7 +209,6 @@ public class CameraView extends FrameLayout {
                 }
                 break;
         }
-
         mCameraImpl.start();
         /*new Thread(new Runnable() {
             @Override
@@ -361,6 +360,12 @@ public class CameraView extends FrameLayout {
     private class CameraListenerMiddleWare extends CameraListener {
 
         private CameraListener mCameraListener;
+
+        @Override
+        public void onPreviewStarted(){
+            super.onPreviewStarted();
+            getCameraListener().onPreviewStarted();
+        }
 
         @Override
         public void onCameraOpened() {

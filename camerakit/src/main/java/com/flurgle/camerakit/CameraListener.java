@@ -6,6 +6,10 @@ import java.io.File;
 
 public abstract class CameraListener {
 
+    public void onPreviewStarted(){
+
+    }
+
     public void onCameraOpened() {
 
     }
