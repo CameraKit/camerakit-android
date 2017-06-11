@@ -241,6 +241,11 @@ public class CameraView extends FrameLayout {
         mCameraImpl.stop();
     }
 
+    @Facing
+    public int getFacing() {
+        return mFacing;
+    }
+
     public void setFacing(@Facing final int facing) {
         this.mFacing = facing;
 
