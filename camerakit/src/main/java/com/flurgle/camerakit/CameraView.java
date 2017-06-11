@@ -2,6 +2,10 @@ package com.flurgle.camerakit;
 
 import android.Manifest;
 import android.app.Activity;
+import android.arch.lifecycle.Lifecycle;
+import android.arch.lifecycle.LifecycleObserver;
+import android.arch.lifecycle.LifecycleOwner;
+import android.arch.lifecycle.OnLifecycleEvent;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.pm.PackageManager;
@@ -37,7 +41,21 @@ import static com.flurgle.camerakit.CameraKit.Constants.PERMISSIONS_LAZY;
 import static com.flurgle.camerakit.CameraKit.Constants.PERMISSIONS_PICTURE;
 import static com.flurgle.camerakit.CameraKit.Constants.PERMISSIONS_STRICT;
 
-public class CameraView extends FrameLayout {
+/**
+ * The CameraView implements the LifecycleObserver interface for ease of use. To take advantage of
+ * this, simply call the following from any LifecycleOwner:
+ * <pre>
+ * {@code
+ * protected void onCreate(@Nullable Bundle savedInstanceState) {
+ *     super.onCreate(savedInstanceState);
+ *     setContentView(R.layout.my_view);
+ *     ...
+ *     getLifecycle().addObserver(mCameraView);
+ * }
+ * }
+ * </pre>
+ */
+public class CameraView extends FrameLayout implements LifecycleObserver {
 
     private static Handler sWorkerHandler;
 
@@ -81,6 +99,7 @@ public class CameraView extends FrameLayout {
 
     private PreviewImpl mPreviewImpl;
 
+    private Lifecycle mLifecycle;
     private boolean mIsStarted;
 
     public CameraView(@NonNull Context context) {
@@ -154,6 +173,7 @@ public class CameraView extends FrameLayout {
                 return true;
             }
         });
+        mLifecycle = null;
     }
 
     @Override
@@ -209,8 +229,34 @@ public class CameraView extends FrameLayout {
         return mIsStarted;
     }
 
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        if (mLifecycle != null && mLifecycle.getCurrentState().isAtLeast(Lifecycle.State.RESUMED)) {
+            // Potentially update the UI
+            if (enabled) {
+                start();
+            } else {
+                stop();
+            }
+        }
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+    public void onResume(LifecycleOwner owner) {
+        mLifecycle = owner.getLifecycle();
+        start();
+    }
+
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+    public void onPause(LifecycleOwner owner) {
+        mLifecycle = owner.getLifecycle();
+        stop();
+    }
+
     public void start() {
-        if (mIsStarted) {
+        if (mIsStarted || !isEnabled()) {
             // Already started, do nothing.
             return;
         }
