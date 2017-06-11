@@ -6,6 +6,7 @@ import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.View;
@@ -36,6 +37,7 @@ public class Camera1 extends CameraImpl {
     private int mCameraId;
     private Camera mCamera;
     private Camera.Parameters mCameraParameters;
+    private CameraProperties mCameraProperties;
     private Camera.CameraInfo mCameraInfo;
     private Size mPreviewSize;
     private Size mCaptureSize;
@@ -309,6 +311,12 @@ public class Camera1 extends CameraImpl {
         return mCamera != null;
     }
 
+    @Nullable
+    @Override
+    CameraProperties getCameraProperties() {
+        return mCameraProperties;
+    }
+
     // Internal:
 
     private void openCamera() {
@@ -319,6 +327,7 @@ public class Camera1 extends CameraImpl {
         mCamera = Camera.open(mCameraId);
         mCameraParameters = mCamera.getParameters();
 
+        collectCameraProperties();
         adjustCameraParameters();
         mCamera.setDisplayOrientation(calculatePreviewRotation());
 
@@ -389,6 +398,11 @@ public class Camera1 extends CameraImpl {
         setFlash(mFlash);
 
         mCamera.setParameters(mCameraParameters);
+    }
+
+    private void collectCameraProperties() {
+        mCameraProperties = new CameraProperties(mCameraParameters.getVerticalViewAngle(),
+                mCameraParameters.getHorizontalViewAngle());
     }
 
     private TreeSet<AspectRatio> findCommonAspectRatios(List<Camera.Size> previewSizes, List<Camera.Size> captureSizes) {

@@ -1,5 +1,7 @@
 package com.flurgle.camerakit;
 
+import android.support.annotation.Nullable;
+
 abstract class CameraImpl {
 
     protected final CameraListener mCameraListener;
@@ -29,5 +31,8 @@ abstract class CameraImpl {
     abstract Size getCaptureResolution();
     abstract Size getPreviewResolution();
     abstract boolean isCameraOpened();
+
+    @Nullable
+    abstract CameraProperties getCameraProperties();
 
 }

@@ -258,6 +258,11 @@ public class CameraView extends FrameLayout {
         mCameraImpl.stop();
     }
 
+    @Nullable
+    public CameraProperties getCameraProperties() {
+        return mCameraImpl.getCameraProperties();
+    }
+
     @Facing
     public int getFacing() {
         return mFacing;
