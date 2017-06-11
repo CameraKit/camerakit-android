@@ -81,6 +81,8 @@ public class CameraView extends FrameLayout {
 
     private PreviewImpl mPreviewImpl;
 
+    private boolean mIsStarted;
+
     public CameraView(@NonNull Context context) {
         super(context, null);
         init(context, null);
@@ -121,6 +123,7 @@ public class CameraView extends FrameLayout {
         mPreviewImpl = new TextureViewPreview(context, this);
         mCameraImpl = new Camera1(mCameraListener, mPreviewImpl);
 
+        mIsStarted = false;
         setFacing(mFacing);
         setFlash(mFlash);
         setFocus(mFocus);
@@ -202,7 +205,16 @@ public class CameraView extends FrameLayout {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
+    public boolean isStarted() {
+        return mIsStarted;
+    }
+
     public void start() {
+        if (mIsStarted) {
+            // Already started, do nothing.
+            return;
+        }
+        mIsStarted = true;
         int cameraCheck = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA);
         int audioCheck = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.RECORD_AUDIO);
 
@@ -238,6 +250,11 @@ public class CameraView extends FrameLayout {
     }
 
     public void stop() {
+        if (!mIsStarted) {
+            // Already stopped, do nothing.
+            return;
+        }
+        mIsStarted = false;
         mCameraImpl.stop();
     }
 
