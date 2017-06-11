@@ -8,6 +8,8 @@ import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -37,6 +39,17 @@ import static com.flurgle.camerakit.CameraKit.Constants.PERMISSIONS_STRICT;
 
 public class CameraView extends FrameLayout {
 
+    private static Handler sWorkerHandler;
+
+    static {
+        // Initialize a single worker thread. This can be static since only a single camera
+        // reference can exist at a time.
+        HandlerThread workerThread = new HandlerThread("CameraViewWorker");
+        workerThread.setDaemon(true);
+        workerThread.start();
+        sWorkerHandler = new Handler(workerThread.getLooper());
+    }
+
     @Facing
     private int mFacing;
 
@@ -57,24 +70,30 @@ public class CameraView extends FrameLayout {
 
     @VideoQuality
     private int mVideoQuality;
-
     private int mJpegQuality;
     private boolean mCropOutput;
+
     private boolean mAdjustViewBounds;
-
     private CameraListenerMiddleWare mCameraListener;
-    private DisplayOrientationDetector mDisplayOrientationDetector;
 
+    private DisplayOrientationDetector mDisplayOrientationDetector;
     private CameraImpl mCameraImpl;
+
     private PreviewImpl mPreviewImpl;
 
     public CameraView(@NonNull Context context) {
         super(context, null);
+        init(context, null);
     }
 
     @SuppressWarnings("all")
     public CameraView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+        init(context, attrs);
+    }
+
+    @SuppressWarnings("WrongConstant")
+    private void init(@NonNull Context context, @Nullable AttributeSet attrs) {
         if (attrs != null) {
             TypedArray a = context.getTheme().obtainStyledAttributes(
                     attrs,
@@ -210,28 +229,27 @@ public class CameraView extends FrameLayout {
                 break;
         }
 
-        new Thread(new Runnable() {
+        sWorkerHandler.post(new Runnable() {
             @Override
             public void run() {
                 mCameraImpl.start();
             }
-        }).start();
+        });
     }
 
     public void stop() {
         mCameraImpl.stop();
     }
 
-    public void setFacing(@Facing
-                          final int facing) {
+    public void setFacing(@Facing final int facing) {
         this.mFacing = facing;
 
-        new Thread(new Runnable() {
+        sWorkerHandler.post(new Runnable() {
             @Override
             public void run() {
                 mCameraImpl.setFacing(facing);
             }
-        }).start();
+        });
     }
 
     public void setFlash(@Flash int flash) {
