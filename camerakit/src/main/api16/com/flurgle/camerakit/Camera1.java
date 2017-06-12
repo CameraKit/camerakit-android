@@ -214,7 +214,9 @@ public class Camera1 extends CameraImpl {
                     @Override
                     public void onPictureTaken(byte[] data, Camera camera) {
                         mCameraListener.onPictureTaken(data);
-                        camera.startPreview();
+                        if (mCamera != null) {
+                            mCamera.startPreview();
+                        }
                     }
                 });
                 break;

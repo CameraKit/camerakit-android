@@ -330,6 +330,11 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
         mCameraImpl.setFlash(flash);
     }
 
+    @Flash
+    public int getFlash() {
+        return mFlash;
+    }
+
     public void setFocus(@Focus int focus) {
         this.mFocus = focus;
         if (this.mFocus == CameraKit.Constants.FOCUS_TAP_WITH_MARKER) {
