@@ -5,6 +5,7 @@ import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
+import android.os.Build;
 import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -248,59 +249,79 @@ public class Camera1 extends CameraImpl {
         mCameraListener.onVideoTaken(mVideoFile);
     }
 
-    @Override
-    Size getCaptureResolution() {
-        if (mCaptureSize == null && mCameraParameters != null) {
-            TreeSet<Size> sizes = new TreeSet<>();
-            for (Camera.Size size : mCameraParameters.getSupportedPictureSizes()) {
-                sizes.add(new Size(size.width, size.height));
-            }
+    // Code from SandriosCamera library
+    // https://github.com/sandrios/sandriosCamera/blob/master/sandriosCamera/src/main/java/com/sandrios/sandriosCamera/internal/utils/CameraHelper.java#L218
+    public static Size getSizeWithClosestRatio(List<Size> sizes, int width, int height)
+    {
+        if (sizes == null) return null;
 
-            TreeSet<AspectRatio> aspectRatios = findCommonAspectRatios(
-                    mCameraParameters.getSupportedPreviewSizes(),
-                    mCameraParameters.getSupportedPictureSizes()
-            );
-            AspectRatio targetRatio = aspectRatios.size() > 0 ? aspectRatios.last() : null;
+        double MIN_TOLERANCE = 100;
+        double targetRatio = (double) height / width;
+        Size optimalSize = null;
+        double minDiff = Double.MAX_VALUE;
 
-            Iterator<Size> descendingSizes = sizes.descendingIterator();
-            Size size;
-            while (descendingSizes.hasNext() && mCaptureSize == null) {
-                size = descendingSizes.next();
-                if (targetRatio == null || targetRatio.matches(size)) {
-                    mCaptureSize = size;
-                    break;
-                }
+        int targetHeight = height;
+
+        for (Size size : sizes) {
+            if (size.getWidth() == width && size.getHeight() == height)
+                return size;
+
+            double ratio = (double) size.getHeight() / size.getWidth();
+
+            if (Math.abs(ratio - targetRatio) < MIN_TOLERANCE) MIN_TOLERANCE = ratio;
+            else continue;
+
+            if (Math.abs(size.getHeight() - targetHeight) < minDiff) {
+                optimalSize = size;
+                minDiff = Math.abs(size.getHeight() - targetHeight);
             }
         }
 
+        if (optimalSize == null) {
+            minDiff = Double.MAX_VALUE;
+            for (Size size : sizes) {
+                if (Math.abs(size.getHeight() - targetHeight) < minDiff) {
+                    optimalSize = size;
+                    minDiff = Math.abs(size.getHeight() - targetHeight);
+                }
+            }
+        }
+        return optimalSize;
+    }
+
+    List<Size> sizesFromList(List<Camera.Size> sizes) {
+        if (sizes == null) return null;
+        List<Size> result = new ArrayList<>(sizes.size());
+
+        for (Camera.Size size : sizes) {
+            result.add(new Size(size.width, size.height));
+        }
+
+        return result;
+    }
+
+    // Code from SandriosCamera library
+    // https://github.com/sandrios/sandriosCamera/blob/master/sandriosCamera/src/main/java/com/sandrios/sandriosCamera/internal/manager/impl/Camera1Manager.java#L212
+    void initResolutions() {
+        List<Size> previewSizes = sizesFromList(mCameraParameters.getSupportedPreviewSizes());
+        List<Size> videoSizes = (Build.VERSION.SDK_INT > 10) ? sizesFromList(mCameraParameters.getSupportedVideoSizes()) : previewSizes;
+
+        CamcorderProfile camcorderProfile = getCamcorderProfile(mVideoQuality);
+
+        mCaptureSize = getSizeWithClosestRatio(
+                (videoSizes == null || videoSizes.isEmpty()) ? previewSizes : videoSizes,
+                camcorderProfile.videoFrameWidth, camcorderProfile.videoFrameHeight);
+
+        mPreviewSize = getSizeWithClosestRatio(previewSizes, mCaptureSize.getWidth(), mCaptureSize.getHeight());
+    }
+
+    @Override
+    Size getCaptureResolution() {
         return mCaptureSize;
     }
 
     @Override
     Size getPreviewResolution() {
-        if (mPreviewSize == null && mCameraParameters != null) {
-            TreeSet<Size> sizes = new TreeSet<>();
-            for (Camera.Size size : mCameraParameters.getSupportedPreviewSizes()) {
-                sizes.add(new Size(size.width, size.height));
-            }
-
-            TreeSet<AspectRatio> aspectRatios = findCommonAspectRatios(
-                    mCameraParameters.getSupportedPreviewSizes(),
-                    mCameraParameters.getSupportedPictureSizes()
-            );
-            AspectRatio targetRatio = aspectRatios.size() > 0 ? aspectRatios.last() : null;
-
-            Iterator<Size> descendingSizes = sizes.descendingIterator();
-            Size size;
-            while (descendingSizes.hasNext() && mPreviewSize == null) {
-                size = descendingSizes.next();
-                if (targetRatio == null || targetRatio.matches(size)) {
-                    mPreviewSize = size;
-                    break;
-                }
-            }
-        }
-
         return mPreviewSize;
     }
 
@@ -367,6 +388,8 @@ public class Camera1 extends CameraImpl {
     }
 
     private void adjustCameraParameters() {
+        initResolutions();
+
         boolean invertPreviewSizes = mDisplayOrientation%180 != 0;
         mPreview.setTruePreviewSize(
                 invertPreviewSizes? getPreviewResolution().getHeight() : getPreviewResolution().getWidth(),
@@ -428,6 +451,7 @@ public class Camera1 extends CameraImpl {
         mVideoFile = new File(mPreview.getView().getContext().getExternalFilesDir(null), "video.mp4");
         mMediaRecorder.setOutputFile(mVideoFile.getAbsolutePath());
         mMediaRecorder.setOrientationHint(calculatePreviewRotation());
+        mMediaRecorder.setVideoSize(mCaptureSize.getWidth(), mCaptureSize.getHeight());
     }
 
     private void prepareMediaRecorder() {
