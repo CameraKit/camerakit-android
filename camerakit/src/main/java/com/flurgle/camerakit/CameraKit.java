@@ -44,6 +44,7 @@ public class CameraKit {
         public static final int VIDEO_QUALITY_2160P = 3;
         public static final int VIDEO_QUALITY_HIGHEST = 4;
         public static final int VIDEO_QUALITY_LOWEST = 5;
+        public static final int VIDEO_QUALITY_QVGA = 6;
 
     }
 
