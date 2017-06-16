@@ -151,44 +151,50 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
         setPermissions(mPermissions);
         setVideoQuality(mVideoQuality);
 
-        mDisplayOrientationDetector = new DisplayOrientationDetector(context) {
-            @Override
-            public void onDisplayOrientationChanged(int displayOrientation) {
-                mCameraImpl.setDisplayOrientation(displayOrientation);
-                mPreviewImpl.setDisplayOrientation(displayOrientation);
-            }
-        };
-
-        final FocusMarkerLayout focusMarkerLayout = new FocusMarkerLayout(getContext());
-        addView(focusMarkerLayout);
-        focusMarkerLayout.setOnTouchListener(new OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent motionEvent) {
-                int action = motionEvent.getAction();
-                if (motionEvent.getAction() == MotionEvent.ACTION_UP && mFocus == CameraKit.Constants.FOCUS_TAP_WITH_MARKER) {
-                    focusMarkerLayout.focus(motionEvent.getX(), motionEvent.getY());
+        if (!isInEditMode()) {
+            mDisplayOrientationDetector = new DisplayOrientationDetector(context) {
+                @Override
+                public void onDisplayOrientationChanged(int displayOrientation) {
+                    mCameraImpl.setDisplayOrientation(displayOrientation);
+                    mPreviewImpl.setDisplayOrientation(displayOrientation);
                 }
+            };
 
-                mPreviewImpl.getView().dispatchTouchEvent(motionEvent);
-                return true;
-            }
-        });
+            final FocusMarkerLayout focusMarkerLayout = new FocusMarkerLayout(getContext());
+            addView(focusMarkerLayout);
+            focusMarkerLayout.setOnTouchListener(new OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent motionEvent) {
+                    int action = motionEvent.getAction();
+                    if (motionEvent.getAction() == MotionEvent.ACTION_UP && mFocus == CameraKit.Constants.FOCUS_TAP_WITH_MARKER) {
+                        focusMarkerLayout.focus(motionEvent.getX(), motionEvent.getY());
+                    }
+
+                    mPreviewImpl.getView().dispatchTouchEvent(motionEvent);
+                    return true;
+                }
+            });
+        }
         mLifecycle = null;
     }
 
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        mDisplayOrientationDetector.enable(
-                ViewCompat.isAttachedToWindow(this)
-                        ? DisplayManagerCompat.getInstance(getContext()).getDisplay(Display.DEFAULT_DISPLAY)
-                        : null
-        );
+        if (!isInEditMode()) {
+            mDisplayOrientationDetector.enable(
+                    ViewCompat.isAttachedToWindow(this)
+                            ? DisplayManagerCompat.getInstance(getContext()).getDisplay(Display.DEFAULT_DISPLAY)
+                            : null
+            );
+        }
     }
 
     @Override
     protected void onDetachedFromWindow() {
-        mDisplayOrientationDetector.disable();
+        if (!isInEditMode()) {
+            mDisplayOrientationDetector.disable();
+        }
         super.onDetachedFromWindow();
     }
 
