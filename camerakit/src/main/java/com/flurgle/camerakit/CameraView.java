@@ -2,12 +2,18 @@ package com.flurgle.camerakit;
 
 import android.Manifest;
 import android.app.Activity;
+import android.arch.lifecycle.Lifecycle;
+import android.arch.lifecycle.LifecycleObserver;
+import android.arch.lifecycle.LifecycleOwner;
+import android.arch.lifecycle.OnLifecycleEvent;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -35,7 +41,32 @@ import static com.flurgle.camerakit.CameraKit.Constants.PERMISSIONS_LAZY;
 import static com.flurgle.camerakit.CameraKit.Constants.PERMISSIONS_PICTURE;
 import static com.flurgle.camerakit.CameraKit.Constants.PERMISSIONS_STRICT;
 
-public class CameraView extends FrameLayout {
+/**
+ * The CameraView implements the LifecycleObserver interface for ease of use. To take advantage of
+ * this, simply call the following from any LifecycleOwner:
+ * <pre>
+ * {@code
+ * protected void onCreate(@Nullable Bundle savedInstanceState) {
+ *     super.onCreate(savedInstanceState);
+ *     setContentView(R.layout.my_view);
+ *     ...
+ *     getLifecycle().addObserver(mCameraView);
+ * }
+ * }
+ * </pre>
+ */
+public class CameraView extends FrameLayout implements LifecycleObserver {
+
+    private static Handler sWorkerHandler;
+
+    static {
+        // Initialize a single worker thread. This can be static since only a single camera
+        // reference can exist at a time.
+        HandlerThread workerThread = new HandlerThread("CameraViewWorker");
+        workerThread.setDaemon(true);
+        workerThread.start();
+        sWorkerHandler = new Handler(workerThread.getLooper());
+    }
 
     @Facing
     private int mFacing;
@@ -57,24 +88,33 @@ public class CameraView extends FrameLayout {
 
     @VideoQuality
     private int mVideoQuality;
-
     private int mJpegQuality;
     private boolean mCropOutput;
+
     private boolean mAdjustViewBounds;
-
     private CameraListenerMiddleWare mCameraListener;
-    private DisplayOrientationDetector mDisplayOrientationDetector;
 
+    private DisplayOrientationDetector mDisplayOrientationDetector;
     private CameraImpl mCameraImpl;
+
     private PreviewImpl mPreviewImpl;
+
+    private Lifecycle mLifecycle;
+    private boolean mIsStarted;
 
     public CameraView(@NonNull Context context) {
         super(context, null);
+        init(context, null);
     }
 
     @SuppressWarnings("all")
     public CameraView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+        init(context, attrs);
+    }
+
+    @SuppressWarnings("WrongConstant")
+    private void init(@NonNull Context context, @Nullable AttributeSet attrs) {
         if (attrs != null) {
             TypedArray a = context.getTheme().obtainStyledAttributes(
                     attrs,
@@ -102,6 +142,7 @@ public class CameraView extends FrameLayout {
         mPreviewImpl = new TextureViewPreview(context, this);
         mCameraImpl = new Camera1(mCameraListener, mPreviewImpl);
 
+        mIsStarted = false;
         setFacing(mFacing);
         setFlash(mFlash);
         setFocus(mFocus);
@@ -134,6 +175,7 @@ public class CameraView extends FrameLayout {
                 }
             });
         }
+        mLifecycle = null;
     }
 
     @Override
@@ -189,7 +231,42 @@ public class CameraView extends FrameLayout {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
+    public boolean isStarted() {
+        return mIsStarted;
+    }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        if (mLifecycle != null && mLifecycle.getCurrentState().isAtLeast(Lifecycle.State.RESUMED)) {
+            // Potentially update the UI
+            if (enabled) {
+                start();
+            } else {
+                stop();
+            }
+        }
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+    public void onResume(LifecycleOwner owner) {
+        mLifecycle = owner.getLifecycle();
+        start();
+    }
+
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+    public void onPause(LifecycleOwner owner) {
+        mLifecycle = owner.getLifecycle();
+        stop();
+    }
+
     public void start() {
+        if (mIsStarted || !isEnabled()) {
+            // Already started, do nothing.
+            return;
+        }
+        mIsStarted = true;
         int cameraCheck = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA);
         int audioCheck = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.RECORD_AUDIO);
 
@@ -216,33 +293,52 @@ public class CameraView extends FrameLayout {
                 break;
         }
 
-        new Thread(new Runnable() {
+        sWorkerHandler.post(new Runnable() {
             @Override
             public void run() {
                 mCameraImpl.start();
             }
-        }).start();
+        });
     }
 
     public void stop() {
+        if (!mIsStarted) {
+            // Already stopped, do nothing.
+            return;
+        }
+        mIsStarted = false;
         mCameraImpl.stop();
     }
 
-    public void setFacing(@Facing
-                          final int facing) {
+    @Nullable
+    public CameraProperties getCameraProperties() {
+        return mCameraImpl.getCameraProperties();
+    }
+
+    @Facing
+    public int getFacing() {
+        return mFacing;
+    }
+
+    public void setFacing(@Facing final int facing) {
         this.mFacing = facing;
 
-        new Thread(new Runnable() {
+        sWorkerHandler.post(new Runnable() {
             @Override
             public void run() {
                 mCameraImpl.setFacing(facing);
             }
-        }).start();
+        });
     }
 
     public void setFlash(@Flash int flash) {
         this.mFlash = flash;
         mCameraImpl.setFlash(flash);
+    }
+
+    @Flash
+    public int getFlash() {
+        return mFlash;
     }
 
     public void setFocus(@Focus int focus) {
