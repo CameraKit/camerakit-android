@@ -12,6 +12,7 @@
             <enum name="off" value="0" />
             <enum name="on" value="1" />
             <enum name="auto" value="2" />
+            <enum name="torch" value="3" />
         </attr>
 
         <attr name="ckFocus" format="enum">
