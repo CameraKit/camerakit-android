@@ -161,6 +161,11 @@ class Camera2 extends CameraImpl {
     }
 
     @Override
+    void setAudio(@Audio final int audio) {
+        //TODO
+    }
+
+    @Override
     void captureImage() {
 
     }

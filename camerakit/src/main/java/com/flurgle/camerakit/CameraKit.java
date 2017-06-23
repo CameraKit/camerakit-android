@@ -47,6 +47,10 @@ public class CameraKit {
         public static final int VIDEO_QUALITY_LOWEST = 5;
         public static final int VIDEO_QUALITY_QVGA = 6;
 
+        public static final int AUDIO_DEFAULT = 0;
+        public static final int AUDIO_VOICE_RECOGNITION_COMPATIBLE = 1;
+        public static final int AUDIO_MUTED = 2;
+
     }
 
     static class Defaults {
@@ -58,6 +62,7 @@ public class CameraKit {
         static final int DEFAULT_METHOD = Constants.METHOD_STANDARD;
         static final int DEFAULT_PERMISSIONS = Constants.PERMISSIONS_STRICT;
         static final int DEFAULT_VIDEO_QUALITY = Constants.VIDEO_QUALITY_480P;
+        static final int DEFAULT_AUDIO = Constants.AUDIO_DEFAULT;
 
         static final int DEFAULT_JPEG_QUALITY = 100;
         static final boolean DEFAULT_CROP_OUTPUT = false;

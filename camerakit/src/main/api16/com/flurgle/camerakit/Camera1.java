@@ -22,6 +22,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import static com.flurgle.camerakit.CameraKit.Constants.AUDIO_DEFAULT;
+import static com.flurgle.camerakit.CameraKit.Constants.AUDIO_MUTED;
+import static com.flurgle.camerakit.CameraKit.Constants.AUDIO_VOICE_RECOGNITION_COMPATIBLE;
 import static com.flurgle.camerakit.CameraKit.Constants.FLASH_OFF;
 import static com.flurgle.camerakit.CameraKit.Constants.FOCUS_CONTINUOUS;
 import static com.flurgle.camerakit.CameraKit.Constants.FOCUS_OFF;
@@ -69,6 +72,9 @@ public class Camera1 extends CameraImpl {
 
     @VideoQuality
     private int mVideoQuality;
+
+    @Audio
+    private int mAudio;
 
     private Handler mHandler = new Handler();
 
@@ -209,6 +215,11 @@ public class Camera1 extends CameraImpl {
     @Override
     void setVideoQuality(int videoQuality) {
         this.mVideoQuality = videoQuality;
+    }
+
+    @Override
+    void setAudio(@Audio final int audio) {
+        this.mAudio = audio;
     }
 
     @Override
@@ -477,7 +488,16 @@ public class Camera1 extends CameraImpl {
         mMediaRecorder.setCamera(mCamera);
 
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-        mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
+
+        switch (mAudio) {
+            case AUDIO_DEFAULT:
+                mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
+            case AUDIO_VOICE_RECOGNITION_COMPATIBLE:
+                mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.VOICE_RECOGNITION);
+            case AUDIO_MUTED:
+                //For muted audio setAudioSource isn't called
+                break;
+        }
 
         mMediaRecorder.setProfile(getCamcorderProfile(mVideoQuality));
 
