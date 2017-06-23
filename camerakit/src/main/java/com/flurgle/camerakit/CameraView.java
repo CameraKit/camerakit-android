@@ -90,8 +90,7 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
     @VideoQuality
     private int mVideoQuality;
 
-    @Audio
-    private int mAudio;
+    private boolean mAudioEnabled;
 
     private int mJpegQuality;
     private boolean mCropOutput;
@@ -134,7 +133,7 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
                 mZoom = a.getInteger(R.styleable.CameraView_ckZoom, CameraKit.Defaults.DEFAULT_ZOOM);
                 mPermissions = a.getInteger(R.styleable.CameraView_ckPermissions, CameraKit.Defaults.DEFAULT_PERMISSIONS);
                 mVideoQuality = a.getInteger(R.styleable.CameraView_ckVideoQuality, CameraKit.Defaults.DEFAULT_VIDEO_QUALITY);
-                mAudio = a.getInteger(R.styleable.CameraView_ckAudio, CameraKit.Defaults.DEFAULT_AUDIO);
+                mAudioEnabled = a.getBoolean(R.styleable.CameraView_ckAudioEnabled, CameraKit.Defaults.DEFAULT_AUDIO_ENABLED);
                 mJpegQuality = a.getInteger(R.styleable.CameraView_ckJpegQuality, CameraKit.Defaults.DEFAULT_JPEG_QUALITY);
                 mCropOutput = a.getBoolean(R.styleable.CameraView_ckCropOutput, CameraKit.Defaults.DEFAULT_CROP_OUTPUT);
                 mAdjustViewBounds = a.getBoolean(R.styleable.CameraView_android_adjustViewBounds, CameraKit.Defaults.DEFAULT_ADJUST_VIEW_BOUNDS);
@@ -156,7 +155,7 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
         setZoom(mZoom);
         setPermissions(mPermissions);
         setVideoQuality(mVideoQuality);
-        setAudio(mAudio);
+        setAudioEnabled(mAudioEnabled);
 
         if (!isInEditMode()) {
             mDisplayOrientationDetector = new DisplayOrientationDetector(context) {
@@ -378,9 +377,9 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
         mCameraImpl.setVideoQuality(mVideoQuality);
     }
 
-    public void setAudio(@Audio int audio) {
-        this.mAudio = audio;
-        mCameraImpl.setAudio(mAudio);
+    public void setAudioEnabled(boolean audioEnabled) {
+        this.mAudioEnabled = audioEnabled;
+        mCameraImpl.setAudioEnabled(mAudioEnabled);
     }
 
     public void setJpegQuality(int jpegQuality) {

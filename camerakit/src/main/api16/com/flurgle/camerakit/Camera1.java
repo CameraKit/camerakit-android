@@ -17,14 +17,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static com.flurgle.camerakit.CameraKit.Constants.AUDIO_DEFAULT;
-import static com.flurgle.camerakit.CameraKit.Constants.AUDIO_MUTED;
-import static com.flurgle.camerakit.CameraKit.Constants.AUDIO_VOICE_RECOGNITION_COMPATIBLE;
 import static com.flurgle.camerakit.CameraKit.Constants.FLASH_OFF;
 import static com.flurgle.camerakit.CameraKit.Constants.FOCUS_CONTINUOUS;
 import static com.flurgle.camerakit.CameraKit.Constants.FOCUS_OFF;
@@ -73,8 +69,7 @@ public class Camera1 extends CameraImpl {
     @VideoQuality
     private int mVideoQuality;
 
-    @Audio
-    private int mAudio;
+    private boolean mAudioEnabled;
 
     private Handler mHandler = new Handler();
 
@@ -218,8 +213,8 @@ public class Camera1 extends CameraImpl {
     }
 
     @Override
-    void setAudio(@Audio final int audio) {
-        this.mAudio = audio;
+    void setAudioEnabled(boolean audioEnabled) {
+        this.mAudioEnabled = audioEnabled;
     }
 
     @Override
@@ -489,22 +484,35 @@ public class Camera1 extends CameraImpl {
 
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
 
-        switch (mAudio) {
-            case AUDIO_DEFAULT:
-                mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
-            case AUDIO_VOICE_RECOGNITION_COMPATIBLE:
-                mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.VOICE_RECOGNITION);
-            case AUDIO_MUTED:
-                //For muted audio setAudioSource isn't called
-                break;
+        if (mAudioEnabled) {
+            mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
         }
 
-        mMediaRecorder.setProfile(getCamcorderProfile(mVideoQuality));
+        setProfile(getCamcorderProfile(mVideoQuality), mAudioEnabled);
 
         mVideoFile = new File(mPreview.getView().getContext().getExternalFilesDir(null), "video.mp4");
         mMediaRecorder.setOutputFile(mVideoFile.getAbsolutePath());
         mMediaRecorder.setOrientationHint(calculatePreviewRotation());
         mMediaRecorder.setVideoSize(mCaptureSize.getWidth(), mCaptureSize.getHeight());
+    }
+
+    public void setProfile(CamcorderProfile profile, boolean audioEnabled) {
+        mMediaRecorder.setOutputFormat(profile.fileFormat);
+        mMediaRecorder.setVideoFrameRate(profile.videoFrameRate);
+        mMediaRecorder.setVideoSize(profile.videoFrameWidth, profile.videoFrameHeight);
+        mMediaRecorder.setVideoEncodingBitRate(profile.videoBitRate);
+        mMediaRecorder.setVideoEncoder(profile.videoCodec);
+
+        if (profile.quality >= CamcorderProfile.QUALITY_TIME_LAPSE_LOW &&
+                profile.quality <= CamcorderProfile.QUALITY_TIME_LAPSE_QVGA) {
+            // Nothing needs to be done. Call to setCaptureRate() enables
+            // time lapse video recording.
+        } else if (audioEnabled) {
+            mMediaRecorder.setAudioEncodingBitRate(profile.audioBitRate);
+            mMediaRecorder.setAudioChannels(profile.audioChannels);
+            mMediaRecorder.setAudioSamplingRate(profile.audioSampleRate);
+            mMediaRecorder.setAudioEncoder(profile.audioCodec);
+        }
     }
 
     private void prepareMediaRecorder() {
