@@ -519,10 +519,10 @@ public class Camera1 extends CameraImpl {
 
         switch (mCameraInfo.orientation) {
             case SENSOR_ORIENTATION_DEFAULT_DEGREES:
-                mMediaRecorder.setOrientationHint(DEFAULT_ORIENTATIONS.get(mCameraInfo.orientation));
+                mMediaRecorder.setOrientationHint(DEFAULT_ORIENTATIONS.get(mDisplayOrientation));
                 break;
             case SENSOR_ORIENTATION_INVERSE_DEGREES:
-                mMediaRecorder.setOrientationHint(INVERSE_ORIENTATIONS.get(mCameraInfo.orientation));
+                mMediaRecorder.setOrientationHint(INVERSE_ORIENTATIONS.get(mDisplayOrientation));
                 break;
         }
     }
