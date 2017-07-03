@@ -11,7 +11,6 @@ import android.util.Log;
 import android.support.annotation.Nullable;
 import android.util.SparseIntArray;
 import android.view.MotionEvent;
-import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.View;
 
@@ -54,25 +53,30 @@ public class Camera1 extends CameraImpl {
 
     private static final int SENSOR_ORIENTATION_DEFAULT_DEGREES = 90;
     private static final int SENSOR_ORIENTATION_INVERSE_DEGREES = 270;
-    private static final SparseIntArray DEFAULT_ORIENTATIONS = new SparseIntArray();
-    private static final SparseIntArray INVERSE_ORIENTATIONS = new SparseIntArray();
+    private static final SparseIntArray DEFAULT_ORIENTATION_HINTS = new SparseIntArray();
+    private static final SparseIntArray INVERSE_ORIENTATION_HINTS = new SparseIntArray();
 
-    static {
-        DEFAULT_ORIENTATIONS.append(Surface.ROTATION_0, 90);
-        DEFAULT_ORIENTATIONS.append(Surface.ROTATION_90, 0);
-        DEFAULT_ORIENTATIONS.append(Surface.ROTATION_180, 270);
-        DEFAULT_ORIENTATIONS.append(Surface.ROTATION_270, 180);
-    }
-
-    static {
-        INVERSE_ORIENTATIONS.append(Surface.ROTATION_0, 270);
-        INVERSE_ORIENTATIONS.append(Surface.ROTATION_90, 180);
-        INVERSE_ORIENTATIONS.append(Surface.ROTATION_180, 90);
-        INVERSE_ORIENTATIONS.append(Surface.ROTATION_270, 0);
-
-    }
 
     private int mDisplayOrientation;
+
+    private static final int ORIENTATION_0 = 0;
+    private static final int ORIENTATION_90 = 90;
+    private static final int ORIENTATION_180 = 180;
+    private static final int ORIENTATION_270 = 270;
+
+    static {
+        DEFAULT_ORIENTATION_HINTS.append(ORIENTATION_0, 90);
+        DEFAULT_ORIENTATION_HINTS.append(ORIENTATION_90, 0);
+        DEFAULT_ORIENTATION_HINTS.append(ORIENTATION_180, 270);
+        DEFAULT_ORIENTATION_HINTS.append(ORIENTATION_270, 180);
+    }
+
+    static {
+        INVERSE_ORIENTATION_HINTS.append(ORIENTATION_0, 270);
+        INVERSE_ORIENTATION_HINTS.append(ORIENTATION_90, 180);
+        INVERSE_ORIENTATION_HINTS.append(ORIENTATION_180, 90);
+        INVERSE_ORIENTATION_HINTS.append(ORIENTATION_270, 0);
+    }
 
     @Facing
     private int mFacing;
@@ -519,10 +523,10 @@ public class Camera1 extends CameraImpl {
 
         switch (mCameraInfo.orientation) {
             case SENSOR_ORIENTATION_DEFAULT_DEGREES:
-                mMediaRecorder.setOrientationHint(DEFAULT_ORIENTATIONS.get(mDisplayOrientation));
+                mMediaRecorder.setOrientationHint(DEFAULT_ORIENTATION_HINTS.get(mDisplayOrientation));
                 break;
             case SENSOR_ORIENTATION_INVERSE_DEGREES:
-                mMediaRecorder.setOrientationHint(INVERSE_ORIENTATIONS.get(mDisplayOrientation));
+                mMediaRecorder.setOrientationHint(INVERSE_ORIENTATION_HINTS.get(mDisplayOrientation));
                 break;
         }
     }
