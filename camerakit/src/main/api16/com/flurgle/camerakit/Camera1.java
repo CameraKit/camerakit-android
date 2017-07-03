@@ -9,7 +9,9 @@ import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 import android.support.annotation.Nullable;
+import android.util.SparseIntArray;
 import android.view.MotionEvent;
+import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.View;
 
@@ -48,6 +50,27 @@ public class Camera1 extends CameraImpl {
     private File mVideoFile;
     private Camera.AutoFocusCallback mAutofocusCallback;
     private boolean capturingImage = false;
+
+
+    private static final int SENSOR_ORIENTATION_DEFAULT_DEGREES = 90;
+    private static final int SENSOR_ORIENTATION_INVERSE_DEGREES = 270;
+    private static final SparseIntArray DEFAULT_ORIENTATIONS = new SparseIntArray();
+    private static final SparseIntArray INVERSE_ORIENTATIONS = new SparseIntArray();
+
+    static {
+        DEFAULT_ORIENTATIONS.append(Surface.ROTATION_0, 90);
+        DEFAULT_ORIENTATIONS.append(Surface.ROTATION_90, 0);
+        DEFAULT_ORIENTATIONS.append(Surface.ROTATION_180, 270);
+        DEFAULT_ORIENTATIONS.append(Surface.ROTATION_270, 180);
+    }
+
+    static {
+        INVERSE_ORIENTATIONS.append(Surface.ROTATION_0, 270);
+        INVERSE_ORIENTATIONS.append(Surface.ROTATION_90, 180);
+        INVERSE_ORIENTATIONS.append(Surface.ROTATION_180, 90);
+        INVERSE_ORIENTATIONS.append(Surface.ROTATION_270, 0);
+
+    }
 
     private int mDisplayOrientation;
 
@@ -492,8 +515,16 @@ public class Camera1 extends CameraImpl {
 
         mVideoFile = new File(mPreview.getView().getContext().getExternalFilesDir(null), "video.mp4");
         mMediaRecorder.setOutputFile(mVideoFile.getAbsolutePath());
-        mMediaRecorder.setOrientationHint(calculatePreviewRotation());
         mMediaRecorder.setVideoSize(mCaptureSize.getWidth(), mCaptureSize.getHeight());
+
+        switch (mCameraInfo.orientation) {
+            case SENSOR_ORIENTATION_DEFAULT_DEGREES:
+                mMediaRecorder.setOrientationHint(DEFAULT_ORIENTATIONS.get(mCameraInfo.orientation));
+                break;
+            case SENSOR_ORIENTATION_INVERSE_DEGREES:
+                mMediaRecorder.setOrientationHint(INVERSE_ORIENTATIONS.get(mCameraInfo.orientation));
+                break;
+        }
     }
 
     public void setProfile(CamcorderProfile profile, boolean audioEnabled) {
