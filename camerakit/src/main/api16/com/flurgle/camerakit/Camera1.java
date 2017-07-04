@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 import android.support.annotation.Nullable;
+import android.util.SparseIntArray;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.View;
@@ -17,7 +18,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -50,7 +50,33 @@ public class Camera1 extends CameraImpl {
     private Camera.AutoFocusCallback mAutofocusCallback;
     private boolean capturingImage = false;
 
+
+    private static final int SENSOR_ORIENTATION_DEFAULT_DEGREES = 90;
+    private static final int SENSOR_ORIENTATION_INVERSE_DEGREES = 270;
+    private static final SparseIntArray DEFAULT_ORIENTATION_HINTS = new SparseIntArray();
+    private static final SparseIntArray INVERSE_ORIENTATION_HINTS = new SparseIntArray();
+
+
     private int mDisplayOrientation;
+
+    private static final int ORIENTATION_0 = 0;
+    private static final int ORIENTATION_90 = 90;
+    private static final int ORIENTATION_180 = 180;
+    private static final int ORIENTATION_270 = 270;
+
+    static {
+        DEFAULT_ORIENTATION_HINTS.append(ORIENTATION_0, 90);
+        DEFAULT_ORIENTATION_HINTS.append(ORIENTATION_90, 0);
+        DEFAULT_ORIENTATION_HINTS.append(ORIENTATION_180, 270);
+        DEFAULT_ORIENTATION_HINTS.append(ORIENTATION_270, 180);
+    }
+
+    static {
+        INVERSE_ORIENTATION_HINTS.append(ORIENTATION_0, 270);
+        INVERSE_ORIENTATION_HINTS.append(ORIENTATION_90, 180);
+        INVERSE_ORIENTATION_HINTS.append(ORIENTATION_180, 90);
+        INVERSE_ORIENTATION_HINTS.append(ORIENTATION_270, 0);
+    }
 
     @Facing
     private int mFacing;
@@ -69,6 +95,8 @@ public class Camera1 extends CameraImpl {
 
     @VideoQuality
     private int mVideoQuality;
+
+    private boolean mAudioEnabled;
 
     private Handler mHandler = new Handler();
 
@@ -209,6 +237,11 @@ public class Camera1 extends CameraImpl {
     @Override
     void setVideoQuality(int videoQuality) {
         this.mVideoQuality = videoQuality;
+    }
+
+    @Override
+    void setAudioEnabled(boolean audioEnabled) {
+        this.mAudioEnabled = audioEnabled;
     }
 
     @Override
@@ -477,14 +510,44 @@ public class Camera1 extends CameraImpl {
         mMediaRecorder.setCamera(mCamera);
 
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-        mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
 
-        mMediaRecorder.setProfile(getCamcorderProfile(mVideoQuality));
+        if (mAudioEnabled) {
+            mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
+        }
+
+        setProfile(getCamcorderProfile(mVideoQuality), mAudioEnabled);
 
         mVideoFile = new File(mPreview.getView().getContext().getExternalFilesDir(null), "video.mp4");
         mMediaRecorder.setOutputFile(mVideoFile.getAbsolutePath());
-        mMediaRecorder.setOrientationHint(calculatePreviewRotation());
         mMediaRecorder.setVideoSize(mCaptureSize.getWidth(), mCaptureSize.getHeight());
+
+        switch (mCameraInfo.orientation) {
+            case SENSOR_ORIENTATION_DEFAULT_DEGREES:
+                mMediaRecorder.setOrientationHint(DEFAULT_ORIENTATION_HINTS.get(mDisplayOrientation));
+                break;
+            case SENSOR_ORIENTATION_INVERSE_DEGREES:
+                mMediaRecorder.setOrientationHint(INVERSE_ORIENTATION_HINTS.get(mDisplayOrientation));
+                break;
+        }
+    }
+
+    public void setProfile(CamcorderProfile profile, boolean audioEnabled) {
+        mMediaRecorder.setOutputFormat(profile.fileFormat);
+        mMediaRecorder.setVideoFrameRate(profile.videoFrameRate);
+        mMediaRecorder.setVideoSize(profile.videoFrameWidth, profile.videoFrameHeight);
+        mMediaRecorder.setVideoEncodingBitRate(profile.videoBitRate);
+        mMediaRecorder.setVideoEncoder(profile.videoCodec);
+
+        if (profile.quality >= CamcorderProfile.QUALITY_TIME_LAPSE_LOW &&
+                profile.quality <= CamcorderProfile.QUALITY_TIME_LAPSE_QVGA) {
+            // Nothing needs to be done. Call to setCaptureRate() enables
+            // time lapse video recording.
+        } else if (audioEnabled) {
+            mMediaRecorder.setAudioEncodingBitRate(profile.audioBitRate);
+            mMediaRecorder.setAudioChannels(profile.audioChannels);
+            mMediaRecorder.setAudioSamplingRate(profile.audioSampleRate);
+            mMediaRecorder.setAudioEncoder(profile.audioCodec);
+        }
     }
 
     private void prepareMediaRecorder() {

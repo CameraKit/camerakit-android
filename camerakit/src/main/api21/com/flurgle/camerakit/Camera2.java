@@ -3,7 +3,6 @@ package com.flurgle.camerakit;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.ImageFormat;
-import android.graphics.PointF;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
@@ -157,6 +156,11 @@ class Camera2 extends CameraImpl {
 
     @Override
     void setVideoQuality(int videoQuality) {
+
+    }
+
+    @Override
+    void setAudioEnabled(final boolean audioEnabled) {
 
     }
 
