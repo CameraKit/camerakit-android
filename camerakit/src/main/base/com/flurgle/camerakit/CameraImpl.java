@@ -1,5 +1,6 @@
 package com.flurgle.camerakit;
 
+import android.hardware.Camera;
 import android.support.annotation.Nullable;
 
 abstract class CameraImpl {
@@ -31,6 +32,8 @@ abstract class CameraImpl {
     abstract Size getCaptureResolution();
     abstract Size getPreviewResolution();
     abstract boolean isCameraOpened();
+
+    abstract void setTapToAutofocusListener(Camera.AutoFocusCallback autoFocusCallback);
 
     @Nullable
     abstract CameraProperties getCameraProperties();
