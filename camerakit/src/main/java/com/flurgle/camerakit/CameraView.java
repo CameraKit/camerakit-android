@@ -12,6 +12,7 @@ import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
+import android.hardware.Camera;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
@@ -519,6 +520,10 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
             };
         }
 
+    }
+
+    public void setTapToAutofocusListener(Camera.AutoFocusCallback callback){
+        mCameraImpl.setTapToAutofocusListener(callback);
     }
 
 }
