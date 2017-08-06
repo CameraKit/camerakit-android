@@ -174,7 +174,7 @@ cameraView.setFacing(CameraKit.Constants.FACING_FRONT);
 - - -
 
 ### `ckFlash`
-[`off`](#off) [`on`](#on) [`auto`](#auto)
+[`off`](#off) [`on`](#on) [`auto`](#auto) [`torch`](#torch)
 
 #### `off`
 
@@ -192,6 +192,11 @@ cameraView.setFlash(CameraKit.Constants.FLASH_ON);
 
 ```java
 cameraView.setFlash(CameraKit.Constants.FLASH_AUTO);
+```
+
+#### `torch`
+```java
+cameraView.setFlash(CameraKit.Constants.FLASH_TORCH);
 ```
 
 - - -
@@ -316,7 +321,7 @@ cameraView.setJpegQuality(100);
 - - -
 
 ### `ckVideoQuality`
-[`max480p`](#max480p) [`max720p`](#max720p) [`max1080p`](#max1080p) [`max2160p`](#max2160p) [`highest`](#highest) [`lowest`](#lowest)
+[`max480p`](#max480p) [`max720p`](#max720p) [`max1080p`](#max1080p) [`max2160p`](#max2160p) [`lowest`](#lowest) [`highest`](#highest) [`qvga`](#qvga)
 
 #### `max480p`
 
@@ -352,6 +357,12 @@ cameraView.setVideoQuality(CameraKit.Constants.VIDEO_QUALITY_LOWEST);
 
 ```java
 cameraView.setVideoQuality(CameraKit.Constants.VIDEO_QUALITY_HIGHEST);
+```
+
+#### `qvga`
+
+```java
+cameraView.setVideoQuality(CameraKit.Constants.VIDEO_QUALITY_QVGA);
 ```
 
 - - -

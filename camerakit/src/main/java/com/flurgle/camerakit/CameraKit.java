@@ -21,6 +21,7 @@ public class CameraKit {
         public static final int FLASH_OFF = 0;
         public static final int FLASH_ON = 1;
         public static final int FLASH_AUTO = 2;
+        public static final int FLASH_TORCH = 3;
 
         public static final int FOCUS_OFF = 0;
         public static final int FOCUS_CONTINUOUS = 1;
@@ -44,6 +45,7 @@ public class CameraKit {
         public static final int VIDEO_QUALITY_2160P = 3;
         public static final int VIDEO_QUALITY_HIGHEST = 4;
         public static final int VIDEO_QUALITY_LOWEST = 5;
+        public static final int VIDEO_QUALITY_QVGA = 6;
 
     }
 

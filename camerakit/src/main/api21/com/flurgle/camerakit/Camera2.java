@@ -3,14 +3,18 @@ package com.flurgle.camerakit;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.ImageFormat;
+import android.graphics.PointF;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.params.StreamConfigurationMap;
+import android.support.annotation.Nullable;
 import android.util.Log;
+import android.util.SizeF;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
@@ -28,6 +32,8 @@ class Camera2 extends CameraImpl {
     private Size mCaptureSize;
     private Size mPreviewSize;
 
+    private final HashMap<String, CameraProperties> mCameraPropertyMap = new HashMap<>();
+
     Camera2(CameraListener callback, PreviewImpl preview, Context context) {
         super(callback, preview);
         preview.setCallback(new PreviewImpl.Callback() {
@@ -38,6 +44,36 @@ class Camera2 extends CameraImpl {
         });
 
         mCameraManager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
+
+        // Get all view angles
+        try {
+            for (final String cameraId : mCameraManager.getCameraIdList()) {
+                CameraCharacteristics characteristics =
+                        mCameraManager.getCameraCharacteristics(cameraId);
+                @SuppressWarnings("ConstantConditions")
+                int orientation = characteristics.get(CameraCharacteristics.LENS_FACING);
+                if (orientation == CameraCharacteristics.LENS_FACING_BACK) {
+                    float[] maxFocus = characteristics.get(
+                            CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS);
+                    if (maxFocus == null) {
+                        continue;
+                    }
+                    SizeF size = characteristics.get(
+                            CameraCharacteristics.SENSOR_INFO_PHYSICAL_SIZE);
+                    if (size == null) {
+                        continue;
+                    }
+                    float w = size.getWidth();
+                    float h = size.getHeight();
+                    mCameraPropertyMap.put(cameraId, new CameraProperties(
+                            (float) Math.toDegrees(2*Math.atan(size.getWidth()/(maxFocus[0]*2))),
+                            (float) Math.toDegrees(2*Math.atan(size.getHeight()/(maxFocus[0]*2)))
+                    ));
+                }
+            }
+        } catch (CameraAccessException e) {
+            throw new RuntimeException("Failed to get camera view angles", e);
+        }
     }
 
     // CameraImpl:
@@ -196,6 +232,14 @@ class Camera2 extends CameraImpl {
         return mCamera != null;
     }
 
+    @Nullable
+    @Override
+    CameraProperties getCameraProperties() {
+        if (mCamera == null) {
+            return null;
+        }
+        return mCameraPropertyMap.get(mCamera.getId());
+    }
     // Internal
 
     private List<Size> getAvailableCaptureResolutions() {

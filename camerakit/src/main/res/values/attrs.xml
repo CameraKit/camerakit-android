@@ -12,6 +12,7 @@
             <enum name="off" value="0" />
             <enum name="on" value="1" />
             <enum name="auto" value="2" />
+            <enum name="torch" value="3" />
         </attr>
 
         <attr name="ckFocus" format="enum">
@@ -52,6 +53,7 @@
             <enum name="max2160p" value="3" />
             <enum name="highest" value="4" />
             <enum name="lowest" value="5" />
+            <enum name="qvga" value="6" />
         </attr>
 
         <attr name="ckCropOutput" format="boolean" />

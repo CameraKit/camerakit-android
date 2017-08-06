@@ -5,7 +5,10 @@ import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
+import android.os.Build;
 import android.os.Handler;
+import android.util.Log;
+import android.support.annotation.Nullable;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.View;
@@ -29,6 +32,8 @@ import static com.flurgle.camerakit.CameraKit.Constants.METHOD_STILL;
 @SuppressWarnings("deprecation")
 public class Camera1 extends CameraImpl {
 
+    private static final String TAG = Camera1.class.getSimpleName();
+
     private static final int FOCUS_AREA_SIZE_DEFAULT = 300;
     private static final int FOCUS_METERING_AREA_WEIGHT_DEFAULT = 1000;
     private static final int DELAY_MILLIS_BEFORE_RESETTING_FOCUS = 3000;
@@ -36,12 +41,14 @@ public class Camera1 extends CameraImpl {
     private int mCameraId;
     private Camera mCamera;
     private Camera.Parameters mCameraParameters;
+    private CameraProperties mCameraProperties;
     private Camera.CameraInfo mCameraInfo;
     private Size mPreviewSize;
     private Size mCaptureSize;
     private MediaRecorder mMediaRecorder;
     private File mVideoFile;
     private Camera.AutoFocusCallback mAutofocusCallback;
+    private boolean capturingImage = false;
 
     private int mDisplayOrientation;
 
@@ -208,13 +215,28 @@ public class Camera1 extends CameraImpl {
     void captureImage() {
         switch (mMethod) {
             case METHOD_STANDARD:
-                mCamera.takePicture(null, null, null, new Camera.PictureCallback() {
-                    @Override
-                    public void onPictureTaken(byte[] data, Camera camera) {
-                        mCameraListener.onPictureTaken(data);
-                        camera.startPreview();
-                    }
-                });
+                // Null check required for camera here as is briefly null when View is detached
+                if (!capturingImage && mCamera != null) {
+
+                    // Set boolean to wait for image callback
+                    capturingImage = true;
+
+                    mCamera.takePicture(null, null, null,
+                        new Camera.PictureCallback() {
+                            @Override
+                            public void onPictureTaken(byte[] data, Camera camera) {
+                                mCameraListener.onPictureTaken(data);
+
+                                // Reset capturing state to allow photos to be taken
+                                capturingImage = false;
+
+                                camera.startPreview();
+                            }
+                        });
+                }
+                else {
+                    Log.w(TAG, "Unable, waiting for picture to be taken");
+                }
                 break;
 
             case METHOD_STILL:
@@ -248,65 +270,91 @@ public class Camera1 extends CameraImpl {
         mCameraListener.onVideoTaken(mVideoFile);
     }
 
-    @Override
-    Size getCaptureResolution() {
-        if (mCaptureSize == null && mCameraParameters != null) {
-            TreeSet<Size> sizes = new TreeSet<>();
-            for (Camera.Size size : mCameraParameters.getSupportedPictureSizes()) {
-                sizes.add(new Size(size.width, size.height));
-            }
+    // Code from SandriosCamera library
+    // https://github.com/sandrios/sandriosCamera/blob/master/sandriosCamera/src/main/java/com/sandrios/sandriosCamera/internal/utils/CameraHelper.java#L218
+    public static Size getSizeWithClosestRatio(List<Size> sizes, int width, int height)
+    {
+        if (sizes == null) return null;
 
-            TreeSet<AspectRatio> aspectRatios = findCommonAspectRatios(
-                    mCameraParameters.getSupportedPreviewSizes(),
-                    mCameraParameters.getSupportedPictureSizes()
-            );
-            AspectRatio targetRatio = aspectRatios.size() > 0 ? aspectRatios.last() : null;
+        double MIN_TOLERANCE = 100;
+        double targetRatio = (double) height / width;
+        Size optimalSize = null;
+        double minDiff = Double.MAX_VALUE;
 
-            Iterator<Size> descendingSizes = sizes.descendingIterator();
-            Size size;
-            while (descendingSizes.hasNext() && mCaptureSize == null) {
-                size = descendingSizes.next();
-                if (targetRatio == null || targetRatio.matches(size)) {
-                    mCaptureSize = size;
-                    break;
-                }
+        int targetHeight = height;
+
+        for (Size size : sizes) {
+            if (size.getWidth() == width && size.getHeight() == height)
+                return size;
+
+            double ratio = (double) size.getHeight() / size.getWidth();
+
+            if (Math.abs(ratio - targetRatio) < MIN_TOLERANCE) MIN_TOLERANCE = ratio;
+            else continue;
+
+            if (Math.abs(size.getHeight() - targetHeight) < minDiff) {
+                optimalSize = size;
+                minDiff = Math.abs(size.getHeight() - targetHeight);
             }
         }
 
+        if (optimalSize == null) {
+            minDiff = Double.MAX_VALUE;
+            for (Size size : sizes) {
+                if (Math.abs(size.getHeight() - targetHeight) < minDiff) {
+                    optimalSize = size;
+                    minDiff = Math.abs(size.getHeight() - targetHeight);
+                }
+            }
+        }
+        return optimalSize;
+    }
+
+    List<Size> sizesFromList(List<Camera.Size> sizes) {
+        if (sizes == null) return null;
+        List<Size> result = new ArrayList<>(sizes.size());
+
+        for (Camera.Size size : sizes) {
+            result.add(new Size(size.width, size.height));
+        }
+
+        return result;
+    }
+
+    // Code from SandriosCamera library
+    // https://github.com/sandrios/sandriosCamera/blob/master/sandriosCamera/src/main/java/com/sandrios/sandriosCamera/internal/manager/impl/Camera1Manager.java#L212
+    void initResolutions() {
+        List<Size> previewSizes = sizesFromList(mCameraParameters.getSupportedPreviewSizes());
+        List<Size> videoSizes = (Build.VERSION.SDK_INT > 10) ? sizesFromList(mCameraParameters.getSupportedVideoSizes()) : previewSizes;
+
+        CamcorderProfile camcorderProfile = getCamcorderProfile(mVideoQuality);
+
+        mCaptureSize = getSizeWithClosestRatio(
+                (videoSizes == null || videoSizes.isEmpty()) ? previewSizes : videoSizes,
+                camcorderProfile.videoFrameWidth, camcorderProfile.videoFrameHeight);
+
+        mPreviewSize = getSizeWithClosestRatio(previewSizes, mCaptureSize.getWidth(), mCaptureSize.getHeight());
+    }
+
+    @Override
+    Size getCaptureResolution() {
         return mCaptureSize;
     }
 
     @Override
     Size getPreviewResolution() {
-        if (mPreviewSize == null && mCameraParameters != null) {
-            TreeSet<Size> sizes = new TreeSet<>();
-            for (Camera.Size size : mCameraParameters.getSupportedPreviewSizes()) {
-                sizes.add(new Size(size.width, size.height));
-            }
-
-            TreeSet<AspectRatio> aspectRatios = findCommonAspectRatios(
-                    mCameraParameters.getSupportedPreviewSizes(),
-                    mCameraParameters.getSupportedPictureSizes()
-            );
-            AspectRatio targetRatio = aspectRatios.size() > 0 ? aspectRatios.last() : null;
-
-            Iterator<Size> descendingSizes = sizes.descendingIterator();
-            Size size;
-            while (descendingSizes.hasNext() && mPreviewSize == null) {
-                size = descendingSizes.next();
-                if (targetRatio == null || targetRatio.matches(size)) {
-                    mPreviewSize = size;
-                    break;
-                }
-            }
-        }
-
         return mPreviewSize;
     }
 
     @Override
     boolean isCameraOpened() {
         return mCamera != null;
+    }
+
+    @Nullable
+    @Override
+    CameraProperties getCameraProperties() {
+        return mCameraProperties;
     }
 
     // Internal:
@@ -319,6 +367,7 @@ public class Camera1 extends CameraImpl {
         mCamera = Camera.open(mCameraId);
         mCameraParameters = mCamera.getParameters();
 
+        collectCameraProperties();
         adjustCameraParameters();
         mCamera.setDisplayOrientation(calculatePreviewRotation());
         mCamera.setOneShotPreviewCallback(new Camera.PreviewCallback() {
@@ -373,6 +422,8 @@ public class Camera1 extends CameraImpl {
     }
 
     private void adjustCameraParameters() {
+        initResolutions();
+
         boolean invertPreviewSizes = mDisplayOrientation%180 != 0;
         mPreview.setTruePreviewSize(
                 invertPreviewSizes? getPreviewResolution().getHeight() : getPreviewResolution().getWidth(),
@@ -395,6 +446,11 @@ public class Camera1 extends CameraImpl {
         setFlash(mFlash);
 
         mCamera.setParameters(mCameraParameters);
+    }
+
+    private void collectCameraProperties() {
+        mCameraProperties = new CameraProperties(mCameraParameters.getVerticalViewAngle(),
+                mCameraParameters.getHorizontalViewAngle());
     }
 
     private TreeSet<AspectRatio> findCommonAspectRatios(List<Camera.Size> previewSizes, List<Camera.Size> captureSizes) {
@@ -433,7 +489,8 @@ public class Camera1 extends CameraImpl {
 
         mVideoFile = new File(mPreview.getView().getContext().getExternalFilesDir(null), "video.mp4");
         mMediaRecorder.setOutputFile(mVideoFile.getAbsolutePath());
-        mMediaRecorder.setOrientationHint(mCameraInfo.orientation);
+        mMediaRecorder.setOrientationHint(calculatePreviewRotation());
+        mMediaRecorder.setVideoSize(mCaptureSize.getWidth(), mCaptureSize.getHeight());
     }
 
     private void prepareMediaRecorder() {
@@ -449,11 +506,19 @@ public class Camera1 extends CameraImpl {
     private CamcorderProfile getCamcorderProfile(@VideoQuality int videoQuality) {
         CamcorderProfile camcorderProfile = null;
         switch (videoQuality) {
+            case CameraKit.Constants.VIDEO_QUALITY_QVGA:
+                if (CamcorderProfile.hasProfile(mCameraId, CamcorderProfile.QUALITY_QVGA)) {
+                    camcorderProfile = CamcorderProfile.get(mCameraId, CamcorderProfile.QUALITY_QVGA);
+                } else {
+                    return getCamcorderProfile(CameraKit.Constants.VIDEO_QUALITY_LOWEST);
+                }
+                break;
+
             case CameraKit.Constants.VIDEO_QUALITY_480P:
                 if (CamcorderProfile.hasProfile(mCameraId, CamcorderProfile.QUALITY_480P)) {
                     camcorderProfile = CamcorderProfile.get(mCameraId, CamcorderProfile.QUALITY_480P);
                 } else {
-                    return getCamcorderProfile(CameraKit.Constants.VIDEO_QUALITY_LOWEST);
+                    return getCamcorderProfile(CameraKit.Constants.VIDEO_QUALITY_QVGA);
                 }
                 break;
 
@@ -601,28 +666,28 @@ public class Camera1 extends CameraImpl {
     }
 
     private Rect calculateFocusArea(float x, float y) {
-        int centerX = clamp(Float.valueOf((x / mPreview.getView().getWidth()) * 2000 - 1000).intValue(), getFocusAreaSize());
-        int centerY = clamp(Float.valueOf((y / mPreview.getView().getHeight()) * 2000 - 1000).intValue(), getFocusAreaSize());
+        int buffer = getFocusAreaSize() / 2;
+        int centerX = calculateCenter(x, mPreview.getView().getWidth(), buffer);
+        int centerY = calculateCenter(y, mPreview.getView().getHeight(), buffer);
         return new Rect(
-                centerX - getFocusAreaSize() / 2,
-                centerY - getFocusAreaSize() / 2,
-                centerX + getFocusAreaSize() / 2,
-                centerY + getFocusAreaSize() / 2
+                centerX - buffer,
+                centerY - buffer,
+                centerX + buffer,
+                centerY + buffer
         );
     }
 
-    private int clamp(int touchCoordinateInCameraReper, int focusAreaSize) {
-        int result;
-        if (Math.abs(touchCoordinateInCameraReper) + focusAreaSize / 2 > 1000) {
-            if (touchCoordinateInCameraReper > 0) {
-                result = 1000 - focusAreaSize / 2;
+    private static int calculateCenter(float coord, int dimen, int buffer) {
+        int normalized = (int) ((coord / dimen) * 2000 - 1000);
+        if (Math.abs(normalized) + buffer > 1000) {
+            if (normalized > 0) {
+                return 1000 - buffer;
             } else {
-                result = -1000 + focusAreaSize / 2;
+                return -1000 + buffer;
             }
         } else {
-            result = touchCoordinateInCameraReper - focusAreaSize / 2;
+            return normalized;
         }
-        return result;
     }
 
 }
