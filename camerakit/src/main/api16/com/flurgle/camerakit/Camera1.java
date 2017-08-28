@@ -413,9 +413,10 @@ public class Camera1 extends CameraImpl {
 
     private int calculateCaptureRotation() {
         int previewRotation = calculatePreviewRotation();
+        //return previewRotation + 180;
         if (mCameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
             //Front is flipped
-            return (previewRotation + 180 + 2*mDisplayOrientation + 720) %360;
+            return (previewRotation + 2*mDisplayOrientation + 180) %360;
         } else {
             return previewRotation;
         }
@@ -489,7 +490,8 @@ public class Camera1 extends CameraImpl {
 
         mVideoFile = new File(mPreview.getView().getContext().getExternalFilesDir(null), "video.mp4");
         mMediaRecorder.setOutputFile(mVideoFile.getAbsolutePath());
-        mMediaRecorder.setOrientationHint(calculatePreviewRotation());
+        //mMediaRecorder.setOrientationHint(calculatePreviewRotation());
+        mMediaRecorder.setOrientationHint(calculateCaptureRotation());
         mMediaRecorder.setVideoSize(mCaptureSize.getWidth(), mCaptureSize.getHeight());
     }
 

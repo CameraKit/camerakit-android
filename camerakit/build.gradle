@@ -32,7 +32,7 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:25.2.0'
+    compile 'com.android.support:appcompat-v7:25.3.1'
 
 
     compile 'android.arch.lifecycle:runtime:1.0.0-alpha1'
