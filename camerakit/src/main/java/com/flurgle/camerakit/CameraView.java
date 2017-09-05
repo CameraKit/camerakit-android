@@ -10,12 +10,14 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.media.ExifInterface;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.hardware.display.DisplayManagerCompat;
@@ -23,7 +25,9 @@ import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.Display;
 import android.view.MotionEvent;
+import android.view.Surface;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 
 import java.io.ByteArrayOutputStream;
@@ -144,6 +148,14 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
         mCameraImpl = new Camera1(mCameraListener, mPreviewImpl);
 
         mIsStarted = false;
+
+        // Handle situations where there's only 1 camera & it's front facing OR it's a chromebook in laptop mode
+        WindowManager windowService = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
+        boolean isChromebookInLaptopMode = (context.getPackageManager().hasSystemFeature("org.chromium.arc.device_management") && windowService.getDefaultDisplay().getRotation() == Surface.ROTATION_0);
+        if(mCameraImpl.frontCameraOnly() || isChromebookInLaptopMode){
+            mFacing = FACING_FRONT;
+        }
+
         setFacing(mFacing);
         setFlash(mFlash);
         setFocus(mFocus);
@@ -155,8 +167,8 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
         if (!isInEditMode()) {
             mDisplayOrientationDetector = new DisplayOrientationDetector(context) {
                 @Override
-                public void onDisplayOrientationChanged(int displayOrientation) {
-                    mCameraImpl.setDisplayOrientation(displayOrientation);
+                public void onDisplayOrDeviceOrientationChanged(int displayOrientation, int deviceOrientation) {
+                    mCameraImpl.setDisplayAndDeviceOrientation(displayOrientation, deviceOrientation);
                     mPreviewImpl.setDisplayOrientation(displayOrientation);
                 }
             };
@@ -468,6 +480,7 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
         @Override
         public void onCameraOpened() {
             super.onCameraOpened();
+
             getCameraListener().onCameraOpened();
         }
 
@@ -480,6 +493,16 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
         @Override
         public void onPictureTaken(byte[] jpeg) {
             super.onPictureTaken(jpeg);
+
+            // Handle cameras that don't give us the correctly rotated/mirrored image, but instead just set the corresponding EXIF data.
+            // Exif data is lost when we do a BitmapFactory.decodeByteArray, so need to correct image here.
+            if(ExifUtil.getExifOrientation(jpeg) != ExifInterface.ORIENTATION_NORMAL || mFacing == FACING_FRONT){
+                Bitmap bitmap = ExifUtil.decodeBitmapWithRotation(jpeg, mFacing == FACING_FRONT);
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                jpeg = stream.toByteArray();
+            }
+
             if (mCropOutput) {
                 int width = mMethod == METHOD_STANDARD ? mCameraImpl.getCaptureResolution().getWidth() : mCameraImpl.getPreviewResolution().getWidth();
                 int height = mMethod == METHOD_STANDARD ? mCameraImpl.getCaptureResolution().getHeight() : mCameraImpl.getPreviewResolution().getHeight();

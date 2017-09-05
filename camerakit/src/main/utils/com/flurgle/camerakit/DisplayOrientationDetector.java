@@ -21,11 +21,12 @@ public abstract class DisplayOrientationDetector {
     private Display mDisplay;
 
     private int mLastKnownDisplayOrientation = 0;
+    private int mLastKnownDeviceOrientation = 0;
 
     public DisplayOrientationDetector(Context context) {
         mOrientationEventListener = new OrientationEventListener(context) {
 
-            private int mLastKnownRotation = -1;
+            private int mLastKnownDisplayRotation = -1;
 
             @Override
             public void onOrientationChanged(int orientation) {
@@ -33,10 +34,34 @@ public abstract class DisplayOrientationDetector {
                     return;
                 }
 
-                final int rotation = mDisplay.getRotation();
-                if (mLastKnownRotation != rotation) {
-                    mLastKnownRotation = rotation;
-                    dispatchOnDisplayOrientationChanged(DISPLAY_ORIENTATIONS.get(rotation));
+                boolean displayOrDeviceOrientationChanged = false;
+
+                final int displayRotation = mDisplay.getRotation();
+                if (mLastKnownDisplayRotation != displayRotation) {
+                    mLastKnownDisplayRotation = displayRotation;
+                    displayOrDeviceOrientationChanged = true;
+                }
+
+                int deviceOrientation;
+                if (orientation >= 60 && orientation <= 140){
+                    // the mDisplay.getRotation stuff is flipped for 90 & 270 vs. deviceOrientation here. This keeps it consistent.
+                    deviceOrientation = 270;
+                } else if (orientation >= 140 && orientation <= 220) {
+                    deviceOrientation = 180;
+                } else if (orientation >= 220 && orientation <= 300) {
+                    // the mDisplay.getRotation stuff is flipped for 90 & 270 vs. deviceOrientation here. This keeps it consistent.
+                    deviceOrientation = 90;
+                } else {
+                    deviceOrientation = 0;
+                }
+
+                if (mLastKnownDeviceOrientation != deviceOrientation) {
+                    mLastKnownDeviceOrientation = deviceOrientation;
+                    displayOrDeviceOrientationChanged = true;
+                }
+
+                if(displayOrDeviceOrientationChanged){
+                    dispatchOnDisplayOrDeviceOrientationChanged(DISPLAY_ORIENTATIONS.get(displayRotation));
                 }
             }
 
@@ -46,7 +71,7 @@ public abstract class DisplayOrientationDetector {
     public void enable(Display display) {
         mDisplay = display;
         mOrientationEventListener.enable();
-        dispatchOnDisplayOrientationChanged(DISPLAY_ORIENTATIONS.get(display.getRotation()));
+        dispatchOnDisplayOrDeviceOrientationChanged(DISPLAY_ORIENTATIONS.get(display.getRotation()));
     }
 
     public void disable() {
@@ -58,11 +83,17 @@ public abstract class DisplayOrientationDetector {
         return mLastKnownDisplayOrientation;
     }
 
-    void dispatchOnDisplayOrientationChanged(int displayOrientation) {
+    void dispatchOnDisplayOrDeviceOrientationChanged(int displayOrientation) {
         mLastKnownDisplayOrientation = displayOrientation;
-        onDisplayOrientationChanged(displayOrientation);
+
+        // If we don't have accelerometers, we can't detect the device orientation.
+        if(mOrientationEventListener.canDetectOrientation()){
+            onDisplayOrDeviceOrientationChanged(displayOrientation, mLastKnownDeviceOrientation);
+        } else {
+            onDisplayOrDeviceOrientationChanged(displayOrientation, displayOrientation);
+        }
     }
 
-    public abstract void onDisplayOrientationChanged(int displayOrientation);
+    public abstract void onDisplayOrDeviceOrientationChanged(int displayOrientation, int deviceOrientation);
 
 }
