@@ -461,6 +461,10 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
         }
     }
 
+    public void setErrorListener(ErrorListener listener) {
+        mCameraImpl.setErrorListener(listener);
+    }
+
     private class CameraListenerMiddleWare extends CameraListener {
 
         private CameraListener mCameraListener;

@@ -7,6 +7,8 @@ import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.os.Build;
 import android.os.Handler;
+import android.os.Looper;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.support.annotation.Nullable;
 import android.view.MotionEvent;
@@ -70,7 +72,11 @@ public class Camera1 extends CameraImpl {
     @VideoQuality
     private int mVideoQuality;
 
+    private Handler mainHandler = new Handler(Looper.getMainLooper());
     private Handler mHandler = new Handler();
+
+    @Nullable
+    private ErrorListener mErrorListener;
 
     Camera1(CameraListener callback, PreviewImpl preview) {
         super(callback, preview);
@@ -351,6 +357,11 @@ public class Camera1 extends CameraImpl {
         return mCamera != null;
     }
 
+    @Override
+    void setErrorListener(ErrorListener listener) {
+        mErrorListener = listener;
+    }
+
     @Nullable
     @Override
     CameraProperties getCameraProperties() {
@@ -419,6 +430,32 @@ public class Camera1 extends CameraImpl {
         adjustCameraParameters(0);
     }
 
+    private void notifyErrorListener(@NonNull final String event) {
+        if (mErrorListener == null) {
+            return;
+        }
+
+        mainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mErrorListener.onEvent(event);
+            }
+        });
+    }
+
+    private void notifyErrorListener(@NonNull final Exception e) {
+        if (mErrorListener == null) {
+            return;
+        }
+
+        mainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mErrorListener.onError(e);
+            }
+        });
+    }
+
     private void adjustCameraParameters(int current_try) {
         initResolutions();
 
@@ -438,7 +475,7 @@ public class Camera1 extends CameraImpl {
             try{
                 mCamera.setParameters(mCameraParameters);
             }catch(Exception e){
-                e.printStackTrace();
+                notifyErrorListener(e);
                 mCameraParameters = resolutionLess; //some phones can't set parameters that camerakit has chosen, so fallback to defaults
             }
         }else{
@@ -452,7 +489,7 @@ public class Camera1 extends CameraImpl {
             try{
                 mCamera.setParameters(mCameraParameters);
             }catch(Exception e){
-                e.printStackTrace();
+                notifyErrorListener(e);
                 mCameraParameters = resolutionLess; //some phones can't set parameters that camerakit has chosen, so fallback to defaults
             }
         }else{
@@ -471,7 +508,7 @@ public class Camera1 extends CameraImpl {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            Log.d(TAG, "RE_ADJUST");
+            notifyErrorListener("adjustCameraParameters failed, try: " + current_try);
             adjustCameraParameters(current_try+1);
         }
     }
