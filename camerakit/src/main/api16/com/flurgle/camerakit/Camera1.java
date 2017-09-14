@@ -416,6 +416,10 @@ public class Camera1 extends CameraImpl {
     }
 
     private void adjustCameraParameters() {
+        adjustCameraParameters(0);
+    }
+
+    private void adjustCameraParameters(int current_try) {
         initResolutions();
 
         boolean invertPreviewSizes = mDisplayOrientation%180 != 0;
@@ -461,9 +465,14 @@ public class Camera1 extends CameraImpl {
         setFlash(mFlash);
 
         mCamera.setParameters(mCameraParameters);
-        if (have_to_readjust){
-            adjustCameraParameters();
+        if (have_to_readjust && current_try<100){
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             Log.d(TAG, "RE_ADJUST");
+            adjustCameraParameters(current_try+1);
         }
     }
 
