@@ -430,7 +430,7 @@ public class Camera1 extends CameraImpl {
         adjustCameraParameters(0);
     }
 
-    private void notifyErrorListener(@NonNull final String event) {
+    private void notifyErrorListener(@NonNull final String name, @NonNull final String details) {
         if (mErrorListener == null) {
             return;
         }
@@ -438,7 +438,7 @@ public class Camera1 extends CameraImpl {
         mainHandler.post(new Runnable() {
             @Override
             public void run() {
-                mErrorListener.onEvent(event);
+                mErrorListener.onEvent(name, details);
             }
         });
     }
@@ -507,7 +507,12 @@ public class Camera1 extends CameraImpl {
         mCameraParameters.setRotation(rotation);
 
         setFocus(mFocus);
-        setFlash(mFlash);
+
+        try {
+            setFlash(mFlash);
+        } catch (Exception e) {
+            notifyErrorListener("setFlash", e.getLocalizedMessage());
+        }
 
         mCamera.setParameters(mCameraParameters);
 
@@ -518,7 +523,7 @@ public class Camera1 extends CameraImpl {
                 e.printStackTrace();
             }
 
-            notifyErrorListener("adjustCameraParameters failed, try: " + currentTry);
+            notifyErrorListener("retryAdjustParam", "Failed, try: " + currentTry);
             adjustCameraParameters(currentTry + 1);
         }
     }

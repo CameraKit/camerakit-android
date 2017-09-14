@@ -6,5 +6,5 @@ package com.flurgle.camerakit;
 
 public interface ErrorListener {
     void onError(Exception e);
-    void onEvent(String event);
+    void onEvent(String name, String details);
 }
