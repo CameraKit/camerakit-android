@@ -91,8 +91,8 @@ public class MainActivity extends AppCompatActivity implements View.OnLayoutChan
             }
 
             @Override
-            public void onEvent(String event) {
-                Log.d("", event);
+            public void onEvent(String name, String details) {
+                Log.d("", name + " -> " + details);
             }
         });
 
