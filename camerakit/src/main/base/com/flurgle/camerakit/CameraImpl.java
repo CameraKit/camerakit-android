@@ -32,6 +32,8 @@ abstract class CameraImpl {
     abstract Size getPreviewResolution();
     abstract boolean isCameraOpened();
 
+    abstract void setErrorListener(ErrorListener listener);
+
     @Nullable
     abstract CameraProperties getCameraProperties();
 

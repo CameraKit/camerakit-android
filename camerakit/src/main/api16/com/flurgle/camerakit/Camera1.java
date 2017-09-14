@@ -7,6 +7,8 @@ import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.os.Build;
 import android.os.Handler;
+import android.os.Looper;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.support.annotation.Nullable;
 import android.view.MotionEvent;
@@ -70,7 +72,11 @@ public class Camera1 extends CameraImpl {
     @VideoQuality
     private int mVideoQuality;
 
+    private Handler mainHandler = new Handler(Looper.getMainLooper());
     private Handler mHandler = new Handler();
+
+    @Nullable
+    private ErrorListener mErrorListener;
 
     Camera1(CameraListener callback, PreviewImpl preview) {
         super(callback, preview);
@@ -351,6 +357,11 @@ public class Camera1 extends CameraImpl {
         return mCamera != null;
     }
 
+    @Override
+    void setErrorListener(ErrorListener listener) {
+        mErrorListener = listener;
+    }
+
     @Nullable
     @Override
     CameraProperties getCameraProperties() {
@@ -419,60 +430,101 @@ public class Camera1 extends CameraImpl {
         adjustCameraParameters(0);
     }
 
-    private void adjustCameraParameters(int current_try) {
+    private void notifyErrorListener(@NonNull final String name, @NonNull final String details) {
+        if (mErrorListener == null) {
+            return;
+        }
+
+        mainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mErrorListener.onEvent(name, details);
+            }
+        });
+    }
+
+    private void notifyErrorListener(@NonNull final Exception e) {
+        if (mErrorListener == null) {
+            return;
+        }
+
+        mainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mErrorListener.onError(e);
+            }
+        });
+    }
+
+    private void adjustCameraParameters(int currentTry) {
         initResolutions();
 
         boolean invertPreviewSizes = mDisplayOrientation%180 != 0;
+
+        boolean haveToReadjust = false;
         Camera.Parameters resolutionLess = mCamera.getParameters();
-        boolean have_to_readjust = false;
+
         if (getPreviewResolution() != null) {
             mPreview.setTruePreviewSize(
-                    invertPreviewSizes ? getPreviewResolution().getHeight() : getPreviewResolution().getWidth(),
-                    invertPreviewSizes ? getPreviewResolution().getWidth() : getPreviewResolution().getHeight()
+                invertPreviewSizes ? getPreviewResolution().getHeight() : getPreviewResolution().getWidth(),
+                invertPreviewSizes ? getPreviewResolution().getWidth() : getPreviewResolution().getHeight()
             );
 
             mCameraParameters.setPreviewSize(
-                    getPreviewResolution().getWidth(),
-                    getPreviewResolution().getHeight()
+                getPreviewResolution().getWidth(),
+                getPreviewResolution().getHeight()
             );
-            try{
+
+            try {
                 mCamera.setParameters(mCameraParameters);
-            }catch(Exception e){
-                e.printStackTrace();
-                mCameraParameters = resolutionLess; //some phones can't set parameters that camerakit has chosen, so fallback to defaults
+            } catch (Exception e) {
+                notifyErrorListener(e);
+                // Some phones can't set parameters that camerakit has chosen, so fallback to defaults
+                mCameraParameters = resolutionLess;
             }
-        }else{
-            have_to_readjust = true;
+        } else {
+            haveToReadjust = true;
         }
+
         if (getCaptureResolution() != null) {
             mCameraParameters.setPictureSize(
-                    getCaptureResolution().getWidth(),
-                    getCaptureResolution().getHeight()
+                getCaptureResolution().getWidth(),
+                getCaptureResolution().getHeight()
             );
-            try{
+
+            try {
                 mCamera.setParameters(mCameraParameters);
-            }catch(Exception e){
-                e.printStackTrace();
-                mCameraParameters = resolutionLess; //some phones can't set parameters that camerakit has chosen, so fallback to defaults
+            } catch (Exception e) {
+                notifyErrorListener(e);
+                //Some phones can't set parameters that camerakit has chosen, so fallback to defaults
+                mCameraParameters = resolutionLess;
             }
-        }else{
-            have_to_readjust = true;
+        } else {
+            haveToReadjust = true;
         }
+
         int rotation = calculateCaptureRotation();
         mCameraParameters.setRotation(rotation);
 
         setFocus(mFocus);
-        setFlash(mFlash);
+
+        try {
+            setFlash(mFlash);
+        } catch (Exception e) {
+            notifyErrorListener("setFlash", e.getLocalizedMessage());
+        }
 
         mCamera.setParameters(mCameraParameters);
-        if (have_to_readjust && current_try<100){
+
+        if (haveToReadjust && currentTry < 100) {
             try {
                 Thread.sleep(1);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            Log.d(TAG, "RE_ADJUST");
-            adjustCameraParameters(current_try+1);
+
+            notifyErrorListener("retryAdjustParam", "Failed, try: " + currentTry);
+            adjustCameraParameters(currentTry + 1);
         }
     }
 

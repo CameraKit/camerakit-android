@@ -232,6 +232,11 @@ class Camera2 extends CameraImpl {
         return mCamera != null;
     }
 
+    @Override
+    void setErrorListener(ErrorListener listener) {
+
+    }
+
     @Nullable
     @Override
     CameraProperties getCameraProperties() {
