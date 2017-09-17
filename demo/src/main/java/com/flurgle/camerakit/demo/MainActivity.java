@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLayoutChan
     ViewGroup parent;
 
     @BindView(R.id.camera)
-    CameraView camera;
+    CameraView camera;;
 
     // Capture Mode:
 
