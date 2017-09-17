@@ -7,8 +7,9 @@ import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.os.Build;
 import android.os.Handler;
-import android.util.Log;
+import android.os.HandlerThread;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.View;
@@ -17,7 +18,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -49,6 +49,7 @@ public class Camera1 extends CameraImpl {
     private File mVideoFile;
     private Camera.AutoFocusCallback mAutofocusCallback;
     private boolean capturingImage = false;
+    private CameraHandlerThread mThread = null;
 
     private int mDisplayOrientation;
 
@@ -364,7 +365,7 @@ public class Camera1 extends CameraImpl {
             releaseCamera();
         }
 
-        mCamera = Camera.open(mCameraId);
+        newOpenCamera();
         mCameraParameters = mCamera.getParameters();
 
         collectCameraProperties();
@@ -372,6 +373,44 @@ public class Camera1 extends CameraImpl {
         mCamera.setDisplayOrientation(calculatePreviewRotation());
 
         mCameraListener.onCameraOpened();
+    }
+
+    private void newOpenCamera() {
+        if (mThread == null) {
+            mThread = new CameraHandlerThread();
+        }
+
+        synchronized (mThread) {
+            mThread.openCamera();
+        }
+    }
+
+    private void oldOpenCamera() {
+        try {
+            mCamera = Camera.open(mCameraId);
+        }
+        catch (RuntimeException e) {
+            Log.e(TAG, "failed to open front camera");
+        }
+    }
+
+    private void newCameraRelease() {
+        if (mThread == null) {
+            mThread = new CameraHandlerThread();
+        }
+
+        synchronized (mThread) {
+            mThread.releaseCamera();
+        }
+    }
+
+    private void oldCameraRelease() {
+        try {
+            mCamera.release();
+        }
+        catch (RuntimeException e) {
+            Log.e(TAG, "failed to open front camera");
+        }
     }
 
     private void setupPreview() {
@@ -388,7 +427,7 @@ public class Camera1 extends CameraImpl {
 
     private void releaseCamera() {
         if (mCamera != null) {
-            mCamera.release();
+            newCameraRelease();
             mCamera = null;
             mCameraParameters = null;
             mPreviewSize = null;
@@ -684,4 +723,49 @@ public class Camera1 extends CameraImpl {
         }
     }
 
+    private class CameraHandlerThread extends HandlerThread {
+        Handler mHandler = null;
+
+        CameraHandlerThread() {
+            super("CameraHandlerThread");
+            start();
+            mHandler = new Handler(getLooper());
+        }
+
+        synchronized void notifyCameraEvent() {
+            notify();
+        }
+
+        void openCamera() {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    oldOpenCamera();
+                    notifyCameraEvent();
+                }
+            });
+            try {
+                wait();
+            }
+            catch (InterruptedException e) {
+                Log.w(TAG, "wait was interrupted");
+            }
+        }
+
+        public void releaseCamera() {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    oldCameraRelease();
+                    notifyCameraEvent();
+                }
+            });
+            try {
+                wait();
+            }
+            catch (InterruptedException e) {
+                Log.w(TAG, "wait was interrupted");
+            }
+        }
+    }
 }
