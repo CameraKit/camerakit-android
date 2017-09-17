@@ -394,6 +394,25 @@ public class Camera1 extends CameraImpl {
         }
     }
 
+    private void newCameraRelease() {
+        if (mThread == null) {
+            mThread = new CameraHandlerThread();
+        }
+
+        synchronized (mThread) {
+            mThread.releaseCamera();
+        }
+    }
+
+    private void oldCameraRelease() {
+        try {
+            mCamera.release();
+        }
+        catch (RuntimeException e) {
+            Log.e(TAG, "failed to open front camera");
+        }
+    }
+
     private void setupPreview() {
         try {
             if (mPreview.getOutputClass() == SurfaceHolder.class) {
@@ -408,7 +427,7 @@ public class Camera1 extends CameraImpl {
 
     private void releaseCamera() {
         if (mCamera != null) {
-            mCamera.release();
+            newCameraRelease();
             mCamera = null;
             mCameraParameters = null;
             mPreviewSize = null;
@@ -713,7 +732,7 @@ public class Camera1 extends CameraImpl {
             mHandler = new Handler(getLooper());
         }
 
-        synchronized void notifyCameraOpened() {
+        synchronized void notifyCameraEvent() {
             notify();
         }
 
@@ -722,7 +741,23 @@ public class Camera1 extends CameraImpl {
                 @Override
                 public void run() {
                     oldOpenCamera();
-                    notifyCameraOpened();
+                    notifyCameraEvent();
+                }
+            });
+            try {
+                wait();
+            }
+            catch (InterruptedException e) {
+                Log.w(TAG, "wait was interrupted");
+            }
+        }
+
+        public void releaseCamera() {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    oldCameraRelease();
+                    notifyCameraEvent();
                 }
             });
             try {
