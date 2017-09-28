@@ -14,6 +14,10 @@ public abstract class CameraListener {
 
     }
 
+    public void onCameraError(Throwable throwable) {
+
+    }
+
     public void onPictureTaken(byte[] jpeg) {
 
     }

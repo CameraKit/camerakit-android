@@ -310,7 +310,11 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
         sWorkerHandler.post(new Runnable() {
             @Override
             public void run() {
-                mCameraImpl.start();
+                try {
+                    mCameraImpl.start();
+                } catch (Exception e) {
+                    mCameraListener.onCameraError(e);
+                }
             }
         });
     }
@@ -488,6 +492,12 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
         public void onCameraClosed() {
             super.onCameraClosed();
             getCameraListener().onCameraClosed();
+        }
+
+        @Override
+        public void onCameraError(Throwable throwable) {
+            super.onCameraError(throwable);
+            getCameraListener().onCameraError(throwable);
         }
 
         @Override
