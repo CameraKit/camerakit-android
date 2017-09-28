@@ -1,4 +1,7 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+
+group='com.github.kennywfl'
 
 ext {
     PUBLISH_GROUP_ID = 'com.flurgle'
@@ -29,6 +32,10 @@ android {
         main.java.srcDirs += 'src/main/types'
         main.java.srcDirs += 'src/main/utils'
     }
+    lintOptions {
+        abortOnError false
+    }
+
 }
 
 dependencies {

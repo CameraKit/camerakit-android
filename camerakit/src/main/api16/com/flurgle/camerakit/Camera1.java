@@ -646,7 +646,10 @@ public class Camera1 extends CameraImpl {
                     camera.cancelAutoFocus();
                     Camera.Parameters params = camera.getParameters();
                     if (params.getFocusMode() != Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE) {
-                        params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+                        List<String> modes = params.getSupportedFocusModes();
+                        if (modes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
+                            params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+                        }
                         params.setFocusAreas(null);
                         params.setMeteringAreas(null);
                         camera.setParameters(params);
