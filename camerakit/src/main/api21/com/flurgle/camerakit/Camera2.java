@@ -3,7 +3,6 @@ package com.flurgle.camerakit;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.ImageFormat;
-import android.graphics.PointF;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
@@ -89,7 +88,7 @@ class Camera2 extends CameraImpl {
     }
 
     @Override
-    void setDisplayOrientation(int displayOrientation) {
+    void setDisplayAndDeviceOrientation(int displayOrientation, int deviceOrientation) {
 
     }
 
@@ -230,6 +229,24 @@ class Camera2 extends CameraImpl {
     @Override
     boolean isCameraOpened() {
         return mCamera != null;
+    }
+
+    @Override
+    boolean frontCameraOnly() {
+        try {
+            for (final String cameraId : mCameraManager.getCameraIdList()) {
+                CameraCharacteristics characteristics = mCameraManager.getCameraCharacteristics(cameraId);
+                @SuppressWarnings("ConstantConditions")
+                int orientation = characteristics.get(CameraCharacteristics.LENS_FACING);
+                if (orientation == CameraCharacteristics.LENS_FACING_BACK) {
+                    return false;
+                }
+            }
+
+            return true;
+        } catch (CameraAccessException e) {
+            throw new RuntimeException("Failed to get camera view angles", e);
+        }
     }
 
     @Nullable
