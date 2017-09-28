@@ -17,7 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <com.flurgle.camerakit.CameraView xmlns:app="http://schemas.android.com/apk/res-auto"
+            <com.wonderkiln.camerakit.CameraView xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/camera"
                 android:layout_width="match_parent"
                 android:layout_height="400dp"
@@ -238,7 +238,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
-                        <com.flurgle.camerakit.demo.AutoUnfocusEditText
+                        <com.wonderkiln.camerakit.demo.AutoUnfocusEditText
                             android:id="@+id/width"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -336,7 +336,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
-                        <com.flurgle.camerakit.demo.AutoUnfocusEditText
+                        <com.wonderkiln.camerakit.demo.AutoUnfocusEditText
                             android:id="@+id/height"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
