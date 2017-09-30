@@ -1,5 +1,7 @@
 <img alt='CameraKit Header' src='.repo/camerakit-android-header.png' height='125'/>
 
+<img src="https://join-slack.camerakit.website/badge.svg">
+
 CameraKit is an extraordinarily easy to use utility to work with the infamous Android Camera and Camera2 APIs.
 
 Try out all the unique features using the CameraKit Demo from the Google Play store!
