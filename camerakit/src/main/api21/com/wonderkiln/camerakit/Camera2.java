@@ -162,6 +162,11 @@ class Camera2 extends CameraImpl {
     }
 
     @Override
+    void setVideoBitRate(int videoBitRate) {
+
+    }
+
+    @Override
     void captureImage() {
 
     }

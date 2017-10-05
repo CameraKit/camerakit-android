@@ -60,6 +60,7 @@ public class CameraKit {
         static final int DEFAULT_VIDEO_QUALITY = Constants.VIDEO_QUALITY_480P;
 
         static final int DEFAULT_JPEG_QUALITY = 100;
+        static final int DEFAULT_VIDEO_BIT_RATE = 0;
         static final boolean DEFAULT_CROP_OUTPUT = false;
         static final boolean DEFAULT_ADJUST_VIEW_BOUNDS = false;
 

@@ -72,6 +72,8 @@ public class Camera1 extends CameraImpl {
     @VideoQuality
     private int mVideoQuality;
 
+    private int mVideoBitRate;
+
     private Handler mainHandler = new Handler(Looper.getMainLooper());
     private Handler mHandler = new Handler();
 
@@ -215,6 +217,11 @@ public class Camera1 extends CameraImpl {
     @Override
     void setVideoQuality(int videoQuality) {
         this.mVideoQuality = videoQuality;
+    }
+
+    @Override
+    void setVideoBitRate(int videoBitRate) {
+        this.mVideoBitRate = videoBitRate;
     }
 
     @Override
@@ -595,7 +602,7 @@ public class Camera1 extends CameraImpl {
                 if (CamcorderProfile.hasProfile(mCameraId, CamcorderProfile.QUALITY_QVGA)) {
                     camcorderProfile = CamcorderProfile.get(mCameraId, CamcorderProfile.QUALITY_QVGA);
                 } else {
-                    return getCamcorderProfile(CameraKit.Constants.VIDEO_QUALITY_LOWEST);
+                    camcorderProfile = getCamcorderProfile(CameraKit.Constants.VIDEO_QUALITY_LOWEST);
                 }
                 break;
 
@@ -603,7 +610,7 @@ public class Camera1 extends CameraImpl {
                 if (CamcorderProfile.hasProfile(mCameraId, CamcorderProfile.QUALITY_480P)) {
                     camcorderProfile = CamcorderProfile.get(mCameraId, CamcorderProfile.QUALITY_480P);
                 } else {
-                    return getCamcorderProfile(CameraKit.Constants.VIDEO_QUALITY_QVGA);
+                    camcorderProfile = getCamcorderProfile(CameraKit.Constants.VIDEO_QUALITY_QVGA);
                 }
                 break;
 
@@ -611,7 +618,7 @@ public class Camera1 extends CameraImpl {
                 if (CamcorderProfile.hasProfile(mCameraId, CamcorderProfile.QUALITY_720P)) {
                     camcorderProfile = CamcorderProfile.get(mCameraId, CamcorderProfile.QUALITY_720P);
                 } else {
-                    return getCamcorderProfile(CameraKit.Constants.VIDEO_QUALITY_480P);
+                    camcorderProfile = getCamcorderProfile(CameraKit.Constants.VIDEO_QUALITY_480P);
                 }
                 break;
 
@@ -619,7 +626,7 @@ public class Camera1 extends CameraImpl {
                 if (CamcorderProfile.hasProfile(mCameraId, CamcorderProfile.QUALITY_1080P)) {
                     camcorderProfile = CamcorderProfile.get(mCameraId, CamcorderProfile.QUALITY_1080P);
                 } else {
-                    return getCamcorderProfile(CameraKit.Constants.VIDEO_QUALITY_720P);
+                    camcorderProfile = getCamcorderProfile(CameraKit.Constants.VIDEO_QUALITY_720P);
                 }
                 break;
 
@@ -627,7 +634,7 @@ public class Camera1 extends CameraImpl {
                 try {
                     camcorderProfile = CamcorderProfile.get(mCameraId, CamcorderProfile.QUALITY_2160P);
                 } catch (Exception e) {
-                    return getCamcorderProfile(CameraKit.Constants.VIDEO_QUALITY_HIGHEST);
+                    camcorderProfile = getCamcorderProfile(CameraKit.Constants.VIDEO_QUALITY_HIGHEST);
                 }
                 break;
 
@@ -638,6 +645,10 @@ public class Camera1 extends CameraImpl {
             case CameraKit.Constants.VIDEO_QUALITY_LOWEST:
                 camcorderProfile = CamcorderProfile.get(mCameraId, CamcorderProfile.QUALITY_LOW);
                 break;
+        }
+
+        if (camcorderProfile != null && mVideoBitRate != 0) {
+            camcorderProfile.videoBitRate = mVideoBitRate;
         }
 
         return camcorderProfile;
