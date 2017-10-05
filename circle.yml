@@ -1,0 +1,19 @@
+machine:
+  environment:
+    ANDROID_TARGET: android-25
+    ADB_INSTALL_TIMEOUT: 12
+    ANDROID_HOME: /usr/local/android-sdk-linux
+  java:
+    version: openjdk8
+
+dependencies:
+  pre:
+    - echo y | android update sdk --no-ui --all --filter "android-25","build-tools-25.0.2","extra-android-m2repository"
+    - gem install bundler
+    - bundle install
+
+  override:
+    - bundle check --path=vendor/bundle || bundle install --path=vendor/bundle --jobs=4 --retry=3 --without development
+  cache_directories:
+    - vendor/bundle
+
