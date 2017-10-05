@@ -8,8 +8,8 @@ import android.media.MediaRecorder;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.View;
@@ -44,8 +44,9 @@ public class Camera1 extends CameraImpl {
     private Camera.Parameters mCameraParameters;
     private CameraProperties mCameraProperties;
     private Camera.CameraInfo mCameraInfo;
-    private Size mPreviewSize;
     private Size mCaptureSize;
+    private Size mVideoSize;
+    private Size mPreviewSize;
     private MediaRecorder mMediaRecorder;
     private File mVideoFile;
     private Camera.AutoFocusCallback mAutofocusCallback;
@@ -310,6 +311,34 @@ public class Camera1 extends CameraImpl {
     }
 
     @Override
+    Size getVideoResolution() {
+        if (mVideoSize == null && mCameraParameters != null) {
+            TreeSet<Size> sizes = new TreeSet<>();
+            for (Camera.Size size : mCameraParameters.getSupportedVideoSizes()) {
+                sizes.add(new Size(size.width, size.height));
+            }
+
+            TreeSet<AspectRatio> aspectRatios = findCommonAspectRatios(
+                    mCameraParameters.getSupportedPreviewSizes(),
+                    mCameraParameters.getSupportedVideoSizes()
+            );
+            AspectRatio targetRatio = aspectRatios.size() > 0 ? aspectRatios.last() : null;
+
+            Iterator<Size> descendingSizes = sizes.descendingIterator();
+            Size size;
+            while (descendingSizes.hasNext() && mVideoSize == null) {
+                size = descendingSizes.next();
+                if (targetRatio == null || targetRatio.matches(size)) {
+                    mVideoSize = size;
+                    break;
+                }
+            }
+        }
+
+        return mVideoSize;
+    }
+
+    @Override
     Size getPreviewResolution() {
         if (mPreviewSize == null && mCameraParameters != null) {
             TreeSet<Size> sizes = new TreeSet<>();
@@ -538,7 +567,7 @@ public class Camera1 extends CameraImpl {
                 mCameraParameters.getHorizontalViewAngle());
     }
 
-    private TreeSet<AspectRatio> findCommonAspectRatios(List<Camera.Size> previewSizes, List<Camera.Size> captureSizes) {
+    private TreeSet<AspectRatio> findCommonAspectRatios(List<Camera.Size> previewSizes, List<Camera.Size> pictureSizes) {
         Set<AspectRatio> previewAspectRatios = new HashSet<>();
         for (Camera.Size size : previewSizes) {
             if (size.width >= CameraKit.Internal.screenHeight && size.height >= CameraKit.Internal.screenWidth) {
@@ -547,7 +576,7 @@ public class Camera1 extends CameraImpl {
         }
 
         Set<AspectRatio> captureAspectRatios = new HashSet<>();
-        for (Camera.Size size : captureSizes) {
+        for (Camera.Size size : pictureSizes) {
             captureAspectRatios.add(AspectRatio.of(size.width, size.height));
         }
 
@@ -575,7 +604,7 @@ public class Camera1 extends CameraImpl {
         mVideoFile = new File(mPreview.getView().getContext().getExternalFilesDir(null), "video.mp4");
         mMediaRecorder.setOutputFile(mVideoFile.getAbsolutePath());
         mMediaRecorder.setOrientationHint(calculateCaptureRotation());
-        mMediaRecorder.setVideoSize(mCaptureSize.getWidth(), mCaptureSize.getHeight());
+        mMediaRecorder.setVideoSize(mVideoSize.getWidth(), mVideoSize.getHeight());
     }
 
     private void prepareMediaRecorder() {

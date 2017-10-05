@@ -29,6 +29,7 @@ abstract class CameraImpl {
     abstract void endVideo();
 
     abstract Size getCaptureResolution();
+    abstract Size getVideoResolution();
     abstract Size getPreviewResolution();
     abstract boolean isCameraOpened();
     abstract boolean frontCameraOnly();
