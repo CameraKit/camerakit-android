@@ -307,12 +307,12 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
                 break;
         }
 
-        sWorkerHandler.post(new Runnable() {
+        sWorkerHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 mCameraImpl.start();
             }
-        });
+        }, 100);
     }
 
     public void stop() {
@@ -471,6 +471,10 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
                     permissions.toArray(new String[permissions.size()]),
                     CameraKit.Constants.PERMISSION_REQUEST_CAMERA);
         }
+    }
+
+    public void setErrorListener(ErrorListener listener) {
+        mCameraImpl.setErrorListener(listener);
     }
 
     private class CameraListenerMiddleWare extends CameraListener {

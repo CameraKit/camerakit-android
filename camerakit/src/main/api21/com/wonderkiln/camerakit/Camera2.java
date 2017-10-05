@@ -12,6 +12,8 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.util.SizeF;
 
+import com.wonderkiln.camerakit.ErrorListener;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -247,6 +249,10 @@ class Camera2 extends CameraImpl {
         } catch (CameraAccessException e) {
             throw new RuntimeException("Failed to get camera view angles", e);
         }
+    }
+
+    void setErrorListener(ErrorListener listener) {
+
     }
 
     @Nullable

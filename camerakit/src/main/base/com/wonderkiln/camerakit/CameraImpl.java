@@ -33,6 +33,8 @@ abstract class CameraImpl {
     abstract boolean isCameraOpened();
     abstract boolean frontCameraOnly();
 
+    abstract void setErrorListener(ErrorListener listener);
+
     @Nullable
     abstract CameraProperties getCameraProperties();
 
