@@ -284,9 +284,10 @@ public class Camera1 extends CameraImpl {
         } catch (RuntimeException e) {
             mCameraListener.onVideoTaken(null);
             mCamera.lock();
-            stop();
-            start();
         }
+
+        stop();
+        start();
     }
 
     @Override
