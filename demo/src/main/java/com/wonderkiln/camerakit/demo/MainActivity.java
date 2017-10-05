@@ -1,25 +1,28 @@
 package com.wonderkiln.camerakit.demo;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.PorterDuff;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.util.Log;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.RadioGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,50 +32,27 @@ import com.wonderkiln.camerakit.CameraView;
 import com.wonderkiln.camerakit.ErrorListener;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
-public class MainActivity extends AppCompatActivity implements View.OnLayoutChangeListener {
+public class MainActivity extends AppCompatActivity {
 
-    @BindView(R.id.activity_main)
+    @BindView(R.id.activityMain)
+    DrawerLayout drawerLayout;
+
+    @BindView(R.id.leftDrawer)
+    ListView leftDrawer;
+
+    ActionBarDrawerToggle drawerToggle;
+
+    @BindView(R.id.contentFrame)
     ViewGroup parent;
 
     @BindView(R.id.camera)
     CameraView camera;
-
-    // Capture Mode:
-
-    @BindView(R.id.captureModeRadioGroup)
-    RadioGroup captureModeRadioGroup;
-
-    // Crop Mode:
-
-    @BindView(R.id.cropModeRadioGroup)
-    RadioGroup cropModeRadioGroup;
-
-    // Width:
-
-    @BindView(R.id.screenWidth)
-    TextView screenWidth;
-    @BindView(R.id.width)
-    EditText width;
-    @BindView(R.id.widthUpdate)
-    Button widthUpdate;
-    @BindView(R.id.widthModeRadioGroup)
-    RadioGroup widthModeRadioGroup;
-
-    // Height:
-
-    @BindView(R.id.screenHeight)
-    TextView screenHeight;
-    @BindView(R.id.height)
-    EditText height;
-    @BindView(R.id.heightUpdate)
-    Button heightUpdate;
-    @BindView(R.id.heightModeRadioGroup)
-    RadioGroup heightModeRadioGroup;
 
     private int mCameraWidth;
     private int mCameraHeight;
@@ -83,23 +63,8 @@ public class MainActivity extends AppCompatActivity implements View.OnLayoutChan
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayUseLogoEnabled(true);
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        setupDrawerAndToolbar();
 
-            getSupportActionBar().setIcon(R.drawable.actionbar_icon);
-            getSupportActionBar().setTitle(Html.fromHtml("<b>Camera</b>Kit"));
-        }
-
-        parent.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                screenWidth.setText("screen: " + parent.getWidth() + "px");
-                screenHeight.setText("screen: " + parent.getHeight() + "px");
-            }
-        });
-
-        camera.addOnLayoutChangeListener(this);
         camera.setErrorListener(new ErrorListener() {
             @Override
             public void onError(Exception e) {
@@ -111,11 +76,6 @@ public class MainActivity extends AppCompatActivity implements View.OnLayoutChan
                 Log.d("", name + " -> " + details);
             }
         });
-
-        captureModeRadioGroup.setOnCheckedChangeListener(captureModeChangedListener);
-        cropModeRadioGroup.setOnCheckedChangeListener(cropModeChangedListener);
-        widthModeRadioGroup.setOnCheckedChangeListener(widthModeChangedListener);
-        heightModeRadioGroup.setOnCheckedChangeListener(heightModeChangedListener);
     }
 
     @Override
@@ -131,6 +91,18 @@ public class MainActivity extends AppCompatActivity implements View.OnLayoutChan
     }
 
     @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        drawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        drawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
@@ -138,10 +110,13 @@ public class MainActivity extends AppCompatActivity implements View.OnLayoutChan
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        if (drawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+
         switch (item.getItemId()) {
             case R.id.menu_main_about: {
-                Drawable icon = ContextCompat.getDrawable(this, R.drawable.ic_about);
-                icon.setColorFilter(ContextCompat.getColor(this, R.color.colorPrimaryDark), PorterDuff.Mode.SRC_IN);
+                Drawable icon = ContextCompat.getDrawable(this, R.mipmap.ic_launcher);
                 new AlertDialog.Builder(this)
                         .setIcon(icon)
                         .setTitle(getString(R.string.about_dialog_title))
@@ -173,7 +148,64 @@ public class MainActivity extends AppCompatActivity implements View.OnLayoutChan
         }
     }
 
-    @OnClick(R.id.capturePhoto)
+    private void setupDrawerAndToolbar() {
+        drawerToggle = new ActionBarDrawerToggle(
+                this,
+                drawerLayout,
+                R.string.drawer_open,
+                R.string.drawer_close
+        ) {
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+            }
+        };
+
+        drawerLayout.setDrawerListener(drawerToggle);
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeButtonEnabled(true);
+
+            View toolbarView = getLayoutInflater().inflate(R.layout.action_bar, null, false);
+            TextView titleView = toolbarView.findViewById(R.id.toolbar_title);
+            titleView.setText(Html.fromHtml("<b>Camera</b>Kit"));
+
+            getSupportActionBar().setCustomView(toolbarView, new ActionBar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            getSupportActionBar().setDisplayShowCustomEnabled(true);
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        }
+
+        final List<Pair<String, String>> options = new ArrayList<>();
+        options.add(new Pair<>("Demo Preview Scaling", "on"));
+        options.add(new Pair<>("Preview Size", "match_parent x wrap_content"));
+        options.add(new Pair<>("Capture Method", "preview frame"));
+        options.add(new Pair<>("Crop to Preview Frame", "on"));
+
+        ArrayAdapter adapter = new ArrayAdapter<Pair<String, String>>(this, R.layout.drawer_list_item, R.id.text1, options) {
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View view = super.getView(position, convertView, parent);
+                TextView text1 = view.findViewById(R.id.text1);
+                text1.setTextColor(Color.WHITE);
+
+                TextView text2 = view.findViewById(R.id.text2);
+                text2.setTextColor(Color.WHITE);
+
+                text1.setText(options.get(position).first);
+                text2.setText(options.get(position).second);
+                return view;
+            }
+        };
+
+        leftDrawer.setAdapter(adapter);
+    }
+
     void capturePhoto() {
         final long startTime = System.currentTimeMillis();
         camera.setCameraListener(new CameraListener() {
@@ -184,10 +216,10 @@ public class MainActivity extends AppCompatActivity implements View.OnLayoutChan
                 Bitmap bitmap = BitmapFactory.decodeByteArray(jpeg, 0, jpeg.length);
                 ResultHolder.dispose();
                 ResultHolder.setImage(bitmap);
-                ResultHolder.setNativeCaptureSize(
-                        captureModeRadioGroup.getCheckedRadioButtonId() == R.id.modeCaptureStandard ?
-                                camera.getCaptureSize() : camera.getPreviewSize()
-                );
+//                ResultHolder.setNativeCaptureSize(
+//                        captureModeRadioGroup.getCheckedRadioButtonId() == R.id.modeCaptureStandard ?
+//                                camera.getCaptureSize() : camera.getPreviewSize()
+//                );
                 ResultHolder.setTimeToCallback(callbackTime - startTime);
                 Intent intent = new Intent(MainActivity.this, PreviewActivity.class);
                 startActivity(intent);
@@ -196,7 +228,6 @@ public class MainActivity extends AppCompatActivity implements View.OnLayoutChan
         camera.captureImage();
     }
 
-    @OnClick(R.id.captureVideo)
     void captureVideo() {
         camera.setCameraListener(new CameraListener() {
             @Override
@@ -214,7 +245,6 @@ public class MainActivity extends AppCompatActivity implements View.OnLayoutChan
         }, 3000);
     }
 
-    @OnClick(R.id.toggleCamera)
     void toggleCamera() {
         switch (camera.toggleFacing()) {
             case CameraKit.Constants.FACING_BACK:
@@ -227,7 +257,6 @@ public class MainActivity extends AppCompatActivity implements View.OnLayoutChan
         }
     }
 
-    @OnClick(R.id.toggleFlash)
     void toggleFlash() {
         switch (camera.toggleFlash()) {
             case CameraKit.Constants.FLASH_ON:
@@ -244,140 +273,66 @@ public class MainActivity extends AppCompatActivity implements View.OnLayoutChan
         }
     }
 
-    RadioGroup.OnCheckedChangeListener captureModeChangedListener = new RadioGroup.OnCheckedChangeListener() {
-        @Override
-        public void onCheckedChanged(RadioGroup group, int checkedId) {
-            camera.setMethod(
-                    checkedId == R.id.modeCaptureStandard ?
-                            CameraKit.Constants.METHOD_STANDARD :
-                            CameraKit.Constants.METHOD_STILL
-            );
 
-            Toast.makeText(MainActivity.this, "Picture capture set to" + (checkedId == R.id.modeCaptureStandard ? " quality!" : " speed!"), Toast.LENGTH_SHORT).show();
-        }
-    };
-
-    RadioGroup.OnCheckedChangeListener cropModeChangedListener = new RadioGroup.OnCheckedChangeListener() {
-        @Override
-        public void onCheckedChanged(RadioGroup group, int checkedId) {
-            camera.setCropOutput(
-                    checkedId == R.id.modeCropVisible
-            );
-
-            Toast.makeText(MainActivity.this, "Picture cropping is" + (checkedId == R.id.modeCropVisible ? " on!" : " off!"), Toast.LENGTH_SHORT).show();
-        }
-    };
-
-    @OnClick(R.id.widthUpdate)
-    void widthUpdateClicked() {
-        if (widthUpdate.getAlpha() >= 1) {
-            updateCamera(true, false);
-        }
-    }
-
-    RadioGroup.OnCheckedChangeListener widthModeChangedListener = new RadioGroup.OnCheckedChangeListener() {
-        @Override
-        public void onCheckedChanged(RadioGroup group, int checkedId) {
-            widthUpdate.setEnabled(checkedId == R.id.widthCustom);
-            widthUpdate.setAlpha(checkedId == R.id.widthCustom ? 1f : 0.3f);
-            width.clearFocus();
-            width.setEnabled(checkedId == R.id.widthCustom);
-            width.setAlpha(checkedId == R.id.widthCustom ? 1f : 0.5f);
-
-            updateCamera(true, false);
-        }
-    };
-
-    @OnClick(R.id.heightUpdate)
-    void heightUpdateClicked() {
-        if (heightUpdate.getAlpha() >= 1) {
-            updateCamera(false, true);
-        }
-    }
-
-    RadioGroup.OnCheckedChangeListener heightModeChangedListener = new RadioGroup.OnCheckedChangeListener() {
-        @Override
-        public void onCheckedChanged(RadioGroup group, int checkedId) {
-            heightUpdate.setEnabled(checkedId == R.id.heightCustom);
-            heightUpdate.setAlpha(checkedId == R.id.heightCustom ? 1f : 0.3f);
-            height.clearFocus();
-            height.setEnabled(checkedId == R.id.heightCustom);
-            height.setAlpha(checkedId == R.id.heightCustom ? 1f : 0.5f);
-
-            updateCamera(false, true);
-        }
-    };
-
-    private void updateCamera(boolean updateWidth, boolean updateHeight) {
-        ViewGroup.LayoutParams cameraLayoutParams = camera.getLayoutParams();
-        int width = cameraLayoutParams.width;
-        int height = cameraLayoutParams.height;
-
-        if (updateWidth) {
-            switch (widthModeRadioGroup.getCheckedRadioButtonId()) {
-                case R.id.widthCustom:
-                    String widthInput = this.width.getText().toString();
-                    if (widthInput.length() > 0) {
-                        try {
-                            width = Integer.valueOf(widthInput);
-                        } catch (Exception e) {
-
-                        }
-                    }
-
-                    break;
-
-                case R.id.widthWrapContent:
-                    width = ViewGroup.LayoutParams.WRAP_CONTENT;
-                    break;
-
-                case R.id.widthMatchParent:
-                    width = ViewGroup.LayoutParams.MATCH_PARENT;
-                    break;
-            }
-        }
-
-        if (updateHeight) {
-            switch (heightModeRadioGroup.getCheckedRadioButtonId()) {
-                case R.id.heightCustom:
-                    String heightInput = this.height.getText().toString();
-                    if (heightInput.length() > 0) {
-                        try {
-                            height = Integer.valueOf(heightInput);
-                        } catch (Exception e) {
-
-                        }
-                    }
-                    break;
-
-                case R.id.heightWrapContent:
-                    height = ViewGroup.LayoutParams.WRAP_CONTENT;
-                    break;
-
-                case R.id.heightMatchParent:
-                    height = parent.getHeight();
-                    break;
-            }
-        }
-
-        cameraLayoutParams.width = width;
-        cameraLayoutParams.height = height;
-
-        camera.addOnLayoutChangeListener(this);
-        camera.setLayoutParams(cameraLayoutParams);
-
-        Toast.makeText(this, (updateWidth && updateHeight ? "Width and height" : updateWidth ? "Width" : "Height") + " updated!", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-        mCameraWidth = right - left;
-        mCameraHeight = bottom - top;
-
-        width.setText(String.valueOf(mCameraWidth));
-        height.setText(String.valueOf(mCameraHeight));
-
-        camera.removeOnLayoutChangeListener(this);
-    }
+//    private void updateCamera(boolean updateWidth, boolean updateHeight) {
+//        ViewGroup.LayoutParams cameraLayoutParams = camera.getLayoutParams();
+//        int width = cameraLayoutParams.width;
+//        int height = cameraLayoutParams.height;
+//
+//        if (updateWidth) {
+//            switch (widthModeRadioGroup.getCheckedRadioButtonId()) {
+//                case R.id.widthCustom:
+//                    String widthInput = this.width.getText().toString();
+//                    if (widthInput.length() > 0) {
+//                        try {
+//                            width = Integer.valueOf(widthInput);
+//                        } catch (Exception e) {
+//
+//                        }
+//                    }
+//
+//                    break;
+//
+//                case R.id.widthWrapContent:
+//                    width = ViewGroup.LayoutParams.WRAP_CONTENT;
+//                    break;
+//
+//                case R.id.widthMatchParent:
+//                    width = ViewGroup.LayoutParams.MATCH_PARENT;
+//                    break;
+//            }
+//        }
+//
+//        if (updateHeight) {
+//            switch (heightModeRadioGroup.getCheckedRadioButtonId()) {
+//                case R.id.heightCustom:
+//                    String heightInput = this.height.getText().toString();
+//                    if (heightInput.length() > 0) {
+//                        try {
+//                            height = Integer.valueOf(heightInput);
+//                        } catch (Exception e) {
+//
+//                        }
+//                    }
+//                    break;
+//
+//                case R.id.heightWrapContent:
+//                    height = ViewGroup.LayoutParams.WRAP_CONTENT;
+//                    break;
+//
+//                case R.id.heightMatchParent:
+//                    height = parent.getHeight();
+//                    break;
+//            }
+//        }
+//
+//        cameraLayoutParams.width = width;
+//        cameraLayoutParams.height = height;
+//
+//        camera.addOnLayoutChangeListener(this);
+//        camera.setLayoutParams(cameraLayoutParams);
+//
+//        Toast.makeText(this, (updateWidth && updateHeight ? "Width and height" : updateWidth ? "Width" : "Height") + " updated!", Toast.LENGTH_SHORT).show();
+//    }
 
 }

@@ -150,9 +150,9 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
         mIsStarted = false;
 
         // Handle situations where there's only 1 camera & it's front facing OR it's a chromebook in laptop mode
-        WindowManager windowService = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
+        WindowManager windowService = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         boolean isChromebookInLaptopMode = (context.getPackageManager().hasSystemFeature("org.chromium.arc.device_management") && windowService.getDefaultDisplay().getRotation() == Surface.ROTATION_0);
-        if(mCameraImpl.frontCameraOnly() || isChromebookInLaptopMode){
+        if (mCameraImpl.frontCameraOnly() || isChromebookInLaptopMode) {
             mFacing = FACING_FRONT;
         }
 
@@ -196,10 +196,10 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
         super.onAttachedToWindow();
         if (!isInEditMode()) {
             mDisplayOrientationDetector.enable(
-                ViewCompat.isAttachedToWindow(this)
-                    ? DisplayManagerCompat.getInstance(getContext())
-                    .getDisplay(Display.DEFAULT_DISPLAY)
-                    : null
+                    ViewCompat.isAttachedToWindow(this)
+                            ? DisplayManagerCompat.getInstance(getContext())
+                            .getDisplay(Display.DEFAULT_DISPLAY)
+                            : null
             );
         }
     }
@@ -334,9 +334,16 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
         return mFacing;
     }
 
+    public boolean isFacingFront() {
+        return mFacing == CameraKit.Constants.FACING_FRONT;
+    }
+
+    public boolean isFacingBack() {
+        return mFacing == CameraKit.Constants.FACING_BACK;
+    }
+
     public void setFacing(@Facing final int facing) {
         this.mFacing = facing;
-
         sWorkerHandler.post(new Runnable() {
             @Override
             public void run() {
@@ -500,7 +507,7 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
 
             // Handle cameras that don't give us the correctly rotated/mirrored image, but instead just set the corresponding EXIF data.
             // Exif data is lost when we do a BitmapFactory.decodeByteArray, so need to correct image here.
-            if(ExifUtil.getExifOrientation(jpeg) != ExifInterface.ORIENTATION_NORMAL || mFacing == FACING_FRONT){
+            if (ExifUtil.getExifOrientation(jpeg) != ExifInterface.ORIENTATION_NORMAL || mFacing == FACING_FRONT) {
                 Bitmap bitmap = ExifUtil.decodeBitmapWithRotation(jpeg, mFacing == FACING_FRONT);
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 bitmap.compress(Bitmap.CompressFormat.JPEG, mJpegQuality, stream);

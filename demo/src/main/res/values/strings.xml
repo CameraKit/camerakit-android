@@ -5,4 +5,7 @@
 
     <string name="about_dialog_title">About</string>
     <string name="about_dialog_message">Demo Version: %1$S (%2$d)\nCameraKit Version: %3$S</string>
+
+    <string name="drawer_open">Open Drawer</string>
+    <string name="drawer_close">Close Drawer</string>
 </resources>
