@@ -3,6 +3,7 @@
     package="com.wonderkiln.camerakit.demo">
 
     <application
+        android:logo="@drawable/logomark"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"

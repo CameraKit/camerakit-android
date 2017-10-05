@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -74,6 +75,14 @@ public class MainActivity extends AppCompatActivity implements View.OnLayoutChan
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayUseLogoEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+            getSupportActionBar().setIcon(R.drawable.actionbar_icon);
+            getSupportActionBar().setTitle(Html.fromHtml("<b>Camera</b>Kit"));
+        }
 
         parent.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override

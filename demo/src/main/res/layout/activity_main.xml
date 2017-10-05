@@ -50,7 +50,7 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
                     android:layout_weight="1"
-                    android:backgroundTint="@color/colorPrimary"
+                    android:backgroundTint="@color/colorAccent"
                     android:src="@drawable/ic_photo"
                     android:tint="@android:color/white" />
 
@@ -60,7 +60,7 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
                     android:layout_weight="1"
-                    android:backgroundTint="@color/colorPrimary"
+                    android:backgroundTint="@color/colorAccent"
                     android:src="@drawable/ic_video"
                     android:tint="@android:color/white"
                     android:visibility="gone" />
@@ -71,7 +71,7 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
                     android:layout_weight="1"
-                    android:backgroundTint="@color/colorPrimary"
+                    android:backgroundTint="@color/colorAccent"
                     android:src="@drawable/ic_flash"
                     android:tint="@android:color/white" />
 
@@ -81,7 +81,7 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
                     android:layout_weight="1"
-                    android:backgroundTint="@color/colorPrimary"
+                    android:backgroundTint="@color/colorAccent"
                     android:src="@drawable/ic_switch"
                     android:tint="@android:color/white" />
 
@@ -252,7 +252,7 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical|right"
                             android:layout_marginRight="15dp"
-                            android:backgroundTint="@color/colorPrimary"
+                            android:backgroundTint="@color/colorAccent"
                             android:gravity="center"
                             android:text="UPDATE"
                             android:textColor="@android:color/white"
@@ -350,7 +350,7 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical|right"
                             android:layout_marginRight="15dp"
-                            android:backgroundTint="@color/colorPrimary"
+                            android:backgroundTint="@color/colorAccent"
                             android:gravity="center"
                             android:text="UPDATE"
                             android:textColor="@android:color/white"
