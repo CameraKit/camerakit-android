@@ -10,7 +10,7 @@ CameraKit is an extraordinarily easy to use utility to work with the infamous An
 
 Try out all the unique features using the CameraKit Demo from the Google Play store!
 
-<a href='https://play.google.com/store/apps/details?id=com.flurgle.camerakit.demo&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png' height='80'/></a>
+<a href='https://play.google.com/store/apps/details?id=com.wonderkiln.camerakit.demo&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png' height='80'/></a>
 
 <img src='.repo/demo1.png' width='120'/> <img src='.repo/demo2.png' width='120'/> <img src='.repo/demo3.png' width='120'/> <img src='.repo/demo4.png' width='120'/>
 
@@ -56,7 +56,7 @@ Try out all the unique features using the CameraKit Demo from the Google Play st
 Add __CameraKit__ to the dependencies block in your `app` level `build.gradle`:
 
 ```groovy
-compile 'com.flurgle:camerakit:0.9.17'
+compile 'com.wonderkiln:camerakit:0.10.1'
 ```
 
 ## Usage
@@ -64,7 +64,7 @@ compile 'com.flurgle:camerakit:0.9.17'
 To use CameraKit, simply add a `CameraView` to your layout:
 
 ```xml
-<com.flurgle.camerakit.CameraView
+<com.wonderkiln.camerakit.CameraView
     android:id="@+id/camera"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -130,7 +130,7 @@ camera.postDelayed(new Runnable() {
 ## Extra Attributes
 
 ```xml
-<com.flurgle.camerakit.CameraView xmlns:camerakit="http://schemas.android.com/apk/res-auto"
+<com.wonderkiln.camerakit.CameraView xmlns:camerakit="http://schemas.android.com/apk/res-auto"
     android:id="@+id/camera"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
