@@ -1,5 +1,11 @@
 <img alt='CameraKit Header' src='.repo/camerakit-android-header.png' height='125'/>
 
+[![Slack](https://join-slack.camerakit.website/badge.svg)](https://join-slack.camerakit.website)
+[![CircleCI](https://circleci.com/gh/wonderkiln/CameraKit-Android/tree/master.svg?style=shield)](https://circleci.com/gh/wonderkiln/CameraKit-Android/tree/master)
+[![Code Climate](https://codeclimate.com/github/wonderkiln/CameraKit-Android/badges/gpa.svg)](https://codeclimate.com/github/wonderkiln/CameraKit-Android)
+[![Test Coverage](https://codeclimate.com/github/wonderkiln/CameraKit-Android/badges/coverage.svg)](https://codeclimate.com/github/wonderkiln/CameraKit-Android)
+[![Issue Count](https://codeclimate.com/github/wonderkiln/CameraKit-Android/badges/issue_count.svg)](https://codeclimate.com/github/wonderkiln/CameraKit-Android)
+
 CameraKit is an extraordinarily easy to use utility to work with the infamous Android Camera and Camera2 APIs.
 
 Try out all the unique features using the CameraKit Demo from the Google Play store!
@@ -417,8 +423,9 @@ camera.setCameraListener(new CameraListener() {
 
 ## Credits
 
+[WonderKiln, Inc](https://github.com/wonderkiln)  
 [Dylan McIntyre](https://github.com/dwillmc)
-[WonderKiln](https://github.com/wonderkiln)
+
 
 ## License
 
