@@ -58,6 +58,8 @@
 
         <attr name="ckCropOutput" format="boolean" />
 
+        <attr name="ckVideoBitRate" format="integer" />
+
         <attr name="android:adjustViewBounds" />
 
     </declare-styleable>

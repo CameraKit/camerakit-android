@@ -25,6 +25,7 @@ Try out all the unique features using the CameraKit Demo from the Google Play st
   - [`ckZoom`](#ckzoom)
   - [`ckCropOutput`](#ckcropoutput)
   - [`ckJpegQuality`](#ckjpegquality)
+  - [`ckVideoBitRate`](#ckvideobitrate)
 - [Automatic Permissions Behavior](#automatic-permissions-behavior)
 - [Dynamic Sizing Behavior](#dynamic-sizing-behavior)
   - [`adjustViewBounds`](#adjustviewbounds)
@@ -130,15 +131,15 @@ camera.postDelayed(new Runnable() {
     android:id="@+id/camera"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    camerakit:ckFacing="back"
-    camerakit:ckFlash="off"
-    camerakit:ckFocus="continuous"
-    camerakit:ckMethod="standard"
-    camerakit:ckZoom="pinch"
-    camerakit:ckPermissions="strict"
-    camerakit:ckCropOutput="true"  
-    camerakit:ckJpegQuality="100"
-    camerakit:ckVideoQuality="480p"
+    app:ckFacing="back"
+    app:ckFlash="off"
+    app:ckFocus="continuous"
+    app:ckMethod="standard"
+    app:ckZoom="pinch"
+    app:ckPermissions="strict"
+    app:ckCropOutput="true"  
+    app:ckJpegQuality="100"
+    app:ckVideoQuality="480p"
     android:adjustViewBounds="true" />
 ```
 
@@ -153,6 +154,7 @@ camera.postDelayed(new Runnable() {
 |[`ckCropOutput`](#ckcropoutput)|[`true`](#true) [`false`](#false)|`false`|
 |[`ckJpegQuality`](#ckjpegquality)|[`0 <= n <= 100`](#ckjpegquality)|`100`|
 |[`ckVideoQuality`](#ckvideoquality)|[`max480p`](#max480p) [`max720p`](#max720p) [`max1080p`](#max1080p) [`max2160p`](#max2160p) [`highest`](#highest) [`lowest`](#lowest)|`max480p`|
+|[`ckVideoBitRate`](#ckvideobitrate)|[`integer`](#integer)|`By ckVideoQuality`|
 
 - - -
 
@@ -363,6 +365,18 @@ cameraView.setVideoQuality(CameraKit.Constants.VIDEO_QUALITY_HIGHEST);
 
 ```java
 cameraView.setVideoQuality(CameraKit.Constants.VIDEO_QUALITY_QVGA);
+```
+
+- - -
+
+
+### `ckVideoBitRate`
+[`integer`](#integer)
+
+#### `setVideoBitRate`
+
+```java
+cameraView.setVideoBitRate(14000000);
 ```
 
 - - -

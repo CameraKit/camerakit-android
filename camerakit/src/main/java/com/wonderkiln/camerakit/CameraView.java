@@ -94,6 +94,7 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
     @VideoQuality
     private int mVideoQuality;
     private int mJpegQuality;
+    private int mVideoBitRate;
     private boolean mCropOutput;
 
     private boolean mAdjustViewBounds;
@@ -136,6 +137,7 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
                 mVideoQuality = a.getInteger(com.wonderkiln.camerakit.R.styleable.CameraView_ckVideoQuality, CameraKit.Defaults.DEFAULT_VIDEO_QUALITY);
                 mJpegQuality = a.getInteger(com.wonderkiln.camerakit.R.styleable.CameraView_ckJpegQuality, CameraKit.Defaults.DEFAULT_JPEG_QUALITY);
                 mCropOutput = a.getBoolean(com.wonderkiln.camerakit.R.styleable.CameraView_ckCropOutput, CameraKit.Defaults.DEFAULT_CROP_OUTPUT);
+                mVideoBitRate = a.getInteger(R.styleable.CameraView_ckVideoBitRate, CameraKit.Defaults.DEFAULT_VIDEO_BIT_RATE);
                 mAdjustViewBounds = a.getBoolean(com.wonderkiln.camerakit.R.styleable.CameraView_android_adjustViewBounds, CameraKit.Defaults.DEFAULT_ADJUST_VIEW_BOUNDS);
             } finally {
                 a.recycle();
@@ -150,9 +152,9 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
         mIsStarted = false;
 
         // Handle situations where there's only 1 camera & it's front facing OR it's a chromebook in laptop mode
-        WindowManager windowService = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
+        WindowManager windowService = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         boolean isChromebookInLaptopMode = (context.getPackageManager().hasSystemFeature("org.chromium.arc.device_management") && windowService.getDefaultDisplay().getRotation() == Surface.ROTATION_0);
-        if(mCameraImpl.frontCameraOnly() || isChromebookInLaptopMode){
+        if (mCameraImpl.frontCameraOnly() || isChromebookInLaptopMode) {
             mFacing = FACING_FRONT;
         }
 
@@ -163,6 +165,7 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
         setZoom(mZoom);
         setPermissions(mPermissions);
         setVideoQuality(mVideoQuality);
+        setVideoBitRate(mVideoBitRate);
 
         if (!isInEditMode()) {
             mDisplayOrientationDetector = new DisplayOrientationDetector(context) {
@@ -382,6 +385,11 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
     public void setVideoQuality(@VideoQuality int videoQuality) {
         this.mVideoQuality = videoQuality;
         mCameraImpl.setVideoQuality(mVideoQuality);
+    }
+
+    public void setVideoBitRate(int videoBirRate) {
+        this.mVideoBitRate = videoBirRate;
+        mCameraImpl.setVideoBitRate(mVideoBitRate);
     }
 
     public void setJpegQuality(int jpegQuality) {
