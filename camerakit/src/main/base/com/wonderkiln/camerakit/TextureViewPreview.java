@@ -7,6 +7,7 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 @TargetApi(14)
 class TextureViewPreview extends PreviewImpl {
@@ -15,7 +16,7 @@ class TextureViewPreview extends PreviewImpl {
 
     private int mDisplayOrientation;
 
-    TextureViewPreview(Context context, ViewGroup parent) {
+    TextureViewPreview(final Context context, ViewGroup parent) {
         final View view = View.inflate(context, R.layout.texture_view, parent);
         mTextureView = (TextureView) view.findViewById(R.id.texture_view);
         mTextureView.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
