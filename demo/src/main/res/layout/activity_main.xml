@@ -62,9 +62,7 @@
         android:layout_width="240dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:background="@color/colorPrimary"
-        android:choiceMode="singleChoice"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="0dp" />
+        android:background="@color/colorPrimaryDark"
+        android:choiceMode="singleChoice" />
 
 </android.support.v4.widget.DrawerLayout>
