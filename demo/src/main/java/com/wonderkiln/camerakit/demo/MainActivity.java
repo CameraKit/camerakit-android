@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -17,6 +18,7 @@ import android.widget.Toast;
 import com.wonderkiln.camerakit.CameraKit;
 import com.wonderkiln.camerakit.CameraListener;
 import com.wonderkiln.camerakit.CameraView;
+import com.wonderkiln.camerakit.ErrorListener;
 
 import java.io.File;
 
@@ -82,6 +84,17 @@ public class MainActivity extends AppCompatActivity implements View.OnLayoutChan
         });
 
         camera.addOnLayoutChangeListener(this);
+        camera.setErrorListener(new ErrorListener() {
+            @Override
+            public void onError(Exception e) {
+                Log.d("", e.getLocalizedMessage());
+            }
+
+            @Override
+            public void onEvent(String name, String details) {
+                Log.d("", name + " -> " + details);
+            }
+        });
 
         captureModeRadioGroup.setOnCheckedChangeListener(captureModeChangedListener);
         cropModeRadioGroup.setOnCheckedChangeListener(cropModeChangedListener);
