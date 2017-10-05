@@ -13,6 +13,7 @@ android {
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 26
+        versionName project.ext.PUBLISH_VERSION
     }
     buildTypes {
         release {

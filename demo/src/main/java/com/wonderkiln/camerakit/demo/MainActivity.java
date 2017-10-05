@@ -3,10 +3,17 @@ package com.wonderkiln.camerakit.demo;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -121,6 +128,49 @@ public class MainActivity extends AppCompatActivity implements View.OnLayoutChan
     protected void onPause() {
         camera.stop();
         super.onPause();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_main_about: {
+                Drawable icon = ContextCompat.getDrawable(this, R.drawable.ic_about);
+                icon.setColorFilter(ContextCompat.getColor(this, R.color.colorPrimaryDark), PorterDuff.Mode.SRC_IN);
+                new AlertDialog.Builder(this)
+                        .setIcon(icon)
+                        .setTitle(getString(R.string.about_dialog_title))
+                        .setMessage(getString(
+                                R.string.about_dialog_message,
+                                BuildConfig.VERSION_NAME,
+                                BuildConfig.VERSION_CODE,
+                                com.wonderkiln.camerakit.BuildConfig.VERSION_NAME
+                        ))
+                        .setPositiveButton("DONE", null)
+                        .show();
+                return true;
+            }
+
+            case R.id.menu_main_github: {
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.url_github)));
+                startActivity(intent);
+                return true;
+            }
+
+            case R.id.menu_main_website: {
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.url_website)));
+                startActivity(intent);
+                return true;
+            }
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @OnClick(R.id.capturePhoto)
