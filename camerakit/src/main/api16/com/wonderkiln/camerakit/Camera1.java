@@ -265,7 +265,15 @@ public class Camera1 extends CameraImpl {
 
                                     // Reset capturing state to allow photos to be taken
                                     capturingImage = false;
-                                    camera.startPreview();
+
+                                    if (isCameraOpened()) {
+                                        try {
+                                            stop();
+                                            start();
+                                        } catch (Exception e) {
+                                            notifyErrorListener(e);
+                                        }
+                                    }
                                 }
                             });
                 } else {
