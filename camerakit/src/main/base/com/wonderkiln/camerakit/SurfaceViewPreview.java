@@ -31,13 +31,12 @@ public class SurfaceViewPreview extends PreviewImpl {
         holder.addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
-                dispatchSurfaceChanged();
             }
 
             @Override
             public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
                 setSize(width, height);
-                dispatchSurfaceChanged();
+                if (isReady()) dispatchSurfaceChanged();
             }
 
             @Override
@@ -74,7 +73,7 @@ public class SurfaceViewPreview extends PreviewImpl {
 
     @Override
     boolean isReady() {
-        return mSurfaceView != null;
+        return getWidth() != 0 && getHeight() != 0 && getWidth() == getPreviewWidth() && getHeight() == getPreviewHeight();
     }
 
     @TargetApi(15)
