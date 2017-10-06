@@ -121,7 +121,11 @@ public class Camera1 extends CameraImpl {
     void stop() {
         mHandler.removeCallbacksAndMessages(null);
         if (mCamera != null) {
-            mCamera.stopPreview();
+            try {
+                mCamera.stopPreview();
+            } catch (Exception e) {
+                notifyErrorListener(e);
+            }
         }
         mShowingPreview = false;
         releaseCamera();
