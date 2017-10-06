@@ -336,7 +336,6 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
 
     public void setFacing(@Facing final int facing) {
         this.mFacing = facing;
-
         sWorkerHandler.post(new Runnable() {
             @Override
             public void run() {
