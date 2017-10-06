@@ -16,8 +16,9 @@ abstract class PreviewImpl {
     private int mWidth;
     private int mHeight;
 
-    protected int mTrueWidth;
-    protected int mTrueHeight;
+    protected int mPreviewWidth;
+    protected int mPreviewHeight;
+    protected int mPreviewFormat;
 
     void setCallback(Callback callback) {
         mCallback = callback;
@@ -48,9 +49,6 @@ abstract class PreviewImpl {
     void setSize(int width, int height) {
         mWidth = width;
         mHeight = height;
-
-        // Refresh true preview size to adjust scaling
-        setTruePreviewSize(mTrueWidth, mTrueHeight);
     }
 
     int getWidth() {
@@ -61,40 +59,22 @@ abstract class PreviewImpl {
         return mHeight;
     }
 
-    void setTruePreviewSize(final int width, final int height) {
-        this.mTrueWidth = width;
-        this.mTrueHeight = height;
-        getView().post(new Runnable() {
-            @Override
-            public void run() {
-                if (width != 0 && height != 0) {
-                    AspectRatio aspectRatio = AspectRatio.of(width, height);
-                    int targetHeight = (int) (getView().getWidth() * aspectRatio.toFloat());
-                    float scaleY;
-                    if (getView().getHeight() > 0) {
-                        scaleY = (float) targetHeight / (float) getView().getHeight();
-                    } else {
-                        scaleY = 1;
-                    }
-
-                    if (scaleY > 1) {
-                        getView().setScaleX(1);
-                        getView().setScaleY(scaleY);
-                    } else {
-                        getView().setScaleX(1 / scaleY);
-                        getView().setScaleY(1);
-                    }
-                }
-            }
-        });
+    void setPreviewParameters(final int width, final int height, final int format) {
+        this.mPreviewWidth = width;
+        this.mPreviewHeight = height;
+        this.mPreviewFormat = format;
     }
 
-    int getTrueWidth() {
-        return mTrueWidth;
+    int getPreviewWidth() {
+        return mPreviewWidth;
     }
 
-    int getTrueHeight() {
-        return mTrueHeight;
+    int getPreviewHeight() {
+        return mPreviewHeight;
+    }
+
+    int getPreviewFormat() {
+        return mPreviewFormat;
     }
 
 }

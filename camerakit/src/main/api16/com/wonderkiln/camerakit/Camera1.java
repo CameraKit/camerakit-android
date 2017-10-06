@@ -52,6 +52,7 @@ public class Camera1 extends CameraImpl {
     private Camera.AutoFocusCallback mAutofocusCallback;
     private boolean capturingImage = false;
 
+    private boolean mShowingPreview;
     private int mDisplayOrientation;
     private int mDeviceOrientation;
 
@@ -85,8 +86,16 @@ public class Camera1 extends CameraImpl {
             @Override
             public void onSurfaceChanged() {
                 if (mCamera != null) {
+                    if (mShowingPreview) {
+                        mCamera.stopPreview();
+                        mShowingPreview = false;
+                    }
+                    setDisplayAndDeviceOrientation();
                     setupPreview();
-                    adjustCameraParameters();
+                    if (!mShowingPreview) {
+                        mCamera.startPreview();
+                        mShowingPreview = true;
+                    }
                 }
             }
         });
@@ -100,21 +109,36 @@ public class Camera1 extends CameraImpl {
     void start() {
         setFacing(mFacing);
         openCamera();
-        if (mPreview.isReady()) setupPreview();
-        mCamera.startPreview();
+        if (mPreview.isReady()) {
+            setDisplayAndDeviceOrientation();
+            setupPreview();
+            mCamera.startPreview();
+            mShowingPreview = true;
+        }
     }
 
     @Override
     void stop() {
-        if (mCamera != null) mCamera.stopPreview();
         mHandler.removeCallbacksAndMessages(null);
+        if (mCamera != null) {
+            mCamera.stopPreview();
+        }
+        mShowingPreview = false;
         releaseCamera();
+    }
+
+    void setDisplayAndDeviceOrientation() {
+        setDisplayAndDeviceOrientation(this.mDisplayOrientation, this.mDeviceOrientation);
     }
 
     @Override
     void setDisplayAndDeviceOrientation(int displayOrientation, int deviceOrientation) {
         this.mDisplayOrientation = displayOrientation;
         this.mDeviceOrientation = deviceOrientation;
+
+        if (isCameraOpened()) {
+            mCamera.setDisplayOrientation(calculatePreviewRotation());
+        }
     }
 
     @Override
@@ -241,7 +265,6 @@ public class Camera1 extends CameraImpl {
 
                                     // Reset capturing state to allow photos to be taken
                                     capturingImage = false;
-
                                     camera.startPreview();
                                 }
                             });
@@ -376,6 +399,11 @@ public class Camera1 extends CameraImpl {
             }
         }
 
+        boolean invertPreviewSizes = (mCameraInfo.orientation + mDeviceOrientation) % 180 == 90;
+        if (mPreviewSize != null && invertPreviewSizes) {
+            return new Size(mPreviewSize.getHeight(), mPreviewSize.getWidth());
+        }
+
         return mPreviewSize;
     }
 
@@ -414,7 +442,6 @@ public class Camera1 extends CameraImpl {
 
         collectCameraProperties();
         adjustCameraParameters();
-        mCamera.setDisplayOrientation(calculatePreviewRotation());
 
         mCameraListener.onCameraOpened();
     }
@@ -433,6 +460,7 @@ public class Camera1 extends CameraImpl {
 
     private void releaseCamera() {
         if (mCamera != null) {
+            mCamera.lock();
             mCamera.release();
             mCamera = null;
             mCameraParameters = null;
@@ -498,33 +526,37 @@ public class Camera1 extends CameraImpl {
     }
 
     private void adjustCameraParameters() {
-        boolean invertPreviewSizes = (mCameraInfo.orientation + mDisplayOrientation) % 180 == 0;
-        mPreview.setTruePreviewSize(
-                invertPreviewSizes ? getPreviewResolution().getHeight() : getPreviewResolution().getWidth(),
-                invertPreviewSizes ? getPreviewResolution().getWidth() : getPreviewResolution().getHeight()
-        );
+        if (mShowingPreview) {
+            mCamera.stopPreview();
+        }
+
         adjustCameraParameters(0);
+
+        if (mShowingPreview) {
+            mCamera.startPreview();
+        }
     }
 
     private void adjustCameraParameters(int currentTry) {
-        boolean invertPreviewSizes = mDisplayOrientation % 180 != 0;
-
+        boolean invertPreviewSizes = (mCameraInfo.orientation + mDeviceOrientation) % 180 == 90;
         boolean haveToReadjust = false;
         Camera.Parameters resolutionLess = mCamera.getParameters();
 
         if (getPreviewResolution() != null) {
-            mPreview.setTruePreviewSize(
+            mPreview.setPreviewParameters(
+                    getPreviewResolution().getWidth(),
+                    getPreviewResolution().getHeight(),
+                    mCameraParameters.getPreviewFormat()
+            );
+
+            mCameraParameters.setPreviewSize(
                     invertPreviewSizes ? getPreviewResolution().getHeight() : getPreviewResolution().getWidth(),
                     invertPreviewSizes ? getPreviewResolution().getWidth() : getPreviewResolution().getHeight()
             );
 
-            mCameraParameters.setPreviewSize(
-                    getPreviewResolution().getWidth(),
-                    getPreviewResolution().getHeight()
-            );
-
             try {
                 mCamera.setParameters(mCameraParameters);
+                resolutionLess = mCameraParameters;
             } catch (Exception e) {
                 notifyErrorListener(e);
                 // Some phones can't set parameters that camerakit has chosen, so fallback to defaults
@@ -542,6 +574,7 @@ public class Camera1 extends CameraImpl {
 
             try {
                 mCamera.setParameters(mCameraParameters);
+                resolutionLess = mCameraParameters;
             } catch (Exception e) {
                 notifyErrorListener(e);
                 //Some phones can't set parameters that camerakit has chosen, so fallback to defaults

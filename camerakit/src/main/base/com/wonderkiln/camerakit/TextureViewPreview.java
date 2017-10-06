@@ -7,7 +7,6 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 @TargetApi(14)
 class TextureViewPreview extends PreviewImpl {
@@ -23,20 +22,20 @@ class TextureViewPreview extends PreviewImpl {
 
             @Override
             public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-                setSize(width, height);
-                dispatchSurfaceChanged();
             }
 
             @Override
             public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
                 setSize(width, height);
-                dispatchSurfaceChanged();
-                setTruePreviewSize(mTrueWidth, mTrueHeight);
+                if (width == getPreviewWidth() && height == getPreviewHeight()) {
+                    dispatchSurfaceChanged();
+                }
             }
 
             @Override
             public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
                 setSize(0, 0);
+                dispatchSurfaceChanged();
                 return true;
             }
 
@@ -44,11 +43,6 @@ class TextureViewPreview extends PreviewImpl {
             public void onSurfaceTextureUpdated(SurfaceTexture surface) {
             }
         });
-    }
-
-    @Override
-    void setCallback(Callback callback) {
-        super.setCallback(callback);
     }
 
     @Override
@@ -73,12 +67,7 @@ class TextureViewPreview extends PreviewImpl {
 
     @Override
     boolean isReady() {
-        return mTextureView.getSurfaceTexture() != null;
-    }
-
-    @Override
-    protected void dispatchSurfaceChanged() {
-        super.dispatchSurfaceChanged();
+        return getWidth() != 0 && getWidth() == getPreviewWidth() && getHeight() != 0 && getHeight() == getPreviewHeight();
     }
 
     @Override
@@ -88,8 +77,8 @@ class TextureViewPreview extends PreviewImpl {
 
     @TargetApi(15)
     @Override
-    void setTruePreviewSize(int width, int height) {
-        super.setTruePreviewSize(width, height);
+    void setPreviewParameters(int width, int height, int format) {
+        super.setPreviewParameters(width, height, format);
         if (mTextureView.getSurfaceTexture() != null) {
             mTextureView.getSurfaceTexture().setDefaultBufferSize(width, height);
         }

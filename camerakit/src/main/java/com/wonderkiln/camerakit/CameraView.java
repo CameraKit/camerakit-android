@@ -144,15 +144,15 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
 
         mCameraListener = new CameraListenerMiddleWare();
 
-        mPreviewImpl = new TextureViewPreview(context, this);
+        mPreviewImpl = new SurfaceViewPreview(context, this);
         mCameraImpl = new Camera1(mCameraListener, mPreviewImpl);
 
         mIsStarted = false;
 
         // Handle situations where there's only 1 camera & it's front facing OR it's a chromebook in laptop mode
-        WindowManager windowService = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
+        WindowManager windowService = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         boolean isChromebookInLaptopMode = (context.getPackageManager().hasSystemFeature("org.chromium.arc.device_management") && windowService.getDefaultDisplay().getRotation() == Surface.ROTATION_0);
-        if(mCameraImpl.frontCameraOnly() || isChromebookInLaptopMode){
+        if (mCameraImpl.frontCameraOnly() || isChromebookInLaptopMode) {
             mFacing = FACING_FRONT;
         }
 
@@ -196,10 +196,10 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
         super.onAttachedToWindow();
         if (!isInEditMode()) {
             mDisplayOrientationDetector.enable(
-                ViewCompat.isAttachedToWindow(this)
-                    ? DisplayManagerCompat.getInstance(getContext())
-                    .getDisplay(Display.DEFAULT_DISPLAY)
-                    : null
+                    ViewCompat.isAttachedToWindow(this)
+                            ? DisplayManagerCompat.getInstance(getContext())
+                            .getDisplay(Display.DEFAULT_DISPLAY)
+                            : null
             );
         }
     }
@@ -219,8 +219,8 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
             if (previewSize != null) {
                 if (getLayoutParams().width == LayoutParams.WRAP_CONTENT) {
                     int height = MeasureSpec.getSize(heightMeasureSpec);
-                    float ratio = (float) height / (float) previewSize.getWidth();
-                    int width = (int) (previewSize.getHeight() * ratio);
+                    float ratio = (float) height / (float) previewSize.getHeight();
+                    int width = (int) (previewSize.getWidth() * ratio);
                     super.onMeasure(
                             MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
                             heightMeasureSpec
@@ -228,8 +228,8 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
                     return;
                 } else if (getLayoutParams().height == LayoutParams.WRAP_CONTENT) {
                     int width = MeasureSpec.getSize(widthMeasureSpec);
-                    float ratio = (float) width / (float) previewSize.getHeight();
-                    int height = (int) (previewSize.getWidth() * ratio);
+                    float ratio = (float) width / (float) previewSize.getWidth();
+                    int height = (int) (previewSize.getHeight() * ratio);
                     super.onMeasure(
                             widthMeasureSpec,
                             MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY)
@@ -500,7 +500,7 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
 
             // Handle cameras that don't give us the correctly rotated/mirrored image, but instead just set the corresponding EXIF data.
             // Exif data is lost when we do a BitmapFactory.decodeByteArray, so need to correct image here.
-            if(ExifUtil.getExifOrientation(jpeg) != ExifInterface.ORIENTATION_NORMAL || mFacing == FACING_FRONT){
+            if (ExifUtil.getExifOrientation(jpeg) != ExifInterface.ORIENTATION_NORMAL || mFacing == FACING_FRONT) {
                 Bitmap bitmap = ExifUtil.decodeBitmapWithRotation(jpeg, mFacing == FACING_FRONT);
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 bitmap.compress(Bitmap.CompressFormat.JPEG, mJpegQuality, stream);
