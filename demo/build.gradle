@@ -7,8 +7,8 @@ android {
         applicationId 'com.wonderkiln.camerakit.demo'
         minSdkVersion 15
         targetSdkVersion 26
-        versionCode 4
-        versionName '1.0.3'
+        versionCode 1
+        versionName '1.0.0'
     }
     lintOptions {
         abortOnError false
