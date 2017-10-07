@@ -561,6 +561,18 @@ public class Camera1 extends CameraImpl {
         });
     }
 
+    private Camera.Parameters getCameraParameters() {
+        if (mCamera != null) {
+            try {
+                return mCamera.getParameters();
+            } catch (Exception e) {
+                return null;
+            }
+        }
+
+        return null;
+    }
+
     private void adjustCameraParameters() {
         synchronized (mCameraLock) {
             if (mShowingPreview) {
@@ -790,7 +802,9 @@ public class Camera1 extends CameraImpl {
                 if (event.getAction() == MotionEvent.ACTION_UP) {
                     synchronized (mCameraLock) {
                         if (mCamera != null) {
-                            Camera.Parameters parameters = mCamera.getParameters();
+                            Camera.Parameters parameters = getCameraParameters();
+                            if (parameters == null) return false;
+
                             String focusMode = parameters.getFocusMode();
                             Rect rect = calculateFocusArea(event.getX(), event.getY());
                             List<Camera.Area> meteringAreas = new ArrayList<>();
@@ -855,18 +869,20 @@ public class Camera1 extends CameraImpl {
             @Override
             public void run() {
                 synchronized (mCameraLock) {
-                    if (camera != null) {
-                        camera.cancelAutoFocus();
-                        Camera.Parameters params = camera.getParameters();
-                        if (params.getFocusMode() != Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE) {
-                            params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
-                            params.setFocusAreas(null);
-                            params.setMeteringAreas(null);
-                            camera.setParameters(params);
+                    if (mCamera != null) {
+                        mCamera.cancelAutoFocus();
+                        Camera.Parameters parameters = getCameraParameters();
+                        if (parameters == null) return;
+
+                        if (parameters.getFocusMode() != Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE) {
+                            parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+                            parameters.setFocusAreas(null);
+                            parameters.setMeteringAreas(null);
+                            mCamera.setParameters(parameters);
                         }
 
                         if (mAutofocusCallback != null) {
-                            mAutofocusCallback.onAutoFocus(success, camera);
+                            mAutofocusCallback.onAutoFocus(success, mCamera);
                         }
                     }
                 }
