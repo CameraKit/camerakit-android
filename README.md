@@ -23,7 +23,8 @@ With CameraKit you are able to seamlessly do the following...
 - Built-in tap to focus.
 - **Coming soon:** Built-in pinch to zoom.
 
-For more information go to https://www.camerakit.website
+See more here: https://www.camerakit.website
+For more detailed documentation: https://docs.camerakit.website
 
 ## Sponsors
 [![Expensify](.repo/expensify-logo.png)](https://www.expensify.com/)
