@@ -329,12 +329,13 @@ public class Camera1 extends CameraImpl {
         synchronized (mCameraLock) {
             try {
                 mMediaRecorder.stop();
-                mMediaRecorder.release();
-                mMediaRecorder = null;
-                mCamera.lock();
                 mCameraListener.onVideoTaken(mVideoFile);
             } catch (RuntimeException e) {
+                mVideoFile.delete();
                 mCameraListener.onVideoTaken(null);
+            } finally {
+                mMediaRecorder.release();
+                mMediaRecorder = null;
                 mCamera.lock();
             }
 
@@ -695,7 +696,7 @@ public class Camera1 extends CameraImpl {
             mMediaRecorder.setCamera(mCamera);
 
             mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-            mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
+            mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
 
             mMediaRecorder.setProfile(getCamcorderProfile(mVideoQuality));
 

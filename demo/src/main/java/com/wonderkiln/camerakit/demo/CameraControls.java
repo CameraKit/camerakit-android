@@ -3,7 +3,10 @@ package com.wonderkiln.camerakit.demo;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
@@ -13,9 +16,13 @@ import android.view.View;
 import android.view.animation.OvershootInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.wonderkiln.camerakit.CameraKit;
+import com.wonderkiln.camerakit.CameraListener;
 import com.wonderkiln.camerakit.CameraView;
+
+import java.io.File;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -34,6 +41,10 @@ public class CameraControls extends LinearLayout {
 
     @BindView(R.id.flashButton)
     ImageView flashButton;
+
+    private long captureDownTime;
+    private boolean pendingVideoCapture;
+    private boolean capturingVideo;
 
     public CameraControls(Context context) {
         this(context, null);
@@ -94,6 +105,65 @@ public class CameraControls extends LinearLayout {
     @OnTouch(R.id.captureButton)
     boolean onTouchCapture(View view, MotionEvent motionEvent) {
         handleViewTouchFeedback(view, motionEvent);
+        switch (motionEvent.getAction()) {
+            case MotionEvent.ACTION_DOWN: {
+                captureDownTime = System.currentTimeMillis();
+                pendingVideoCapture = true;
+                postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (pendingVideoCapture) {
+                            capturingVideo = true;
+                            cameraView.startRecordingVideo();
+                        }
+                    }
+                }, 250);
+                break;
+            }
+
+            case MotionEvent.ACTION_UP: {
+                pendingVideoCapture = false;
+
+                if (capturingVideo) {
+                    capturingVideo = false;
+                    cameraView.setCameraListener(new CameraListener() {
+                        @Override
+                        public void onVideoTaken(File video) {
+                            super.onVideoTaken(video);
+                            if (video != null) {
+                                Toast.makeText(getContext(), video.getAbsolutePath(), Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(getContext(), "failed", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                    cameraView.stopRecordingVideo();
+                } else {
+                    final long startTime = System.currentTimeMillis();
+                    cameraView.setCameraListener(new CameraListener() {
+                        @Override
+                        public void onPictureTaken(byte[] jpeg) {
+                            super.onPictureTaken(jpeg);
+                            long callbackTime = System.currentTimeMillis();
+                            Bitmap bitmap = BitmapFactory.decodeByteArray(jpeg, 0, jpeg.length);
+                            ResultHolder.dispose();
+                            ResultHolder.setImage(bitmap);
+//                        ResultHolder.setNativeCaptureSize(
+//                                captureModeRadioGroup.getCheckedRadioButtonId() == R.id.modeCaptureStandard ?
+//                                        camera.getCaptureSize() : camera.getPreviewSize()
+//                        );
+
+                            ResultHolder.setNativeCaptureSize(cameraView.getCaptureSize());
+                            ResultHolder.setTimeToCallback(callbackTime - startTime);
+                            Intent intent = new Intent(getContext(), PreviewActivity.class);
+                            getContext().startActivity(intent);
+                        }
+                    });
+                    cameraView.captureImage();
+                }
+                break;
+            }
+        }
         return true;
     }
 

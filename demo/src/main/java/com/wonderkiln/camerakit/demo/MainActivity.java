@@ -2,8 +2,6 @@ package com.wonderkiln.camerakit.demo;
 
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -204,28 +202,6 @@ public class MainActivity extends AppCompatActivity {
         };
 
         leftDrawer.setAdapter(adapter);
-    }
-
-    void capturePhoto() {
-        final long startTime = System.currentTimeMillis();
-        camera.setCameraListener(new CameraListener() {
-            @Override
-            public void onPictureTaken(byte[] jpeg) {
-                super.onPictureTaken(jpeg);
-                long callbackTime = System.currentTimeMillis();
-                Bitmap bitmap = BitmapFactory.decodeByteArray(jpeg, 0, jpeg.length);
-                ResultHolder.dispose();
-                ResultHolder.setImage(bitmap);
-//                ResultHolder.setNativeCaptureSize(
-//                        captureModeRadioGroup.getCheckedRadioButtonId() == R.id.modeCaptureStandard ?
-//                                camera.getCaptureSize() : camera.getPreviewSize()
-//                );
-                ResultHolder.setTimeToCallback(callbackTime - startTime);
-                Intent intent = new Intent(MainActivity.this, PreviewActivity.class);
-                startActivity(intent);
-            }
-        });
-        camera.captureImage();
     }
 
     void captureVideo() {

@@ -5,22 +5,20 @@ import android.support.annotation.Nullable;
 
 import com.wonderkiln.camerakit.Size;
 
-import java.lang.ref.WeakReference;
-
 public class ResultHolder {
 
-    private static WeakReference<Bitmap> image;
+    private static Bitmap image;
     private static Size nativeCaptureSize;
     private static long timeToCallback;
 
 
     public static void setImage(@Nullable Bitmap image) {
-        ResultHolder.image = image != null ? new WeakReference<>(image) : null;
+        ResultHolder.image = image;
     }
 
     @Nullable
     public static Bitmap getImage() {
-        return image != null ? image.get() : null;
+        return image;
     }
 
     public static void setNativeCaptureSize(@Nullable Size nativeCaptureSize) {

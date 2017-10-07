@@ -13,6 +13,7 @@
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginBottom="130dp"
             android:fadeScrollbars="false"
             android:scrollbarAlwaysDrawVerticalTrack="true">
 
@@ -25,7 +26,7 @@
                 <com.wonderkiln.camerakit.CameraView xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:id="@+id/camera"
                     android:layout_width="match_parent"
-                    android:layout_height="400dp"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:adjustViewBounds="true"
                     app:ckCropOutput="false"
@@ -33,7 +34,8 @@
                     app:ckFlash="off"
                     app:ckFocus="tapWithMarker"
                     app:ckJpegQuality="100"
-                    app:ckMethod="standard" />
+                    app:ckMethod="standard"
+                    app:ckVideoQuality="max2160p" />
 
             </LinearLayout>
 

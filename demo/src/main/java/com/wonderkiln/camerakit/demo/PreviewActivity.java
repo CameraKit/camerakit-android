@@ -1,9 +1,13 @@
 package com.wonderkiln.camerakit.demo;
 
-import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -13,7 +17,7 @@ import com.wonderkiln.camerakit.Size;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class PreviewActivity extends Activity {
+public class PreviewActivity extends AppCompatActivity {
 
     @BindView(R.id.image)
     ImageView imageView;
@@ -36,6 +40,8 @@ public class PreviewActivity extends Activity {
         setContentView(R.layout.activity_preview);
         ButterKnife.bind(this);
 
+        setupToolbar();
+
         Bitmap bitmap = ResultHolder.getImage();
         if (bitmap == null) {
             finish();
@@ -54,6 +60,18 @@ public class PreviewActivity extends Activity {
         actualResolution.setText(bitmap.getWidth() + " x " + bitmap.getHeight());
         approxUncompressedSize.setText(getApproximateFileMegabytes(bitmap) + "MB");
         captureLatency.setText(ResultHolder.getTimeToCallback() + " milliseconds");
+    }
+
+    private void setupToolbar() {
+        if (getSupportActionBar() != null) {
+            View toolbarView = getLayoutInflater().inflate(R.layout.action_bar, null, false);
+            TextView titleView = toolbarView.findViewById(R.id.toolbar_title);
+            titleView.setText(Html.fromHtml("<b>Camera</b>Kit"));
+
+            getSupportActionBar().setCustomView(toolbarView, new ActionBar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            getSupportActionBar().setDisplayShowCustomEnabled(true);
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        }
     }
 
     private static float getApproximateFileMegabytes(Bitmap bitmap) {
