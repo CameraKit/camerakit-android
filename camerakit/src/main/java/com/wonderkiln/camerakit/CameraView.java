@@ -144,7 +144,7 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
 
         mCameraListener = new CameraListenerMiddleWare();
 
-        mPreviewImpl = new TextureViewPreview(context, this);
+        mPreviewImpl = new SurfaceViewPreview(context, this);
         mCameraImpl = new Camera1(mCameraListener, mPreviewImpl);
 
         mIsStarted = false;
@@ -219,8 +219,8 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
             if (previewSize != null) {
                 if (getLayoutParams().width == LayoutParams.WRAP_CONTENT) {
                     int height = MeasureSpec.getSize(heightMeasureSpec);
-                    float ratio = (float) height / (float) previewSize.getWidth();
-                    int width = (int) (previewSize.getHeight() * ratio);
+                    float ratio = (float) height / (float) previewSize.getHeight();
+                    int width = (int) (previewSize.getWidth() * ratio);
                     super.onMeasure(
                             MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
                             heightMeasureSpec
@@ -228,8 +228,8 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
                     return;
                 } else if (getLayoutParams().height == LayoutParams.WRAP_CONTENT) {
                     int width = MeasureSpec.getSize(widthMeasureSpec);
-                    float ratio = (float) width / (float) previewSize.getHeight();
-                    int height = (int) (previewSize.getWidth() * ratio);
+                    float ratio = (float) width / (float) previewSize.getWidth();
+                    int height = (int) (previewSize.getHeight() * ratio);
                     super.onMeasure(
                             widthMeasureSpec,
                             MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY)

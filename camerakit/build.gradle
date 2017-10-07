@@ -1,19 +1,22 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.novoda.bintray-release'
 
 ext {
     PUBLISH_GROUP_ID = 'com.wonderkiln'
     PUBLISH_ARTIFACT_ID = 'camerakit'
-    PUBLISH_VERSION = '0.10.1'
+    PUBLISH_VERSION = '0.11.0'
 }
 
 android {
     compileSdkVersion 26
     buildToolsVersion '26.0.1'
-
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 26
         versionName project.ext.PUBLISH_VERSION
+    }
+    lintOptions {
+        abortOnError false
     }
     buildTypes {
         release {
@@ -37,6 +40,15 @@ dependencies {
     implementation 'android.arch.lifecycle:runtime:1.0.0'
     implementation 'android.arch.lifecycle:extensions:1.0.0-beta1'
     annotationProcessor 'android.arch.lifecycle:compiler:1.0.0-beta1'
+}
+
+publish {
+    userOrg = 'wonderkiln'
+    uploadName = 'CameraKit-Android'
+    groupId = project.ext.PUBLISH_GROUP_ID
+    artifactId = project.ext.PUBLISH_ARTIFACT_ID
+    version = project.ext.PUBLISH_VERSION
+    description = ''
 }
 
 apply from: 'https://raw.githubusercontent.com/blundell/release-android-library/master/android-release-aar.gradle'
