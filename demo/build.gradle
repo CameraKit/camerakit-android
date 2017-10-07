@@ -3,6 +3,9 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
+    lintOptions {
+        abortOnError false
+    }
     defaultConfig {
         applicationId "com.wonderkiln.camerakit.demo"
         minSdkVersion 15
@@ -10,6 +13,9 @@ android {
         versionCode 4
         versionName "1.0.3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    lintOptions {
+        abortOnError false
     }
     buildTypes {
         release {
