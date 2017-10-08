@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 echo "Checking branch = $CIRCLE_BRANCH and $CIRCLE_TAG and deploying if necessary."
 
