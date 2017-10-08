@@ -27,6 +27,6 @@ jobs:
           path: app/build/test-results
       - deploy:
           name: Deploy to Bintray
-          command: ./deploy.sh
+          command: sh ./deploy.sh
 
 
