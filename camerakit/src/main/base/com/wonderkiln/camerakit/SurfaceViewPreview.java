@@ -81,8 +81,13 @@ public class SurfaceViewPreview extends PreviewImpl {
     void setPreviewParameters(final int width, final int height, final int format) {
         super.setPreviewParameters(width, height, format);
         mContainer.setPreviewSize(new Size(width, height));
-        getSurfaceHolder().setFixedSize(getPreviewWidth(), getPreviewHeight());
-        getSurfaceHolder().setFormat(getPreviewFormat());
+        mContainer.post(new Runnable() {
+            @Override
+            public void run() {
+                getSurfaceHolder().setFixedSize(getPreviewWidth(), getPreviewHeight());
+                getSurfaceHolder().setFormat(getPreviewFormat());
+            }
+        });
     }
 
 }

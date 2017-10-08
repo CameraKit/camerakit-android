@@ -334,6 +334,14 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
         return mFacing;
     }
 
+    public boolean isFacingFront() {
+        return mFacing == CameraKit.Constants.FACING_FRONT;
+    }
+
+    public boolean isFacingBack() {
+        return mFacing == CameraKit.Constants.FACING_BACK;
+    }
+
     public void setFacing(@Facing final int facing) {
         this.mFacing = facing;
         sWorkerHandler.post(new Runnable() {

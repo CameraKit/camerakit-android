@@ -26,10 +26,7 @@ jobs:
       - store_test_results:
           path: app/build/test-results
       - deploy:
-          filters:
-            branches:
-              only: master
-            tags:
-              only: /^v.*/
-          command: ./gradlew clean build bintrayUpload -PbintrayUser=$BINTRAY_USER -PbintrayKey=$BINTRAY_KEY -PdryRun=false
+          name: Deploy to Bintray
+          command: bash ./deploy.sh
+
 

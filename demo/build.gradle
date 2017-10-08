@@ -1,18 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
-    lintOptions {
-        abortOnError false
-    }
+    compileSdkVersion 26
+    buildToolsVersion '26.0.1'
     defaultConfig {
-        applicationId "com.wonderkiln.camerakit.demo"
+        applicationId 'com.wonderkiln.camerakit.demo'
         minSdkVersion 15
-        targetSdkVersion 25
-        versionCode 4
-        versionName "1.0.3"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        targetSdkVersion 26
+        versionCode 1
+        versionName '1.0.0'
     }
     lintOptions {
         abortOnError false
@@ -27,7 +23,7 @@ android {
 
 dependencies {
     compile project(':camerakit')
-    compile 'com.android.support:appcompat-v7:25.2.0'
-    compile 'com.jakewharton:butterknife:8.4.0'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
+    compile 'com.android.support:appcompat-v7:26.1.0'
+    compile 'com.jakewharton:butterknife:8.6.0'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.6.0'
 }
