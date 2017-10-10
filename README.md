@@ -28,7 +28,36 @@ With CameraKit you are able to seamlessly do the following...
 - Built-in tap to focus.
 - **Coming soon:** Built-in pinch to zoom.
 
-## Documentation
+
+## Usage
+
+To use CameraKit, simply add a `CameraView` to your layout:
+
+```xml
+<com.wonderkiln.camerakit.CameraView
+    android:id="@+id/camera"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:adjustViewBounds="true" />
+```
+
+Make sure you override `onResume` and `onPause` in your activity, and make calls respectively to `CameraView.start()` and `CameraView.stop()`.
+
+```java
+@Override
+protected void onResume() {
+    super.onResume();
+    cameraView.start();
+}
+
+@Override
+protected void onPause() {
+    cameraView.stop();
+    super.onPause();
+}
+```
+
+## Detailed Documentation
 Tp check out detailed docs, visit our [Documentation Website](http://docs.camerakit.website)
 
 ## Sponsors
