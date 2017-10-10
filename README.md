@@ -58,7 +58,7 @@ protected void onPause() {
 ```
 
 ## Detailed Documentation
-Tp check out detailed docs, visit our [Documentation Website](http://docs.camerakit.website)
+To check out detailed docs, visit our [Documentation Website](http://docs.camerakit.website)
 
 ## Sponsors
 [![Expensify](.repo/expensify-logo.png)](https://www.expensify.com/)
