@@ -61,7 +61,7 @@ protected void onPause() {
 To check out detailed docs, visit our [Documentation Website](http://docs.camerakit.website)
 
 ## Sponsors
-[![Expensify](.repo/expensify-logo.png)](https://www.expensify.com/)
+<a href="https://www.expensify.com/"><img src=".repo/expensify-logo.png" width="150"></a>
 
 ## License
 CameraKit is [MIT License](https://github.com/wonderkiln/CameraKit-Android/blob/master/LICENSE)
