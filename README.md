@@ -29,6 +29,14 @@ With CameraKit you are able to seamlessly do the following...
 - **Coming soon:** Built-in pinch to zoom.
 
 
+## Setup
+Add __CameraKit__ to the dependencies block in your `app` level `build.gradle`:
+
+```groovy		
+compile 'com.wonderkiln:camerakit:0.11.0'		
+```		
+
+
 ## Usage
 
 To use CameraKit, simply add a `CameraView` to your layout:
@@ -58,10 +66,10 @@ protected void onPause() {
 ```
 
 ## Detailed Documentation
-Tp check out detailed docs, visit our [Documentation Website](http://docs.camerakit.website)
+To check out detailed docs, visit our [Documentation Website](http://docs.camerakit.website)
 
 ## Sponsors
-[![Expensify](.repo/expensify-logo.png)](https://www.expensify.com/)
+<a href="https://www.expensify.com/"><img src=".repo/expensify-logo.png" width="150"></a>
 
 ## License
 CameraKit is [MIT License](https://github.com/wonderkiln/CameraKit-Android/blob/master/LICENSE)

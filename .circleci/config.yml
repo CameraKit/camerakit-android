@@ -26,7 +26,7 @@ jobs:
       - store_test_results:
           path: app/build/test-results
       - deploy:
-          name: Deploy to Bintray
-          command: bash ./deploy.sh
+          name: Deploy Snapshot to Bintray
+          command: bash ./deploy-snapshot.sh
 
 
