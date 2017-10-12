@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -14,22 +15,19 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.util.Log;
-import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.wonderkiln.camerakit.CameraKit;
-import com.wonderkiln.camerakit.CameraListener;
 import com.wonderkiln.camerakit.CameraView;
 import com.wonderkiln.camerakit.ErrorListener;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,8 +50,10 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.camera)
     CameraView camera;
 
-    private int mCameraWidth;
-    private int mCameraHeight;
+    private ArrayAdapter drawerAdapter;
+
+    private int cameraMethod = CameraKit.Constants.METHOD_STANDARD;
+    private boolean cropOutput = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +63,8 @@ public class MainActivity extends AppCompatActivity {
 
         setupDrawerAndToolbar();
 
+        camera.setMethod(cameraMethod);
+        camera.setCropOutput(cropOutput);
         camera.setErrorListener(new ErrorListener() {
             @Override
             public void onError(Exception e) {
@@ -146,6 +148,15 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
     private void setupDrawerAndToolbar() {
         drawerToggle = new ActionBarDrawerToggle(
                 this,
@@ -162,6 +173,7 @@ public class MainActivity extends AppCompatActivity {
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
             }
+
         };
 
         drawerLayout.setDrawerListener(drawerToggle);
@@ -179,136 +191,98 @@ public class MainActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayShowTitleEnabled(false);
         }
 
-        final List<Pair<String, String>> options = new ArrayList<>();
-        options.add(new Pair<>("Demo Preview Scaling", "on"));
-        options.add(new Pair<>("Preview Size", "match_parent x wrap_content"));
-        options.add(new Pair<>("Capture Method", "preview frame"));
-        options.add(new Pair<>("Crop to Preview Frame", "on"));
+        final List<CameraSetting> options = new ArrayList<>();
+        options.add(captureMethodSetting);
+        options.add(cropSetting);
 
-        ArrayAdapter adapter = new ArrayAdapter<Pair<String, String>>(this, R.layout.drawer_list_item, R.id.text1, options) {
+        drawerAdapter = new ArrayAdapter<CameraSetting>(this, R.layout.drawer_list_item, R.id.text1, options) {
             @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
+            public View getView(final int position, View convertView, ViewGroup parent) {
                 View view = super.getView(position, convertView, parent);
                 TextView text1 = view.findViewById(R.id.text1);
                 text1.setTextColor(Color.WHITE);
 
-                TextView text2 = view.findViewById(R.id.text2);
+                final TextView text2 = view.findViewById(R.id.text2);
                 text2.setTextColor(Color.WHITE);
 
-                text1.setText(options.get(position).first);
-                text2.setText(options.get(position).second);
+                text1.setText(options.get(position).getTitle());
+                text2.setText(options.get(position).getValue());
+
                 return view;
             }
         };
 
-        leftDrawer.setAdapter(adapter);
-    }
-
-    void captureVideo() {
-        camera.setCameraListener(new CameraListener() {
+        leftDrawer.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onVideoTaken(File video) {
-                super.onVideoTaken(video);
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                options.get(i).toggle();
+                drawerAdapter.notifyDataSetChanged();
             }
         });
+        leftDrawer.setAdapter(drawerAdapter);
+    }
 
-        camera.startRecordingVideo();
-        camera.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                camera.stopRecordingVideo();
+    private static abstract class CameraSetting {
+
+        abstract String getTitle();
+        abstract String getValue();
+        abstract void toggle();
+
+    }
+
+    private CameraSetting captureMethodSetting = new CameraSetting() {
+        @Override
+        String getTitle() {
+            return "ckMethod";
+        }
+
+        @Override
+        String getValue() {
+            switch (cameraMethod) {
+                case CameraKit.Constants.METHOD_STANDARD: {
+                    return "standard";
+                }
+
+                case CameraKit.Constants.METHOD_STILL: {
+                    return "still";
+                }
+
+                default: return null;
             }
-        }, 3000);
-    }
-
-    void toggleCamera() {
-        switch (camera.toggleFacing()) {
-            case CameraKit.Constants.FACING_BACK:
-                Toast.makeText(this, "Switched to back camera!", Toast.LENGTH_SHORT).show();
-                break;
-
-            case CameraKit.Constants.FACING_FRONT:
-                Toast.makeText(this, "Switched to front camera!", Toast.LENGTH_SHORT).show();
-                break;
         }
-    }
 
-    void toggleFlash() {
-        switch (camera.toggleFlash()) {
-            case CameraKit.Constants.FLASH_ON:
-                Toast.makeText(this, "Flash on!", Toast.LENGTH_SHORT).show();
-                break;
+        @Override
+        void toggle() {
+            if (cameraMethod == CameraKit.Constants.METHOD_STANDARD) {
+                cameraMethod = CameraKit.Constants.METHOD_STILL;
+            } else {
+                cameraMethod = CameraKit.Constants.METHOD_STANDARD;
+            }
 
-            case CameraKit.Constants.FLASH_OFF:
-                Toast.makeText(this, "Flash off!", Toast.LENGTH_SHORT).show();
-                break;
-
-            case CameraKit.Constants.FLASH_AUTO:
-                Toast.makeText(this, "Flash auto!", Toast.LENGTH_SHORT).show();
-                break;
+            camera.setMethod(cameraMethod);
         }
-    }
+    };
 
+    private CameraSetting cropSetting = new CameraSetting() {
+        @Override
+        String getTitle() {
+            return "ckCropOutput";
+        }
 
-//    private void updateCamera(boolean updateWidth, boolean updateHeight) {
-//        ViewGroup.LayoutParams cameraLayoutParams = camera.getLayoutParams();
-//        int width = cameraLayoutParams.width;
-//        int height = cameraLayoutParams.height;
-//
-//        if (updateWidth) {
-//            switch (widthModeRadioGroup.getCheckedRadioButtonId()) {
-//                case R.id.widthCustom:
-//                    String widthInput = this.width.getText().toString();
-//                    if (widthInput.length() > 0) {
-//                        try {
-//                            width = Integer.valueOf(widthInput);
-//                        } catch (Exception e) {
-//
-//                        }
-//                    }
-//
-//                    break;
-//
-//                case R.id.widthWrapContent:
-//                    width = ViewGroup.LayoutParams.WRAP_CONTENT;
-//                    break;
-//
-//                case R.id.widthMatchParent:
-//                    width = ViewGroup.LayoutParams.MATCH_PARENT;
-//                    break;
-//            }
-//        }
-//
-//        if (updateHeight) {
-//            switch (heightModeRadioGroup.getCheckedRadioButtonId()) {
-//                case R.id.heightCustom:
-//                    String heightInput = this.height.getText().toString();
-//                    if (heightInput.length() > 0) {
-//                        try {
-//                            height = Integer.valueOf(heightInput);
-//                        } catch (Exception e) {
-//
-//                        }
-//                    }
-//                    break;
-//
-//                case R.id.heightWrapContent:
-//                    height = ViewGroup.LayoutParams.WRAP_CONTENT;
-//                    break;
-//
-//                case R.id.heightMatchParent:
-//                    height = parent.getHeight();
-//                    break;
-//            }
-//        }
-//
-//        cameraLayoutParams.width = width;
-//        cameraLayoutParams.height = height;
-//
-//        camera.addOnLayoutChangeListener(this);
-//        camera.setLayoutParams(cameraLayoutParams);
-//
-//        Toast.makeText(this, (updateWidth && updateHeight ? "Width and height" : updateWidth ? "Width" : "Height") + " updated!", Toast.LENGTH_SHORT).show();
-//    }
+        @Override
+        String getValue() {
+            if (cropOutput) {
+                return "true";
+            } else {
+                return "false";
+            }
+        }
+
+        @Override
+        void toggle() {
+            cropOutput = !cropOutput;
+            camera.setCropOutput(cropOutput);
+        }
+    };
 
 }
