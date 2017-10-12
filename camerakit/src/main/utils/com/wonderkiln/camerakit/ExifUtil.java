@@ -4,17 +4,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.support.media.ExifInterface;
-import android.util.Log;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
-//import android.media.ExifInterface;
-
-/**
- * Created by andrew on 2017-08-18.
- */
 
 public class ExifUtil {
 
@@ -29,7 +22,9 @@ public class ExifUtil {
     }
 
     public static Bitmap decodeBitmapWithRotation(byte[] picture, boolean frontFacing) {
-        Bitmap bitmap = BitmapFactory.decodeByteArray(picture, 0, picture.length);
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        Bitmap bitmap = BitmapFactory.decodeByteArray(picture, 0, picture.length, options);
         Matrix matrix = getBitmapRotation(picture, frontFacing);
         return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
     }

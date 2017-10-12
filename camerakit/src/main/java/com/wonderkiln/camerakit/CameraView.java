@@ -41,7 +41,6 @@ import static com.wonderkiln.camerakit.CameraKit.Constants.FLASH_AUTO;
 import static com.wonderkiln.camerakit.CameraKit.Constants.FLASH_OFF;
 import static com.wonderkiln.camerakit.CameraKit.Constants.FLASH_ON;
 import static com.wonderkiln.camerakit.CameraKit.Constants.FLASH_TORCH;
-import static com.wonderkiln.camerakit.CameraKit.Constants.METHOD_STANDARD;
 import static com.wonderkiln.camerakit.CameraKit.Constants.PERMISSIONS_LAZY;
 import static com.wonderkiln.camerakit.CameraKit.Constants.PERMISSIONS_PICTURE;
 import static com.wonderkiln.camerakit.CameraKit.Constants.PERMISSIONS_STRICT;
@@ -510,13 +509,11 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
             if (ExifUtil.getExifOrientation(jpeg) != ExifInterface.ORIENTATION_NORMAL || mFacing == FACING_FRONT) {
                 Bitmap bitmap = ExifUtil.decodeBitmapWithRotation(jpeg, mFacing == FACING_FRONT);
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.JPEG, mJpegQuality, stream);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
                 jpeg = stream.toByteArray();
             }
 
             if (mCropOutput) {
-                int width = mMethod == METHOD_STANDARD ? mCameraImpl.getCaptureResolution().getWidth() : mCameraImpl.getPreviewResolution().getWidth();
-                int height = mMethod == METHOD_STANDARD ? mCameraImpl.getCaptureResolution().getHeight() : mCameraImpl.getPreviewResolution().getHeight();
                 AspectRatio outputRatio = AspectRatio.of(getWidth(), getHeight());
                 getCameraListener().onPictureTaken(new CenterCrop(jpeg, outputRatio, mJpegQuality).getJpeg());
             } else {
