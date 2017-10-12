@@ -5,6 +5,7 @@ ext {
     PUBLISH_GROUP_ID = 'com.wonderkiln'
     PUBLISH_ARTIFACT_ID = 'camerakit'
     PUBLISH_VERSION = '0.11.2-SNAPSHOT'
+    REPO_NAME = 'snapshots'
 }
 
 android {
@@ -48,6 +49,7 @@ publish {
     groupId = project.ext.PUBLISH_GROUP_ID
     artifactId = project.ext.PUBLISH_ARTIFACT_ID
     version = project.ext.PUBLISH_VERSION
+    repoName = project.ext.REPO_NAME
     description = ''
 }
 
