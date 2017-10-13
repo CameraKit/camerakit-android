@@ -197,7 +197,7 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
         if (!isInEditMode()) {
             mDisplayOrientationDetector.enable(
                     ViewCompat.isAttachedToWindow(this)
-                            ? DisplayManagerCompat.getInstance(getContext())
+                            ? DisplayManagerCompat.getInstance(getContext().getApplicationContext())
                             .getDisplay(Display.DEFAULT_DISPLAY)
                             : null
             );
