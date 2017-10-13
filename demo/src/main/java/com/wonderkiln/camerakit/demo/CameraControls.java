@@ -16,7 +16,6 @@ import android.view.View;
 import android.view.animation.OvershootInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import com.wonderkiln.camerakit.CameraKit;
 import com.wonderkiln.camerakit.CameraListener;
@@ -131,9 +130,11 @@ public class CameraControls extends LinearLayout {
                         public void onVideoTaken(File video) {
                             super.onVideoTaken(video);
                             if (video != null) {
-                                Toast.makeText(getContext(), video.getAbsolutePath(), Toast.LENGTH_SHORT).show();
-                            } else {
-                                Toast.makeText(getContext(), "failed", Toast.LENGTH_SHORT).show();
+                                ResultHolder.dispose();
+                                ResultHolder.setVideo(video);
+                                ResultHolder.setNativeCaptureSize(cameraView.getCaptureSize());
+                                Intent intent = new Intent(getContext(), PreviewActivity.class);
+                                getContext().startActivity(intent);
                             }
                         }
                     });
@@ -266,6 +267,7 @@ public class CameraControls extends LinearLayout {
     }
 
     void changeViewImageResource(final ImageView imageView, @DrawableRes final int resId) {
+        imageView.setRotation(0);
         imageView.animate()
                 .rotationBy(360)
                 .setDuration(400)

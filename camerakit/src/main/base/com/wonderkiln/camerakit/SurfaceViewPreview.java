@@ -22,8 +22,8 @@ public class SurfaceViewPreview extends PreviewImpl {
         this.mParent = parent;
 
         final View view = View.inflate(context, R.layout.surface_view, parent);
-        mContainer = (SurfaceViewContainer) view.findViewById(R.id.surface_view_container);
-        mSurfaceView = (SurfaceView)  mContainer.findViewById(R.id.surface_view);
+        mContainer = view.findViewById(R.id.surface_view_container);
+        mSurfaceView = mContainer.findViewById(R.id.surface_view);
 
         final SurfaceHolder holder = mSurfaceView.getHolder();
         holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);

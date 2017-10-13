@@ -25,7 +25,7 @@
                 app:ckFocus="tapWithMarker"
                 app:ckJpegQuality="100"
                 app:ckMethod="standard"
-                app:ckVideoQuality="max2160p" />
+                app:ckVideoQuality="highest" />
 
         </FrameLayout>
 

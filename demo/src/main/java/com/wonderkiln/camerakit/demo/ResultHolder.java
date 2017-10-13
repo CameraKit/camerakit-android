@@ -5,9 +5,12 @@ import android.support.annotation.Nullable;
 
 import com.wonderkiln.camerakit.Size;
 
+import java.io.File;
+
 public class ResultHolder {
 
     private static Bitmap image;
+    private static File video;
     private static Size nativeCaptureSize;
     private static long timeToCallback;
 
@@ -19,6 +22,15 @@ public class ResultHolder {
     @Nullable
     public static Bitmap getImage() {
         return image;
+    }
+
+    public static void setVideo(@Nullable File video) {
+        ResultHolder.video = video;
+    }
+
+    @Nullable
+    public static File getVideo() {
+        return video;
     }
 
     public static void setNativeCaptureSize(@Nullable Size nativeCaptureSize) {
