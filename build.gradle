@@ -5,7 +5,8 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.0.0-beta6'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.2'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
     }
 }
 
@@ -18,8 +19,5 @@ allprojects {
         maven { url 'https://wonderkiln.bintray.com/snapshots' }
     }
     apply plugin: 'com.jfrog.bintray'
-}
-
-task clean(type: Delete) {
-    delete rootProject.buildDir
+    apply plugin: 'com.github.dcendents.android-maven'
 }
