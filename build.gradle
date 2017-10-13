@@ -5,15 +5,19 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.0.0-beta6'
-        classpath 'com.novoda:bintray-release:0.5.0'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.2'
     }
 }
+
+apply plugin: 'com.jfrog.bintray'
 
 allprojects {
     repositories {
         jcenter()
         maven { url 'https://maven.google.com' }
+        maven { url 'https://wonderkiln.bintray.com/snapshots' }
     }
+    apply plugin: 'com.jfrog.bintray'
 }
 
 task clean(type: Delete) {

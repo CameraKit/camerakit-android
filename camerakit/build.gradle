@@ -1,11 +1,9 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.novoda.bintray-release'
 
 ext {
     PUBLISH_GROUP_ID = 'com.wonderkiln'
     PUBLISH_ARTIFACT_ID = 'camerakit'
     PUBLISH_VERSION = '0.11.2-SNAPSHOT'
-    REPO_NAME = 'snapshots'
 }
 
 android {
@@ -43,14 +41,18 @@ dependencies {
     annotationProcessor 'android.arch.lifecycle:compiler:1.0.0-beta1'
 }
 
-publish {
-    userOrg = 'wonderkiln'
-    uploadName = 'CameraKit-Android'
-    groupId = project.ext.PUBLISH_GROUP_ID
-    artifactId = project.ext.PUBLISH_ARTIFACT_ID
-    version = project.ext.PUBLISH_VERSION
-    repoName = project.ext.REPO_NAME
-    description = ''
+bintray {
+    override = true
+    pkg {
+        repo = 'snapshots'
+        name = 'CameraKit-Android'
+        userOrg = 'wonderkiln'
+        publish = true
+
+        version {
+            name = project.ext.PUBLISH_VERSION
+        }
+    }
 }
 
 //apply from: 'https://raw.githubusercontent.com/blundell/release-android-library/master/android-release-aar.gradle'
