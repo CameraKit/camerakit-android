@@ -1,12 +1,9 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.novoda.bintray-release'
 
-ext {
-    PUBLISH_GROUP_ID = 'com.wonderkiln'
-    PUBLISH_ARTIFACT_ID = 'camerakit'
-    PUBLISH_VERSION = '0.11.2-SNAPSHOT'
-    REPO_NAME = 'snapshots'
-}
+def ver = '0.11.2-Snapshot'
+
+group = 'com.wonderkiln'
+version = ver
 
 android {
     compileSdkVersion 26
@@ -14,7 +11,7 @@ android {
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 26
-        versionName project.ext.PUBLISH_VERSION
+        versionName ver
     }
     lintOptions {
         abortOnError false
@@ -43,14 +40,30 @@ dependencies {
     annotationProcessor 'android.arch.lifecycle:compiler:1.0.0-beta1'
 }
 
-publish {
-    userOrg = 'wonderkiln'
-    uploadName = 'CameraKit-Android'
-    groupId = project.ext.PUBLISH_GROUP_ID
-    artifactId = project.ext.PUBLISH_ARTIFACT_ID
-    version = project.ext.PUBLISH_VERSION
-    repoName = project.ext.REPO_NAME
-    description = ''
+install {
+    repositories.mavenInstaller {
+        pom.project {
+            name 'CameraKit-Android'
+            packaging 'aar'
+        }
+    }
 }
 
-//apply from: 'https://raw.githubusercontent.com/blundell/release-android-library/master/android-release-aar.gradle'
+bintray {
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_KEY')
+    override = true
+    publish = true
+    configurations = ['archives']
+    pkg {
+        repo = 'snapshots'
+        name = 'CameraKit-Android'
+        userOrg = 'wonderkiln'
+        vcsUrl = 'https://github.com/wonderkiln/CameraKit-Android.git'
+        version {
+            name = ver
+            vcsTag = ver
+            released = new Date()
+        }
+    }
+}
