@@ -149,11 +149,6 @@ public class CameraControls extends LinearLayout {
                             Bitmap bitmap = BitmapFactory.decodeByteArray(jpeg, 0, jpeg.length);
                             ResultHolder.dispose();
                             ResultHolder.setImage(bitmap);
-//                        ResultHolder.setNativeCaptureSize(
-//                                captureModeRadioGroup.getCheckedRadioButtonId() == R.id.modeCaptureStandard ?
-//                                        camera.getCaptureSize() : camera.getPreviewSize()
-//                        );
-
                             ResultHolder.setNativeCaptureSize(cameraView.getCaptureSize());
                             ResultHolder.setTimeToCallback(callbackTime - startTime);
                             Intent intent = new Intent(getContext(), PreviewActivity.class);

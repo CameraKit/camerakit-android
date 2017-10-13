@@ -16,9 +16,6 @@ import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.VideoView;
 
-import com.wonderkiln.camerakit.AspectRatio;
-import com.wonderkiln.camerakit.Size;
-
 import java.io.File;
 
 import butterknife.BindView;
@@ -31,9 +28,6 @@ public class PreviewActivity extends AppCompatActivity {
 
     @BindView(R.id.video)
     VideoView videoView;
-
-    @BindView(R.id.nativeCaptureResolution)
-    TextView nativeCaptureResolution;
 
     @BindView(R.id.actualResolution)
     TextView actualResolution;
@@ -59,13 +53,6 @@ public class PreviewActivity extends AppCompatActivity {
             imageView.setVisibility(View.VISIBLE);
 
             imageView.setImageBitmap(bitmap);
-
-            Size captureSize = ResultHolder.getNativeCaptureSize();
-            if (captureSize != null) {
-                // Native sizes are landscape, hardcode flip because demo app forced to portrait.
-                AspectRatio aspectRatio = AspectRatio.of(captureSize.getHeight(), captureSize.getWidth());
-                nativeCaptureResolution.setText(captureSize.getHeight() + " x " + captureSize.getWidth() + " (" + aspectRatio.toString() + ")");
-            }
 
             actualResolution.setText(bitmap.getWidth() + " x " + bitmap.getHeight());
             approxUncompressedSize.setText(getApproximateFileMegabytes(bitmap) + "MB");
