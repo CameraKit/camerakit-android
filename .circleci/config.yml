@@ -28,3 +28,11 @@ jobs:
       - deploy:
           name: Deploy Snapshot to Bintray
           command: bash ./deploy.sh
+workflows:
+  version: 2
+  deploy_release:
+    jobs:
+      - deploy:
+        filters:
+          tags:
+             only: /^v.*/
