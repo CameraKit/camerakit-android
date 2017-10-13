@@ -2,7 +2,9 @@ package com.wonderkiln.camerakit;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.BitmapRegionDecoder;
 import android.graphics.Matrix;
+import android.graphics.Rect;
 import android.support.media.ExifInterface;
 
 import java.io.ByteArrayInputStream;
@@ -21,12 +23,19 @@ public class ExifUtil {
         return orientation;
     }
 
-    public static Bitmap decodeBitmapWithRotation(byte[] picture, boolean frontFacing) {
+    public static Bitmap decodeBitmapWithRotation(byte[] picture, boolean frontFacing) throws IOException {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
-        Bitmap bitmap = BitmapFactory.decodeByteArray(picture, 0, picture.length, options);
+        BitmapFactory.decodeByteArray(picture, 0, picture.length, options);
+        Bitmap bitmap = BitmapRegionDecoder.newInstance(
+                picture,
+                0,
+                picture.length,
+                true
+        ).decodeRegion(new Rect(0, 0, options.outWidth, options.outHeight), null);
+
         Matrix matrix = getBitmapRotation(picture, frontFacing);
-        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+        return Bitmap.createBitmap(bitmap, 0, 0, options.outWidth, options.outHeight, matrix, true);
     }
 
     public static Matrix getBitmapRotation(byte[] picture, boolean frontFacing) {
