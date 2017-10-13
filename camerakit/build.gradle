@@ -2,6 +2,10 @@ apply plugin: 'com.android.library'
 
 def ver = '0.11.2-Snapshot'
 
+def isSnapshot(version) {
+    return version.contains('-Snapshot') || System.getenv('CIRCLE_TAG') == null || System.getenv('CIRCLE_TAG').length() == 0
+}
+
 group = 'com.wonderkiln'
 version = ver
 
@@ -52,11 +56,11 @@ install {
 bintray {
     user = System.getenv('BINTRAY_USER')
     key = System.getenv('BINTRAY_KEY')
-    override = true
+    override = isSnapshot(ver)
     publish = true
     configurations = ['archives']
     pkg {
-        repo = 'snapshots'
+        repo = isSnapshot(ver) ? 'snapshots' : 'maven'
         name = 'CameraKit-Android'
         userOrg = 'wonderkiln'
         vcsUrl = 'https://github.com/wonderkiln/CameraKit-Android.git'
