@@ -213,10 +213,12 @@ public class CameraControls extends LinearLayout {
         handleViewTouchFeedback(view, motionEvent);
         switch (motionEvent.getAction()) {
             case MotionEvent.ACTION_UP: {
-                if (true) {
-                    changeViewImageResource((ImageView) view, R.drawable.ic_flash_off);
-                } else {
+                if (cameraView.getFlash() == CameraKit.Constants.FLASH_OFF) {
+                    cameraView.setFlash(CameraKit.Constants.FLASH_ON);
                     changeViewImageResource((ImageView) view, R.drawable.ic_flash_on);
+                } else {
+                    cameraView.setFlash(CameraKit.Constants.FLASH_OFF);
+                    changeViewImageResource((ImageView) view, R.drawable.ic_flash_off);
                 }
 
                 break;
