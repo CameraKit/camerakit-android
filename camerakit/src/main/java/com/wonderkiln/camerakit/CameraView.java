@@ -32,6 +32,7 @@ import android.widget.FrameLayout;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,7 +42,6 @@ import static com.wonderkiln.camerakit.CameraKit.Constants.FLASH_AUTO;
 import static com.wonderkiln.camerakit.CameraKit.Constants.FLASH_OFF;
 import static com.wonderkiln.camerakit.CameraKit.Constants.FLASH_ON;
 import static com.wonderkiln.camerakit.CameraKit.Constants.FLASH_TORCH;
-import static com.wonderkiln.camerakit.CameraKit.Constants.METHOD_STANDARD;
 import static com.wonderkiln.camerakit.CameraKit.Constants.PERMISSIONS_LAZY;
 import static com.wonderkiln.camerakit.CameraKit.Constants.PERMISSIONS_PICTURE;
 import static com.wonderkiln.camerakit.CameraKit.Constants.PERMISSIONS_STRICT;
@@ -508,15 +508,16 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
             // Handle cameras that don't give us the correctly rotated/mirrored image, but instead just set the corresponding EXIF data.
             // Exif data is lost when we do a BitmapFactory.decodeByteArray, so need to correct image here.
             if (ExifUtil.getExifOrientation(jpeg) != ExifInterface.ORIENTATION_NORMAL || mFacing == FACING_FRONT) {
-                Bitmap bitmap = ExifUtil.decodeBitmapWithRotation(jpeg, mFacing == FACING_FRONT);
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.JPEG, mJpegQuality, stream);
-                jpeg = stream.toByteArray();
+                try {
+                    Bitmap bitmap = ExifUtil.decodeBitmapWithRotation(jpeg, mFacing == FACING_FRONT);
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                    jpeg = stream.toByteArray();
+                } catch (IOException e) {
+                }
             }
 
             if (mCropOutput) {
-                int width = mMethod == METHOD_STANDARD ? mCameraImpl.getCaptureResolution().getWidth() : mCameraImpl.getPreviewResolution().getWidth();
-                int height = mMethod == METHOD_STANDARD ? mCameraImpl.getCaptureResolution().getHeight() : mCameraImpl.getPreviewResolution().getHeight();
                 AspectRatio outputRatio = AspectRatio.of(getWidth(), getHeight());
                 getCameraListener().onPictureTaken(new CenterCrop(jpeg, outputRatio, mJpegQuality).getJpeg());
             } else {
