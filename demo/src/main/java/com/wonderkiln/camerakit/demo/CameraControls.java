@@ -107,16 +107,16 @@ public class CameraControls extends LinearLayout {
         switch (motionEvent.getAction()) {
             case MotionEvent.ACTION_DOWN: {
                 captureDownTime = System.currentTimeMillis();
-//                pendingVideoCapture = true;
-//                postDelayed(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        if (pendingVideoCapture) {
-//                            capturingVideo = true;
-//                            cameraView.startRecordingVideo();
-//                        }
-//                    }
-//                }, 250);
+                pendingVideoCapture = true;
+                postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (pendingVideoCapture) {
+                            capturingVideo = true;
+                            cameraView.startRecordingVideo();
+                        }
+                    }
+                }, 250);
                 break;
             }
 

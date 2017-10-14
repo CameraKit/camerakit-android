@@ -12,7 +12,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.SurfaceHolder;
 import android.view.View;
 
 import java.io.File;
@@ -496,11 +495,7 @@ public class Camera1 extends CameraImpl {
     private void setupPreview() {
         synchronized (mCameraLock) {
             try {
-                if (mPreview.getOutputClass() == SurfaceHolder.class) {
-                    mCamera.setPreviewDisplay(mPreview.getSurfaceHolder());
-                } else {
-                    mCamera.setPreviewTexture(mPreview.getSurfaceTexture());
-                }
+                mCamera.setPreviewDisplay(mPreview.getSurfaceHolder());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
