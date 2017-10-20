@@ -26,7 +26,6 @@ public class SurfaceViewPreview extends PreviewImpl {
         mSurfaceView = mContainer.findViewById(R.id.surface_view);
 
         final SurfaceHolder holder = mSurfaceView.getHolder();
-        holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
         holder.addCallback(new SurfaceHolder.Callback() {
             @Override
@@ -85,7 +84,6 @@ public class SurfaceViewPreview extends PreviewImpl {
             @Override
             public void run() {
                 getSurfaceHolder().setFixedSize(getPreviewWidth(), getPreviewHeight());
-                getSurfaceHolder().setFormat(getPreviewFormat());
             }
         });
     }
