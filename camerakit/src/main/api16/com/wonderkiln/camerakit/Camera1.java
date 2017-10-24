@@ -695,8 +695,10 @@ public class Camera1 extends CameraImpl {
     private TreeSet<AspectRatio> findCommonAspectRatios(List<Camera.Size> previewSizes, List<Camera.Size> pictureSizes) {
         Set<AspectRatio> previewAspectRatios = new HashSet<>();
         for (Camera.Size size : previewSizes) {
-            if (size.width >= CameraKit.Internal.screenHeight && size.height >= CameraKit.Internal.screenWidth) {
-                previewAspectRatios.add(AspectRatio.of(size.width, size.height));
+            AspectRatio deviceRatio = AspectRatio.of(CameraKit.Internal.screenHeight, CameraKit.Internal.screenWidth);
+            AspectRatio previewRatio = AspectRatio.of(size.width, size.height);
+            if (deviceRatio.equals(previewRatio)) {
+                previewAspectRatios.add(previewRatio);
             }
         }
 
