@@ -33,7 +33,7 @@ With CameraKit you are able to seamlessly do the following...
 Add __CameraKit__ to the dependencies block in your `app` level `build.gradle`:
 
 ```groovy		
-compile 'com.wonderkiln:camerakit:0.11.0'		
+compile 'com.wonderkiln:camerakit:0.11.2'		
 ```		
 
 
