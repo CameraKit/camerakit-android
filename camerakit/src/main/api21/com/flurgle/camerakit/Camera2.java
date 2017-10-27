@@ -3,12 +3,12 @@ package com.flurgle.camerakit;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.ImageFormat;
+import android.hardware.Camera;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.params.StreamConfigurationMap;
-import android.hardware.Camera;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -44,12 +44,6 @@ class Camera2 extends CameraImpl {
     // CameraImpl:
 
     @Override
-    Camera getCamera() {
-        //this is just to satisfy abstract
-        return null;
-    }
-    
-    @Override
     void start() {
 
     }
@@ -57,6 +51,11 @@ class Camera2 extends CameraImpl {
     @Override
     void stop() {
 
+    }
+
+    @Override
+    Camera getCamera() {
+        return null;
     }
 
     @Override
@@ -123,11 +122,6 @@ class Camera2 extends CameraImpl {
 
     @Override
     void setZoom(@Zoom int zoom) {
-
-    }
-
-    @Override
-    void setVideoQuality(int videoQuality) {
 
     }
 
