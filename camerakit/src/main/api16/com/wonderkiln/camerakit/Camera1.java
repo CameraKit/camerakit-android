@@ -708,9 +708,21 @@ public class Camera1 extends CameraImpl {
         }
 
         TreeSet<AspectRatio> output = new TreeSet<>();
-        for (AspectRatio aspectRatio : previewAspectRatios) {
-            if (captureAspectRatios.contains(aspectRatio)) {
-                output.add(aspectRatio);
+        if (previewAspectRatios.size() == 0) {
+            // if no common aspect ratios
+            Camera.Size maxSize = previewSizes.get(0);
+            AspectRatio maxPreviewAspectRatio = AspectRatio.of(maxSize.width, maxSize.height);
+            for (AspectRatio aspectRatio : captureAspectRatios) {
+                if (aspectRatio.equals(maxPreviewAspectRatio)) {
+                    output.add(aspectRatio);
+                }
+            }
+        } else {
+            // if common aspect ratios exist
+            for (AspectRatio aspectRatio : previewAspectRatios) {
+                if (captureAspectRatios.contains(aspectRatio)) {
+                    output.add(aspectRatio);
+                }
             }
         }
 
