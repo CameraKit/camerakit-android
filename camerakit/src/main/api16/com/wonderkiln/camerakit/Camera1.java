@@ -695,8 +695,10 @@ public class Camera1 extends CameraImpl {
     private TreeSet<AspectRatio> findCommonAspectRatios(List<Camera.Size> previewSizes, List<Camera.Size> pictureSizes) {
         Set<AspectRatio> previewAspectRatios = new HashSet<>();
         for (Camera.Size size : previewSizes) {
-            if (size.width >= CameraKit.Internal.screenHeight && size.height >= CameraKit.Internal.screenWidth) {
-                previewAspectRatios.add(AspectRatio.of(size.width, size.height));
+            AspectRatio deviceRatio = AspectRatio.of(CameraKit.Internal.screenHeight, CameraKit.Internal.screenWidth);
+            AspectRatio previewRatio = AspectRatio.of(size.width, size.height);
+            if (deviceRatio.equals(previewRatio)) {
+                previewAspectRatios.add(previewRatio);
             }
         }
 
@@ -706,9 +708,21 @@ public class Camera1 extends CameraImpl {
         }
 
         TreeSet<AspectRatio> output = new TreeSet<>();
-        for (AspectRatio aspectRatio : previewAspectRatios) {
-            if (captureAspectRatios.contains(aspectRatio)) {
-                output.add(aspectRatio);
+        if (previewAspectRatios.size() == 0) {
+            // if no common aspect ratios
+            Camera.Size maxSize = previewSizes.get(0);
+            AspectRatio maxPreviewAspectRatio = AspectRatio.of(maxSize.width, maxSize.height);
+            for (AspectRatio aspectRatio : captureAspectRatios) {
+                if (aspectRatio.equals(maxPreviewAspectRatio)) {
+                    output.add(aspectRatio);
+                }
+            }
+        } else {
+            // if common aspect ratios exist
+            for (AspectRatio aspectRatio : previewAspectRatios) {
+                if (captureAspectRatios.contains(aspectRatio)) {
+                    output.add(aspectRatio);
+                }
             }
         }
 

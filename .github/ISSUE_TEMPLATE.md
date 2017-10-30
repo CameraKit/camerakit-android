@@ -22,7 +22,7 @@
   Now scroll below!
 -->
 
-### Have you read the [Contributing Guidelines](https://github.com/wonderkiln/CameraKit-Android/.github/CONTRIBUTING.md)?
+### Have you read the [Contributing Guidelines](.github/CONTRIBUTING.md)?
 
 (Write your answer here.)
 
