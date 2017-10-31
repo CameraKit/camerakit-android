@@ -3,7 +3,7 @@ jobs:
   build:
     working_directory: ~/camerakit-android
     docker:
-      - image: mwangijames/android-26-alpha-ndk
+      - image: dwillmc/android-27-alpha-ndk
     environment:
       JVM_OPTS: -Xmx3200m
     steps:
