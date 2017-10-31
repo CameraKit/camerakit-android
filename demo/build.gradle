@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion '26.0.2'
+    compileSdkVersion 27
+    buildToolsVersion '27.0.0'
     defaultConfig {
         applicationId 'com.wonderkiln.camerakit.demo'
         minSdkVersion 15
-        targetSdkVersion 26
+        targetSdkVersion 27
         versionCode 1
         versionName '1.0.0'
     }
@@ -21,9 +21,13 @@ android {
     }
 }
 
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
 dependencies {
-    compile project(':camerakit')
-    compile 'com.android.support:appcompat-v7:26.1.0'
+    compile group: 'com.wonderkiln', name:'camerakit', version:'0.11.3-Snapshot', changing: true
+    compile 'com.android.support:appcompat-v7:27.0.0'
     compile 'com.jakewharton:butterknife:8.6.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.6.0'
 }
