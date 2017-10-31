@@ -6,6 +6,7 @@ jobs:
       - image: circleci/android:api-25-alpha
     environment:
       JVM_OPTS: -Xmx3200m
+      ANDROID_NDK_HOME: ${ANDROID_NDK}
     steps:
       - checkout
       - restore_cache:
