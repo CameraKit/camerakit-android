@@ -33,6 +33,11 @@ android {
         main.java.srcDirs += 'src/main/types'
         main.java.srcDirs += 'src/main/utils'
     }
+    externalNativeBuild {
+        cmake {
+            path 'src/main/cpp/CMakeLists.txt'
+        }
+    }
 }
 
 dependencies {

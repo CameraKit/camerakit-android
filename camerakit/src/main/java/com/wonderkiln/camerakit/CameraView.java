@@ -512,38 +512,20 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
         @Override
         public void onPictureTaken(byte[] jpeg) {
             super.onPictureTaken(jpeg);
-
-            // Handle cameras that don't give us the correctly rotated/mirrored image, but instead just set the corresponding EXIF data.
-            // Exif data is lost when we do a BitmapFactory.decodeByteArray, so need to correct image here.
-            if (ExifUtil.getExifOrientation(jpeg) != ExifInterface.ORIENTATION_NORMAL || mFacing == FACING_FRONT) {
-                try {
-                    Bitmap bitmap = ExifUtil.decodeBitmapWithRotation(jpeg, mFacing == FACING_FRONT);
-                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-                    jpeg = stream.toByteArray();
-                } catch (IOException e) {
-                }
-            }
-
-            if (mCropOutput) {
-                AspectRatio outputRatio = AspectRatio.of(getWidth(), getHeight());
-                getCameraListener().onPictureTaken(new CenterCrop(jpeg, outputRatio, mJpegQuality).getJpeg());
-            } else {
-                getCameraListener().onPictureTaken(jpeg);
-            }
+            PostProcessor postProcessor = new PostProcessor(jpeg);
+            postProcessor.setJpegQuality(mJpegQuality);
+            postProcessor.setFacing(mFacing);
+            postProcessor.setMethod(mMethod);
+            if (mCropOutput) postProcessor.setCropOutput(AspectRatio.of(getWidth(), getHeight()));
+            getCameraListener().onPictureTaken(postProcessor.getJpeg());
         }
 
         @Override
         public void onPictureTaken(YuvImage yuv) {
             super.onPictureTaken(yuv);
-            if (mCropOutput) {
-                AspectRatio outputRatio = AspectRatio.of(getWidth(), getHeight());
-                getCameraListener().onPictureTaken(new CenterCrop(yuv, outputRatio, mJpegQuality).getJpeg());
-            } else {
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                yuv.compressToJpeg(new Rect(0, 0, yuv.getWidth(), yuv.getHeight()), mJpegQuality, out);
-                getCameraListener().onPictureTaken(out.toByteArray());
-            }
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            yuv.compressToJpeg(new Rect(0, 0, yuv.getWidth(), yuv.getHeight()), 100, out);
+            onPictureTaken(out.toByteArray());
         }
 
         @Override
@@ -558,8 +540,7 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
 
         @NonNull
         public CameraListener getCameraListener() {
-            return mCameraListener != null ? mCameraListener : new CameraListener() {
-            };
+            return mCameraListener != null ? mCameraListener : new CameraListener() {};
         }
 
     }
