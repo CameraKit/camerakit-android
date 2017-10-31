@@ -32,9 +32,9 @@ Java_com_wonderkiln_camerakit_BitmapOperation_jniRotateBitmap180(JNIEnv *env, jo
                                                                  jobject handle);
 JNIEXPORT void JNICALL
 Java_com_wonderkiln_camerakit_BitmapOperation_jniCropBitmap(JNIEnv *env, jobject obj,
-                                    jobject handle, uint32_t left,
-                                    uint32_t top, uint32_t right,
-                                    uint32_t bottom);
+                                                            jobject handle, uint32_t left,
+                                                            uint32_t top, uint32_t right,
+                                                            uint32_t bottom);
 JNIEXPORT void JNICALL
 Java_com_wonderkiln_camerakit_BitmapOperation_jniScaleNNBitmap(JNIEnv *env, jobject obj,
                                                                jobject handle, uint32_t newWidth,

@@ -53,9 +53,11 @@ public class PostProcessor {
         BitmapOperation bitmapOperation = new BitmapOperation(bitmap);
         new ExifPostProcessor(picture).apply(bitmapOperation);
 
-        if (facing == FACING_FRONT && method == METHOD_STANDARD) {
+        if (facing == FACING_FRONT) {
             bitmapOperation.flipBitmapHorizontal();
         }
+
+        bitmap = bitmapOperation.getBitmap();
 
         if (cropAspectRatio != null) {
             new CenterCrop(bitmap.getWidth(), bitmap.getHeight(), cropAspectRatio).apply(bitmapOperation);
