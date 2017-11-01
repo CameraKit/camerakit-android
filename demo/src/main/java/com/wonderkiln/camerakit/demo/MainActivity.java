@@ -14,7 +14,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,7 +25,6 @@ import android.widget.TextView;
 
 import com.wonderkiln.camerakit.CameraKit;
 import com.wonderkiln.camerakit.CameraView;
-import com.wonderkiln.camerakit.ErrorListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,17 +63,6 @@ public class MainActivity extends AppCompatActivity {
 
         camera.setMethod(cameraMethod);
         camera.setCropOutput(cropOutput);
-        camera.setErrorListener(new ErrorListener() {
-            @Override
-            public void onError(Exception e) {
-                Log.d("", e.getLocalizedMessage());
-            }
-
-            @Override
-            public void onEvent(String name, String details) {
-                Log.d("", name + " -> " + details);
-            }
-        });
     }
 
     @Override

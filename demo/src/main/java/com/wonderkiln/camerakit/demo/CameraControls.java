@@ -17,9 +17,12 @@ import android.view.animation.OvershootInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import com.wonderkiln.camerakit.CKEventCallback;
 import com.wonderkiln.camerakit.CameraKit;
-import com.wonderkiln.camerakit.CameraListener;
+import com.wonderkiln.camerakit.CKImage;
+import com.wonderkiln.camerakit.CKVideo;
 import com.wonderkiln.camerakit.CameraView;
+import com.wonderkiln.camerakit.OnCameraKitEvent;
 
 import java.io.File;
 
@@ -42,6 +45,7 @@ public class CameraControls extends LinearLayout {
     ImageView flashButton;
 
     private long captureDownTime;
+    private long captureStartTime;
     private boolean pendingVideoCapture;
     private boolean capturingVideo;
 
@@ -80,6 +84,7 @@ public class CameraControls extends LinearLayout {
             View view = getRootView().findViewById(cameraViewId);
             if (view instanceof CameraView) {
                 cameraView = (CameraView) view;
+                cameraView.bindCameraKitListener(this);
                 setFacingImageBasedOnCamera();
             }
         }
@@ -101,6 +106,32 @@ public class CameraControls extends LinearLayout {
         }
     }
 
+    //@OnCameraKitEvent(CKImage.class)
+    public void imageCaptured(CKImage image) {
+        byte[] jpeg = image.getJpeg();
+
+        long callbackTime = System.currentTimeMillis();
+        Bitmap bitmap = BitmapFactory.decodeByteArray(jpeg, 0, jpeg.length);
+        ResultHolder.dispose();
+        ResultHolder.setImage(bitmap);
+        ResultHolder.setNativeCaptureSize(cameraView.getCaptureSize());
+        ResultHolder.setTimeToCallback(callbackTime - captureStartTime);
+        Intent intent = new Intent(getContext(), PreviewActivity.class);
+        getContext().startActivity(intent);
+    }
+
+    @OnCameraKitEvent(CKVideo.class)
+    public void videoCaptured(CKVideo video) {
+        File videoFile = video.getVideoFile();
+        if (videoFile != null) {
+            ResultHolder.dispose();
+            ResultHolder.setVideo(videoFile);
+            ResultHolder.setNativeCaptureSize(cameraView.getCaptureSize());
+            Intent intent = new Intent(getContext(), PreviewActivity.class);
+            getContext().startActivity(intent);
+        }
+    }
+
     @OnTouch(R.id.captureButton)
     boolean onTouchCapture(View view, MotionEvent motionEvent) {
         handleViewTouchFeedback(view, motionEvent);
@@ -113,7 +144,7 @@ public class CameraControls extends LinearLayout {
                     public void run() {
                         if (pendingVideoCapture) {
                             capturingVideo = true;
-                            cameraView.startRecordingVideo();
+                            cameraView.captureVideo();
                         }
                     }
                 }, 250);
@@ -125,37 +156,15 @@ public class CameraControls extends LinearLayout {
 
                 if (capturingVideo) {
                     capturingVideo = false;
-                    cameraView.setCameraListener(new CameraListener() {
-                        @Override
-                        public void onVideoTaken(File video) {
-                            super.onVideoTaken(video);
-                            if (video != null) {
-                                ResultHolder.dispose();
-                                ResultHolder.setVideo(video);
-                                ResultHolder.setNativeCaptureSize(cameraView.getCaptureSize());
-                                Intent intent = new Intent(getContext(), PreviewActivity.class);
-                                getContext().startActivity(intent);
-                            }
-                        }
-                    });
-                    cameraView.stopRecordingVideo();
+                    cameraView.stopVideo();
                 } else {
-                    final long startTime = System.currentTimeMillis();
-                    cameraView.setCameraListener(new CameraListener() {
+                    captureStartTime = System.currentTimeMillis();
+                    cameraView.captureImage(new CKEventCallback<CKImage>() {
                         @Override
-                        public void onPictureTaken(byte[] jpeg) {
-                            super.onPictureTaken(jpeg);
-                            long callbackTime = System.currentTimeMillis();
-                            Bitmap bitmap = BitmapFactory.decodeByteArray(jpeg, 0, jpeg.length);
-                            ResultHolder.dispose();
-                            ResultHolder.setImage(bitmap);
-                            ResultHolder.setNativeCaptureSize(cameraView.getCaptureSize());
-                            ResultHolder.setTimeToCallback(callbackTime - startTime);
-                            Intent intent = new Intent(getContext(), PreviewActivity.class);
-                            getContext().startActivity(intent);
+                        public void callback(CKImage event) {
+                            imageCaptured(event);
                         }
                     });
-                    cameraView.captureImage();
                 }
                 break;
             }

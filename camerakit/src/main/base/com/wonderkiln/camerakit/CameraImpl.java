@@ -1,14 +1,17 @@
 package com.wonderkiln.camerakit;
 
+import android.graphics.YuvImage;
 import android.support.annotation.Nullable;
+
+import java.io.File;
 
 abstract class CameraImpl {
 
-    protected final CameraListener mCameraListener;
+    protected final EventDispatcher mEventDispatcher;
     protected final PreviewImpl mPreview;
 
-    CameraImpl(CameraListener callback, PreviewImpl preview) {
-        mCameraListener = callback;
+    CameraImpl(EventDispatcher eventDispatcher, PreviewImpl preview) {
+        mEventDispatcher = eventDispatcher;
         mPreview = preview;
     }
 
@@ -20,22 +23,29 @@ abstract class CameraImpl {
     abstract void setFacing(@Facing int facing);
     abstract void setFlash(@Flash int flash);
     abstract void setFocus(@Focus int focus);
-    abstract void setMethod(@Method int method);
+    abstract void setMethod(@CaptureMethod int method);
     abstract void setZoom(@Zoom int zoom);
     abstract void setVideoQuality(@VideoQuality int videoQuality);
     abstract void setVideoBitRate(int videoBitRate);
 
-    abstract void captureImage();
-    abstract void startVideo();
-    abstract void endVideo();
+    abstract void captureImage(ImageCapturedCallback callback);
+    interface ImageCapturedCallback {
+        void imageCaptured(byte[] jpeg);
+        void imageCaptured(YuvImage yuvImage);
+    }
+
+    abstract void captureVideo(VideoCapturedCallback callback);
+    interface VideoCapturedCallback {
+        void videoCaptured(File file);
+    }
+
+    abstract void stopVideo();
 
     abstract Size getCaptureResolution();
     abstract Size getVideoResolution();
     abstract Size getPreviewResolution();
     abstract boolean isCameraOpened();
     abstract boolean frontCameraOnly();
-
-    abstract void setErrorListener(ErrorListener listener);
 
     @Nullable
     abstract CameraProperties getCameraProperties();

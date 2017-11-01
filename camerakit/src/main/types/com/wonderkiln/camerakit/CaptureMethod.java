@@ -10,5 +10,5 @@ import static com.wonderkiln.camerakit.CameraKit.Constants.METHOD_STILL;
 
 @Retention(RetentionPolicy.SOURCE)
 @IntDef({METHOD_STANDARD, METHOD_STILL})
-public @interface Method {
+public @interface CaptureMethod {
 }

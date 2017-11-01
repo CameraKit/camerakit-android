@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import static com.wonderkiln.camerakit.CameraKit.Constants.FACING_FRONT;
-import static com.wonderkiln.camerakit.CameraKit.Constants.METHOD_STANDARD;
 
 public class PostProcessor {
 

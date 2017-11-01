@@ -65,7 +65,7 @@ public class Camera1 extends CameraImpl {
     @Focus
     private int mFocus;
 
-    @Method
+    @CaptureMethod
     private int mMethod;
 
     @Zoom
@@ -79,13 +79,12 @@ public class Camera1 extends CameraImpl {
     private Handler mainHandler = new Handler(Looper.getMainLooper());
     private Handler mHandler = new Handler();
 
+    private VideoCapturedCallback mVideoCallback;
+
     private final Object mCameraLock = new Object();
 
-    @Nullable
-    private ErrorListener mErrorListener;
-
-    Camera1(CameraListener callback, PreviewImpl preview) {
-        super(callback, preview);
+    Camera1(EventDispatcher eventDispatcher, PreviewImpl preview) {
+        super(eventDispatcher, preview);
         preview.setCallback(new PreviewImpl.Callback() {
             @Override
             public void onSurfaceChanged() {
@@ -246,7 +245,7 @@ public class Camera1 extends CameraImpl {
     }
 
     @Override
-    void setMethod(@Method int method) {
+    void setMethod(@CaptureMethod int method) {
         this.mMethod = method;
     }
 
@@ -266,7 +265,7 @@ public class Camera1 extends CameraImpl {
     }
 
     @Override
-    void captureImage() {
+    void captureImage(final ImageCapturedCallback callback) {
         switch (mMethod) {
             case METHOD_STANDARD:
                 synchronized (mCameraLock) {
@@ -285,7 +284,7 @@ public class Camera1 extends CameraImpl {
                                 new Camera.PictureCallback() {
                                     @Override
                                     public void onPictureTaken(byte[] data, Camera camera) {
-                                        mCameraListener.onPictureTaken(data);
+                                        callback.imageCaptured(data);
 
                                         // Reset capturing state to allow photos to be taken
                                         capturingImage = false;
@@ -316,7 +315,7 @@ public class Camera1 extends CameraImpl {
                             new Thread(new ProcessStillTask(data, camera, calculateCaptureRotation(), new ProcessStillTask.OnStillProcessedListener() {
                                 @Override
                                 public void onStillProcessed(final YuvImage yuv) {
-                                    mCameraListener.onPictureTaken(yuv);
+                                    callback.imageCaptured(yuv);
                                 }
                             })).start();
                         }
@@ -327,12 +326,13 @@ public class Camera1 extends CameraImpl {
     }
 
     @Override
-    void startVideo() {
+    void captureVideo(VideoCapturedCallback callback) {
         synchronized (mCameraLock) {
             try {
                 if (prepareMediaRecorder()) {
                     mMediaRecorder.start();
                     mRecording = true;
+                    this.mVideoCallback = callback;
                 } else {
                     releaseMediaRecorder();
                 }
@@ -345,14 +345,17 @@ public class Camera1 extends CameraImpl {
     }
 
     @Override
-    void endVideo() {
+    void stopVideo() {
         synchronized (mCameraLock) {
             if (mRecording) {
                 File videoFile = getVideoFile();
 
                 try {
                     mMediaRecorder.stop();
-                    mCameraListener.onVideoTaken(videoFile);
+                    if (this.mVideoCallback != null) {
+                        mVideoCallback.videoCaptured(videoFile);
+                        mVideoCallback = null;
+                    }
                 } catch (RuntimeException e) {
                     videoFile.delete();
                 }
@@ -473,10 +476,6 @@ public class Camera1 extends CameraImpl {
         return isFrontCameraOnly;
     }
 
-    void setErrorListener(ErrorListener listener) {
-        mErrorListener = listener;
-    }
-
     @Nullable
     @Override
     CameraProperties getCameraProperties() {
@@ -497,7 +496,7 @@ public class Camera1 extends CameraImpl {
             collectCameraProperties();
             adjustCameraParameters();
 
-            mCameraListener.onCameraOpened();
+            mEventDispatcher.dispatch(new CKEvent(CKEvent.TYPE_CAMERA_OPEN));
         }
     }
 
@@ -522,7 +521,8 @@ public class Camera1 extends CameraImpl {
                 mPreviewSize = null;
                 mCaptureSize = null;
                 mVideoSize = null;
-                mCameraListener.onCameraClosed();
+
+                mEventDispatcher.dispatch(new CKEvent(CKEvent.TYPE_CAMERA_CLOSE));
             }
         }
     }
@@ -555,30 +555,15 @@ public class Camera1 extends CameraImpl {
         return captureRotation;
     }
 
-    private void notifyErrorListener(@NonNull final String name, @NonNull final String details) {
-        if (mErrorListener == null) {
-            return;
-        }
-
-        mainHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                mErrorListener.onEvent(name, details);
-            }
-        });
+    private void notifyErrorListener(@NonNull final String details) {
+        CKError error = new CKError();
+        error.setMessage(details);
+        mEventDispatcher.dispatch(error);
     }
 
     private void notifyErrorListener(@NonNull final Exception e) {
-        if (mErrorListener == null) {
-            return;
-        }
-
-        mainHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                mErrorListener.onError(e);
-            }
-        });
+        CKError error = new CKError(e);
+        mEventDispatcher.dispatch(error);
     }
 
     private Camera.Parameters getCameraParameters() {
@@ -670,7 +655,7 @@ public class Camera1 extends CameraImpl {
         try {
             setFlash(mFlash);
         } catch (Exception e) {
-            notifyErrorListener("setFlash", e.getLocalizedMessage());
+            notifyErrorListener(e);
         }
 
         mCamera.setParameters(mCameraParameters);
@@ -682,7 +667,7 @@ public class Camera1 extends CameraImpl {
                 e.printStackTrace();
             }
 
-            notifyErrorListener("retryAdjustParam", "Failed, try: " + currentTry);
+            notifyErrorListener(String.format("retryAdjustParam Failed, attempt #: %d", currentTry));
             adjustCameraParameters(currentTry + 1);
         }
     }

@@ -10,14 +10,12 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
-import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.media.ExifInterface;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.hardware.display.DisplayManagerCompat;
@@ -32,7 +30,6 @@ import android.widget.FrameLayout;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,20 +43,6 @@ import static com.wonderkiln.camerakit.CameraKit.Constants.PERMISSIONS_LAZY;
 import static com.wonderkiln.camerakit.CameraKit.Constants.PERMISSIONS_PICTURE;
 import static com.wonderkiln.camerakit.CameraKit.Constants.PERMISSIONS_STRICT;
 
-/**
- * The CameraView implements the LifecycleObserver interface for ease of use. To take advantage of
- * this, simply call the following from any LifecycleOwner:
- * <pre>
- * {@code
- * protected void onCreate(@Nullable Bundle savedInstanceState) {
- *     super.onCreate(savedInstanceState);
- *     setContentView(R.layout.my_view);
- *     ...
- *     getLifecycle().addObserver(mCameraView);
- * }
- * }
- * </pre>
- */
 public class CameraView extends FrameLayout implements LifecycleObserver {
 
     private static Handler sWorkerHandler;
@@ -82,7 +65,7 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
     @Focus
     private int mFocus;
 
-    @Method
+    @CaptureMethod
     private int mMethod;
 
     @Zoom
@@ -98,7 +81,6 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
     private boolean mCropOutput;
 
     private boolean mAdjustViewBounds;
-    private CameraListenerMiddleWare mCameraListener;
 
     private DisplayOrientationDetector mDisplayOrientationDetector;
     private CameraImpl mCameraImpl;
@@ -107,6 +89,8 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
 
     private Lifecycle mLifecycle;
     private boolean mIsStarted;
+
+    private EventDispatcher mEventDispatcher;
 
     public CameraView(@NonNull Context context) {
         super(context, null);
@@ -144,10 +128,10 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
             }
         }
 
-        mCameraListener = new CameraListenerMiddleWare();
+        mEventDispatcher = new EventDispatcher();
 
         mPreviewImpl = new SurfaceViewPreview(context, this);
-        mCameraImpl = new Camera1(mCameraListener, mPreviewImpl);
+        mCameraImpl = new Camera1(mEventDispatcher, mPreviewImpl);
 
         mIsStarted = false;
 
@@ -375,7 +359,7 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
         mCameraImpl.setFocus(mFocus);
     }
 
-    public void setMethod(@Method int method) {
+    public void setMethod(@CaptureMethod int method) {
         this.mMethod = method;
         mCameraImpl.setMethod(mMethod);
     }
@@ -442,20 +426,51 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
         return mFlash;
     }
 
-    public void setCameraListener(CameraListener cameraListener) {
-        this.mCameraListener.setCameraListener(cameraListener);
-    }
-
     public void captureImage() {
-        mCameraImpl.captureImage();
+        captureImage(null);
     }
 
-    public void startRecordingVideo() {
-        mCameraImpl.startVideo();
+    public void captureImage(final CKEventCallback<CKImage> callback) {
+        mCameraImpl.captureImage(new CameraImpl.ImageCapturedCallback() {
+            @Override
+            public void imageCaptured(byte[] jpeg) {
+                PostProcessor postProcessor = new PostProcessor(jpeg);
+                postProcessor.setJpegQuality(mJpegQuality);
+                postProcessor.setFacing(mFacing);
+                postProcessor.setMethod(mMethod);
+                if (mCropOutput) postProcessor.setCropOutput(AspectRatio.of(getWidth(), getHeight()));
+
+                CKImage image = new CKImage(postProcessor.getJpeg());
+                if (callback != null) callback.callback(image);
+                mEventDispatcher.dispatch(image);
+            }
+
+            @Override
+            public void imageCaptured(YuvImage yuvImage) {
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                yuvImage.compressToJpeg(new Rect(0, 0, yuvImage.getWidth(), yuvImage.getHeight()), 100, out);
+                imageCaptured(out.toByteArray());
+            }
+        });
     }
 
-    public void stopRecordingVideo() {
-        mCameraImpl.endVideo();
+    public void captureVideo() {
+        captureVideo(null);
+    }
+
+    public void captureVideo(final CKEventCallback<CKVideo> callback) {
+        mCameraImpl.captureVideo(new CameraImpl.VideoCapturedCallback() {
+            @Override
+            public void videoCaptured(File file) {
+                CKVideo video = new CKVideo(file);
+                if (callback != null) callback.callback(video);
+                mEventDispatcher.dispatch(video);
+            }
+        });
+    }
+
+    public void stopVideo() {
+        mCameraImpl.stopVideo();
     }
 
     public Size getPreviewSize() {
@@ -488,61 +503,12 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
         }
     }
 
-    public void setErrorListener(ErrorListener listener) {
-        mCameraImpl.setErrorListener(listener);
+    public void addCameraKitListener(CKEventListener CKEventListener) {
+        mEventDispatcher.addListener(CKEventListener);
     }
 
-    private class CameraListenerMiddleWare extends CameraListener {
-
-        private CameraListener mCameraListener;
-
-        @Override
-        public void onCameraOpened() {
-            super.onCameraOpened();
-
-            getCameraListener().onCameraOpened();
-        }
-
-        @Override
-        public void onCameraClosed() {
-            super.onCameraClosed();
-            getCameraListener().onCameraClosed();
-        }
-
-        @Override
-        public void onPictureTaken(byte[] jpeg) {
-            super.onPictureTaken(jpeg);
-            PostProcessor postProcessor = new PostProcessor(jpeg);
-            postProcessor.setJpegQuality(mJpegQuality);
-            postProcessor.setFacing(mFacing);
-            postProcessor.setMethod(mMethod);
-            if (mCropOutput) postProcessor.setCropOutput(AspectRatio.of(getWidth(), getHeight()));
-            getCameraListener().onPictureTaken(postProcessor.getJpeg());
-        }
-
-        @Override
-        public void onPictureTaken(YuvImage yuv) {
-            super.onPictureTaken(yuv);
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            yuv.compressToJpeg(new Rect(0, 0, yuv.getWidth(), yuv.getHeight()), 100, out);
-            onPictureTaken(out.toByteArray());
-        }
-
-        @Override
-        public void onVideoTaken(File video) {
-            super.onVideoTaken(video);
-            getCameraListener().onVideoTaken(video);
-        }
-
-        public void setCameraListener(@Nullable CameraListener cameraListener) {
-            this.mCameraListener = cameraListener;
-        }
-
-        @NonNull
-        public CameraListener getCameraListener() {
-            return mCameraListener != null ? mCameraListener : new CameraListener() {};
-        }
-
+    public void bindCameraKitListener(Object object) {
+        mEventDispatcher.addBinding(object);
     }
 
 }
