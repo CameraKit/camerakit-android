@@ -18,7 +18,6 @@ public class PostProcessor {
     private byte[] picture;
     private int jpegQuality;
     private int facing;
-    private int method;
     private AspectRatio cropAspectRatio;
 
     public PostProcessor(byte[] picture) {
@@ -31,10 +30,6 @@ public class PostProcessor {
 
     public void setFacing(int facing) {
         this.facing = facing;
-    }
-
-    public void setMethod(int method) {
-        this.method = method;
     }
 
     public void setCropOutput(AspectRatio aspectRatio) {

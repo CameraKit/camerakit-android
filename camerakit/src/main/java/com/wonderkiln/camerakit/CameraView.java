@@ -437,7 +437,6 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
                 PostProcessor postProcessor = new PostProcessor(jpeg);
                 postProcessor.setJpegQuality(mJpegQuality);
                 postProcessor.setFacing(mFacing);
-                postProcessor.setMethod(mMethod);
                 if (mCropOutput) postProcessor.setCropOutput(AspectRatio.of(getWidth(), getHeight()));
 
                 CKImage image = new CKImage(postProcessor.getJpeg());
