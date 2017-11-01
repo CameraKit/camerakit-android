@@ -8,5 +8,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface OnCameraKitEvent {
-    Class<? extends CKEvent> value() default CKEvent.class;
+    Class<? extends CameraKitEvent> value() default CameraKitEvent.class;
 }

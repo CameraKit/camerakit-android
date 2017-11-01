@@ -17,10 +17,10 @@ import android.view.animation.OvershootInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-import com.wonderkiln.camerakit.CKEventCallback;
+import com.wonderkiln.camerakit.CameraKitEventCallback;
 import com.wonderkiln.camerakit.CameraKit;
-import com.wonderkiln.camerakit.CKImage;
-import com.wonderkiln.camerakit.CKVideo;
+import com.wonderkiln.camerakit.CameraKitImage;
+import com.wonderkiln.camerakit.CameraKitVideo;
 import com.wonderkiln.camerakit.CameraView;
 import com.wonderkiln.camerakit.OnCameraKitEvent;
 
@@ -106,8 +106,8 @@ public class CameraControls extends LinearLayout {
         }
     }
 
-    //@OnCameraKitEvent(CKImage.class)
-    public void imageCaptured(CKImage image) {
+    //@OnCameraKitEvent(CameraKitImage.class)
+    public void imageCaptured(CameraKitImage image) {
         byte[] jpeg = image.getJpeg();
 
         long callbackTime = System.currentTimeMillis();
@@ -120,8 +120,8 @@ public class CameraControls extends LinearLayout {
         getContext().startActivity(intent);
     }
 
-    @OnCameraKitEvent(CKVideo.class)
-    public void videoCaptured(CKVideo video) {
+    @OnCameraKitEvent(CameraKitVideo.class)
+    public void videoCaptured(CameraKitVideo video) {
         File videoFile = video.getVideoFile();
         if (videoFile != null) {
             ResultHolder.dispose();
@@ -159,9 +159,9 @@ public class CameraControls extends LinearLayout {
                     cameraView.stopVideo();
                 } else {
                     captureStartTime = System.currentTimeMillis();
-                    cameraView.captureImage(new CKEventCallback<CKImage>() {
+                    cameraView.captureImage(new CameraKitEventCallback<CameraKitImage>() {
                         @Override
-                        public void callback(CKImage event) {
+                        public void callback(CameraKitImage event) {
                             imageCaptured(event);
                         }
                     });

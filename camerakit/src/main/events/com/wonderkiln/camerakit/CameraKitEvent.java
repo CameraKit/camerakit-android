@@ -2,9 +2,9 @@ package com.wonderkiln.camerakit;
 
 import android.support.annotation.NonNull;
 
-public class CKEvent {
+public class CameraKitEvent {
 
-    public static final String TYPE_ERROR = "CKError";
+    public static final String TYPE_ERROR = "CameraKitError";
 
     public static final String TYPE_CAMERA_OPEN = "CKCameraOpenedEvent";
     public static final String TYPE_CAMERA_CLOSE = "CKCameraStoppedEvent";
@@ -18,10 +18,10 @@ public class CKEvent {
     private String type;
     private String message;
 
-    private CKEvent() {
+    private CameraKitEvent() {
     }
 
-    CKEvent(@NonNull String type) {
+    CameraKitEvent(@NonNull String type) {
         this.type = type;
     }
 

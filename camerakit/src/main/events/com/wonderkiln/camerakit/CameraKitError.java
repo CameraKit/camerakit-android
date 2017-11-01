@@ -2,17 +2,17 @@ package com.wonderkiln.camerakit;
 
 import android.support.annotation.Nullable;
 
-public class CKError extends CKEvent {
+public class CameraKitError extends CameraKitEvent {
 
     private String type;
     private String message;
     private Exception exception;
 
-    CKError() {
+    CameraKitError() {
         super(TYPE_ERROR);
     }
 
-    CKError(Exception exception) {
+    CameraKitError(Exception exception) {
         super(TYPE_ERROR);
         this.exception = exception;
     }

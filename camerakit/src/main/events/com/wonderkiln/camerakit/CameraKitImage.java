@@ -3,11 +3,11 @@ package com.wonderkiln.camerakit;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
-public class CKImage extends CKEvent {
+public class CameraKitImage extends CameraKitEvent {
 
     private byte[] jpeg;
 
-    CKImage(byte[] jpeg) {
+    CameraKitImage(byte[] jpeg) {
         super(TYPE_IMAGE_CAPTURED);
         this.jpeg = jpeg;
     }

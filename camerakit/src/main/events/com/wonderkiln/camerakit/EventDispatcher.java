@@ -15,7 +15,7 @@ class EventDispatcher {
 
     private Handler mainThreadHandler;
 
-    private List<CKEventListener> listeners;
+    private List<CameraKitEventListener> listeners;
     private List<BindingHandler> bindings;
 
     public EventDispatcher() {
@@ -24,7 +24,7 @@ class EventDispatcher {
         this.bindings = new ArrayList<>();
     }
 
-    public void addListener(CKEventListener listener) {
+    public void addListener(CameraKitEventListener listener) {
         this.listeners.add(listener);
     }
 
@@ -32,15 +32,15 @@ class EventDispatcher {
         this.bindings.add(new BindingHandler(binding));
     }
 
-    public void dispatch(final CKEvent event) {
+    public void dispatch(final CameraKitEvent event) {
         mainThreadHandler.post(new Runnable() {
             @Override
             public void run() {
-                for (CKEventListener listener : listeners) {
+                for (CameraKitEventListener listener : listeners) {
                     listener.onEvent(event);
-                    if (event instanceof CKError) listener.onError((CKError) event);
-                    if (event instanceof CKImage) listener.onImage((CKImage) event);
-                    if (event instanceof CKVideo) listener.onVideo((CKVideo) event);
+                    if (event instanceof CameraKitError) listener.onError((CameraKitError) event);
+                    if (event instanceof CameraKitImage) listener.onImage((CameraKitImage) event);
+                    if (event instanceof CameraKitVideo) listener.onVideo((CameraKitVideo) event);
                 }
 
                 for (BindingHandler handler : bindings) {
@@ -64,13 +64,13 @@ class EventDispatcher {
             for (Method method : binding.getClass().getDeclaredMethods()) {
                 if (method.isAnnotationPresent(OnCameraKitEvent.class)) {
                     OnCameraKitEvent annotation = method.getAnnotation(OnCameraKitEvent.class);
-                    Class<? extends CKEvent> eventType = annotation.value();
+                    Class<? extends CameraKitEvent> eventType = annotation.value();
                     addMethod(binding, method, eventType, methods);
                 }
             }
         }
 
-        private void addMethod(Object binding, Method method, Class<? extends CKEvent> type, Map<Class, List<MethodHolder>> store) {
+        private void addMethod(Object binding, Method method, Class<? extends CameraKitEvent> type, Map<Class, List<MethodHolder>> store) {
             if (!store.containsKey(type)) {
                 store.put(type, new ArrayList<MethodHolder>());
             }
@@ -78,8 +78,8 @@ class EventDispatcher {
             store.get(type).add(new MethodHolder(binding, method));
         }
 
-        public void dispatchEvent(@NonNull CKEvent event) throws IllegalAccessException, InvocationTargetException {
-            List<MethodHolder> baseMethods = methods.get(CKEvent.class);
+        public void dispatchEvent(@NonNull CameraKitEvent event) throws IllegalAccessException, InvocationTargetException {
+            List<MethodHolder> baseMethods = methods.get(CameraKitEvent.class);
             if (baseMethods != null) {
                 for (MethodHolder methodHolder : baseMethods) {
                     methodHolder.getMethod().invoke(methodHolder.getBinding(), event);

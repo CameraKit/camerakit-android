@@ -511,7 +511,7 @@ public class Camera1 extends CameraImpl {
             collectCameraProperties();
             adjustCameraParameters();
 
-            mEventDispatcher.dispatch(new CKEvent(CKEvent.TYPE_CAMERA_OPEN));
+            mEventDispatcher.dispatch(new CameraKitEvent(CameraKitEvent.TYPE_CAMERA_OPEN));
         }
     }
 
@@ -537,7 +537,7 @@ public class Camera1 extends CameraImpl {
                 mCaptureSize = null;
                 mVideoSize = null;
 
-                mEventDispatcher.dispatch(new CKEvent(CKEvent.TYPE_CAMERA_CLOSE));
+                mEventDispatcher.dispatch(new CameraKitEvent(CameraKitEvent.TYPE_CAMERA_CLOSE));
             }
         }
     }
@@ -571,13 +571,13 @@ public class Camera1 extends CameraImpl {
     }
 
     private void notifyErrorListener(@NonNull final String details) {
-        CKError error = new CKError();
+        CameraKitError error = new CameraKitError();
         error.setMessage(details);
         mEventDispatcher.dispatch(error);
     }
 
     private void notifyErrorListener(@NonNull final Exception e) {
-        CKError error = new CKError(e);
+        CameraKitError error = new CameraKitError(e);
         mEventDispatcher.dispatch(error);
     }
 

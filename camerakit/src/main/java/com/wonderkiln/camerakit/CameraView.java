@@ -427,7 +427,7 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
         captureImage(null);
     }
 
-    public void captureImage(final CKEventCallback<CKImage> callback) {
+    public void captureImage(final CameraKitEventCallback<CameraKitImage> callback) {
         mCameraImpl.captureImage(new CameraImpl.ImageCapturedCallback() {
             @Override
             public void imageCaptured(byte[] jpeg) {
@@ -436,7 +436,7 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
                 postProcessor.setFacing(mFacing);
                 if (mCropOutput) postProcessor.setCropOutput(AspectRatio.of(getWidth(), getHeight()));
 
-                CKImage image = new CKImage(postProcessor.getJpeg());
+                CameraKitImage image = new CameraKitImage(postProcessor.getJpeg());
                 if (callback != null) callback.callback(image);
                 mEventDispatcher.dispatch(image);
             }
@@ -447,11 +447,11 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
         captureVideo(null);
     }
 
-    public void captureVideo(final CKEventCallback<CKVideo> callback) {
+    public void captureVideo(final CameraKitEventCallback<CameraKitVideo> callback) {
         mCameraImpl.captureVideo(new CameraImpl.VideoCapturedCallback() {
             @Override
             public void videoCaptured(File file) {
-                CKVideo video = new CKVideo(file);
+                CameraKitVideo video = new CameraKitVideo(file);
                 if (callback != null) callback.callback(video);
                 mEventDispatcher.dispatch(video);
             }
@@ -492,8 +492,8 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
         }
     }
 
-    public void addCameraKitListener(CKEventListener CKEventListener) {
-        mEventDispatcher.addListener(CKEventListener);
+    public void addCameraKitListener(CameraKitEventListener CameraKitEventListener) {
+        mEventDispatcher.addListener(CameraKitEventListener);
     }
 
     public void bindCameraKitListener(Object object) {
