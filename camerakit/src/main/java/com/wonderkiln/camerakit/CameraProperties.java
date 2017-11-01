@@ -1,8 +1,5 @@
 package com.wonderkiln.camerakit;
 
-/**
- * Simple pojo containing various camera properties.
- */
 public class CameraProperties {
     public final float verticalViewingAngle;
     public final float horizontalViewingAngle;

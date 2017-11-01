@@ -44,20 +44,20 @@ public class PostProcessor {
             return null;
         }
 
-        BitmapOperation bitmapOperation = new BitmapOperation(bitmap);
-        new ExifPostProcessor(picture).apply(bitmapOperation);
+        BitmapOperator bitmapOperator = new BitmapOperator(bitmap);
+        new ExifPostProcessor(picture).apply(bitmapOperator);
 
         if (facing == FACING_FRONT) {
-            bitmapOperation.flipBitmapHorizontal();
+            bitmapOperator.flipBitmapHorizontal();
         }
 
-        bitmap = bitmapOperation.getBitmap();
+        bitmap = bitmapOperator.getBitmap();
 
         if (cropAspectRatio != null) {
-            new CenterCrop(bitmap.getWidth(), bitmap.getHeight(), cropAspectRatio).apply(bitmapOperation);
+            new CenterCrop(bitmap.getWidth(), bitmap.getHeight(), cropAspectRatio).apply(bitmapOperator);
         }
 
-        bitmap = bitmapOperation.getBitmapAndFree();
+        bitmap = bitmapOperator.getBitmapAndFree();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, jpegQuality, out);
         return out.toByteArray();
@@ -87,30 +87,30 @@ public class PostProcessor {
             }
         }
 
-        public void apply(BitmapOperation bitmapOperation) {
+        public void apply(BitmapOperator bitmapOperator) {
             switch (orientation) {
                 case ExifInterface.ORIENTATION_FLIP_HORIZONTAL:
-                    bitmapOperation.flipBitmapHorizontal();
+                    bitmapOperator.flipBitmapHorizontal();
                     break;
                 case ExifInterface.ORIENTATION_ROTATE_180:
-                    bitmapOperation.rotateBitmap(180);
+                    bitmapOperator.rotateBitmap(180);
                     break;
                 case ExifInterface.ORIENTATION_FLIP_VERTICAL:
-                    bitmapOperation.flipBitmapVertical();
+                    bitmapOperator.flipBitmapVertical();
                     break;
                 case ExifInterface.ORIENTATION_TRANSPOSE:
-                    bitmapOperation.rotateBitmap(90);
-                    bitmapOperation.flipBitmapHorizontal();
+                    bitmapOperator.rotateBitmap(90);
+                    bitmapOperator.flipBitmapHorizontal();
                     break;
                 case ExifInterface.ORIENTATION_ROTATE_90:
-                    bitmapOperation.rotateBitmap(90);
+                    bitmapOperator.rotateBitmap(90);
                     break;
                 case ExifInterface.ORIENTATION_TRANSVERSE:
-                    bitmapOperation.rotateBitmap(270);
-                    bitmapOperation.flipBitmapHorizontal();
+                    bitmapOperator.rotateBitmap(270);
+                    bitmapOperator.flipBitmapHorizontal();
                     break;
                 case ExifInterface.ORIENTATION_ROTATE_270:
-                    bitmapOperation.rotateBitmap(270);
+                    bitmapOperator.rotateBitmap(270);
                     break;
                 case ExifInterface.ORIENTATION_NORMAL:
                 case ExifInterface.ORIENTATION_UNDEFINED:
@@ -137,9 +137,9 @@ public class PostProcessor {
             this.aspectRatio = aspectRatio;
         }
 
-        public void apply(BitmapOperation bitmapOperation) {
+        public void apply(BitmapOperator bitmapOperator) {
             Rect crop = getCrop(width, height, aspectRatio);
-            bitmapOperation.cropBitmap(crop.left, crop.top, crop.right, crop.bottom);
+            bitmapOperator.cropBitmap(crop.left, crop.top, crop.right, crop.bottom);
         }
 
         private static Rect getCrop(int currentWidth, int currentHeight, AspectRatio targetRatio) {

@@ -12,42 +12,42 @@
 extern "C"
 {
 JNIEXPORT jobject JNICALL
-Java_com_wonderkiln_camerakit_BitmapOperation_jniStoreBitmapData(JNIEnv *env, jobject obj,
+Java_com_wonderkiln_camerakit_BitmapOperator_jniStoreBitmapData(JNIEnv *env, jobject obj,
                                                                  jobject bitmap);
 JNIEXPORT jobject JNICALL
-Java_com_wonderkiln_camerakit_BitmapOperation_jniGetBitmapFromStoredBitmapData(JNIEnv *env,
+Java_com_wonderkiln_camerakit_BitmapOperator_jniGetBitmapFromStoredBitmapData(JNIEnv *env,
                                                                                jobject obj,
                                                                                jobject handle);
 JNIEXPORT void JNICALL
-Java_com_wonderkiln_camerakit_BitmapOperation_jniFreeBitmapData(JNIEnv *env, jobject obj,
+Java_com_wonderkiln_camerakit_BitmapOperator_jniFreeBitmapData(JNIEnv *env, jobject obj,
                                                                 jobject handle);
 JNIEXPORT void JNICALL
-Java_com_wonderkiln_camerakit_BitmapOperation_jniRotateBitmapCcw90(JNIEnv *env, jobject obj,
+Java_com_wonderkiln_camerakit_BitmapOperator_jniRotateBitmapCcw90(JNIEnv *env, jobject obj,
                                                                    jobject handle);
 JNIEXPORT void JNICALL
-Java_com_wonderkiln_camerakit_BitmapOperation_jniRotateBitmapCw90(JNIEnv *env, jobject obj,
+Java_com_wonderkiln_camerakit_BitmapOperator_jniRotateBitmapCw90(JNIEnv *env, jobject obj,
                                                                   jobject handle);
 JNIEXPORT void JNICALL
-Java_com_wonderkiln_camerakit_BitmapOperation_jniRotateBitmap180(JNIEnv *env, jobject obj,
+Java_com_wonderkiln_camerakit_BitmapOperator_jniRotateBitmap180(JNIEnv *env, jobject obj,
                                                                  jobject handle);
 JNIEXPORT void JNICALL
-Java_com_wonderkiln_camerakit_BitmapOperation_jniCropBitmap(JNIEnv *env, jobject obj,
+Java_com_wonderkiln_camerakit_BitmapOperator_jniCropBitmap(JNIEnv *env, jobject obj,
                                                             jobject handle, uint32_t left,
                                                             uint32_t top, uint32_t right,
                                                             uint32_t bottom);
 JNIEXPORT void JNICALL
-Java_com_wonderkiln_camerakit_BitmapOperation_jniScaleNNBitmap(JNIEnv *env, jobject obj,
+Java_com_wonderkiln_camerakit_BitmapOperator_jniScaleNNBitmap(JNIEnv *env, jobject obj,
                                                                jobject handle, uint32_t newWidth,
                                                                uint32_t newHeight);
 JNIEXPORT void JNICALL
-Java_com_wonderkiln_camerakit_BitmapOperation_jniScaleBIBitmap(JNIEnv *env, jobject obj,
+Java_com_wonderkiln_camerakit_BitmapOperator_jniScaleBIBitmap(JNIEnv *env, jobject obj,
                                                                jobject handle, uint32_t newWidth,
                                                                uint32_t newHeight);
 JNIEXPORT void JNICALL
-Java_com_wonderkiln_camerakit_BitmapOperation_jniFlipBitmapHorizontal(JNIEnv *env, jobject obj,
+Java_com_wonderkiln_camerakit_BitmapOperator_jniFlipBitmapHorizontal(JNIEnv *env, jobject obj,
                                                                       jobject handle);
 JNIEXPORT void JNICALL
-Java_com_wonderkiln_camerakit_BitmapOperation_jniFlipBitmapVertical(JNIEnv *env, jobject obj,
+Java_com_wonderkiln_camerakit_BitmapOperator_jniFlipBitmapVertical(JNIEnv *env, jobject obj,
                                                                     jobject handle);
 }
 
@@ -78,7 +78,7 @@ void convertIntToArgb(uint32_t pixel, ARGB *argb) {
     argb->alpha = (pixel & 0xff);
 }
 
-JNIEXPORT void JNICALL Java_com_wonderkiln_camerakit_BitmapOperation_jniCropBitmap(
+JNIEXPORT void JNICALL Java_com_wonderkiln_camerakit_BitmapOperator_jniCropBitmap(
         JNIEnv *env, jobject obj, jobject handle, uint32_t left, uint32_t top,
         uint32_t right, uint32_t bottom) {
     JniBitmap *jniBitmap = (JniBitmap *) env->GetDirectBufferAddress(handle);
@@ -102,7 +102,7 @@ JNIEXPORT void JNICALL Java_com_wonderkiln_camerakit_BitmapOperation_jniCropBitm
     jniBitmap->_bitmapInfo.height = newHeight;
 }
 
-JNIEXPORT void JNICALL Java_com_wonderkiln_camerakit_BitmapOperation_jniRotateBitmapCcw90(
+JNIEXPORT void JNICALL Java_com_wonderkiln_camerakit_BitmapOperator_jniRotateBitmapCcw90(
         JNIEnv *env, jobject obj, jobject handle) {
     JniBitmap *jniBitmap = (JniBitmap *) env->GetDirectBufferAddress(handle);
     if (jniBitmap->_storedBitmapPixels == NULL)
@@ -123,7 +123,7 @@ JNIEXPORT void JNICALL Java_com_wonderkiln_camerakit_BitmapOperation_jniRotateBi
     jniBitmap->_storedBitmapPixels = newBitmapPixels;
 }
 
-JNIEXPORT void JNICALL Java_com_wonderkiln_camerakit_BitmapOperation_jniRotateBitmapCw90(
+JNIEXPORT void JNICALL Java_com_wonderkiln_camerakit_BitmapOperator_jniRotateBitmapCw90(
         JNIEnv *env, jobject obj, jobject handle) {
     JniBitmap *jniBitmap = (JniBitmap *) env->GetDirectBufferAddress(handle);
     if (jniBitmap->_storedBitmapPixels == NULL)
@@ -145,7 +145,7 @@ JNIEXPORT void JNICALL Java_com_wonderkiln_camerakit_BitmapOperation_jniRotateBi
 }
 
 JNIEXPORT void JNICALL
-Java_com_wonderkiln_camerakit_BitmapOperation_jniRotateBitmap180(JNIEnv *env, jobject obj,
+Java_com_wonderkiln_camerakit_BitmapOperator_jniRotateBitmap180(JNIEnv *env, jobject obj,
                                                                  jobject handle) {
     JniBitmap *jniBitmap = (JniBitmap *) env->GetDirectBufferAddress(handle);
     if (jniBitmap->_storedBitmapPixels == NULL)
@@ -176,7 +176,7 @@ Java_com_wonderkiln_camerakit_BitmapOperation_jniRotateBitmap180(JNIEnv *env, jo
 }
 
 JNIEXPORT void JNICALL
-Java_com_wonderkiln_camerakit_BitmapOperation_jniFreeBitmapData(JNIEnv *env, jobject obj,
+Java_com_wonderkiln_camerakit_BitmapOperator_jniFreeBitmapData(JNIEnv *env, jobject obj,
                                                                 jobject handle) {
     JniBitmap *jniBitmap = (JniBitmap *) env->GetDirectBufferAddress(handle);
     if (jniBitmap->_storedBitmapPixels == NULL)
@@ -187,7 +187,7 @@ Java_com_wonderkiln_camerakit_BitmapOperation_jniFreeBitmapData(JNIEnv *env, job
 }
 
 JNIEXPORT jobject JNICALL
-Java_com_wonderkiln_camerakit_BitmapOperation_jniGetBitmapFromStoredBitmapData(JNIEnv *env,
+Java_com_wonderkiln_camerakit_BitmapOperator_jniGetBitmapFromStoredBitmapData(JNIEnv *env,
                                                                                jobject obj,
                                                                                jobject handle) {
     JniBitmap *jniBitmap = (JniBitmap *) env->GetDirectBufferAddress(handle);
@@ -228,7 +228,7 @@ Java_com_wonderkiln_camerakit_BitmapOperation_jniGetBitmapFromStoredBitmapData(J
 }
 
 JNIEXPORT jobject JNICALL
-Java_com_wonderkiln_camerakit_BitmapOperation_jniStoreBitmapData(JNIEnv *env, jobject obj,
+Java_com_wonderkiln_camerakit_BitmapOperator_jniStoreBitmapData(JNIEnv *env, jobject obj,
                                                                  jobject bitmap) {
     AndroidBitmapInfo bitmapInfo;
     uint32_t *storedBitmapPixels = NULL;
@@ -258,7 +258,7 @@ Java_com_wonderkiln_camerakit_BitmapOperation_jniStoreBitmapData(JNIEnv *env, jo
 }
 
 JNIEXPORT void JNICALL
-Java_com_wonderkiln_camerakit_BitmapOperation_jniScaleNNBitmap(JNIEnv *env, jobject obj,
+Java_com_wonderkiln_camerakit_BitmapOperator_jniScaleNNBitmap(JNIEnv *env, jobject obj,
                                                                jobject handle, uint32_t newWidth,
                                                                uint32_t newHeight) {
     JniBitmap *jniBitmap = (JniBitmap *) env->GetDirectBufferAddress(handle);
@@ -293,7 +293,7 @@ Java_com_wonderkiln_camerakit_BitmapOperation_jniScaleNNBitmap(JNIEnv *env, jobj
 }
 
 JNIEXPORT void JNICALL
-Java_com_wonderkiln_camerakit_BitmapOperation_jniScaleBIBitmap(JNIEnv *env, jobject obj,
+Java_com_wonderkiln_camerakit_BitmapOperator_jniScaleBIBitmap(JNIEnv *env, jobject obj,
                                                                jobject handle, uint32_t newWidth,
                                                                uint32_t newHeight) {
 
@@ -394,7 +394,7 @@ Java_com_wonderkiln_camerakit_BitmapOperation_jniScaleBIBitmap(JNIEnv *env, jobj
 }
 
 JNIEXPORT void JNICALL
-Java_com_wonderkiln_camerakit_BitmapOperation_jniFlipBitmapHorizontal(JNIEnv *env, jobject obj,
+Java_com_wonderkiln_camerakit_BitmapOperator_jniFlipBitmapHorizontal(JNIEnv *env, jobject obj,
                                                                       jobject handle) {
     JniBitmap *jniBitmap = (JniBitmap *) env->GetDirectBufferAddress(handle);
     if (jniBitmap->_storedBitmapPixels == NULL)
@@ -416,7 +416,7 @@ Java_com_wonderkiln_camerakit_BitmapOperation_jniFlipBitmapHorizontal(JNIEnv *en
 }
 
 JNIEXPORT void JNICALL
-Java_com_wonderkiln_camerakit_BitmapOperation_jniFlipBitmapVertical(JNIEnv *env, jobject obj,
+Java_com_wonderkiln_camerakit_BitmapOperator_jniFlipBitmapVertical(JNIEnv *env, jobject obj,
                                                                     jobject handle) {
     JniBitmap *jniBitmap = (JniBitmap *) env->GetDirectBufferAddress(handle);
     if (jniBitmap->_storedBitmapPixels == NULL)

@@ -1,5 +1,8 @@
 package com.wonderkiln.camerakit;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+
 public class CKImage extends CKEvent {
 
     private byte[] jpeg;
@@ -11,6 +14,10 @@ public class CKImage extends CKEvent {
 
     public byte[] getJpeg() {
         return jpeg;
+    }
+
+    public Bitmap getBitmap() {
+        return BitmapFactory.decodeByteArray(jpeg, 0, jpeg.length);
     }
 
 }

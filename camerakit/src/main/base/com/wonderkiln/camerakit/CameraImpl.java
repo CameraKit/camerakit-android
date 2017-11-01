@@ -1,6 +1,5 @@
 package com.wonderkiln.camerakit;
 
-import android.graphics.YuvImage;
 import android.support.annotation.Nullable;
 
 import java.io.File;
@@ -31,7 +30,6 @@ abstract class CameraImpl {
     abstract void captureImage(ImageCapturedCallback callback);
     interface ImageCapturedCallback {
         void imageCaptured(byte[] jpeg);
-        void imageCaptured(YuvImage yuvImage);
     }
 
     abstract void captureVideo(VideoCapturedCallback callback);

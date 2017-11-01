@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -312,12 +313,26 @@ public class Camera1 extends CameraImpl {
                     mCamera.setOneShotPreviewCallback(new Camera.PreviewCallback() {
                         @Override
                         public void onPreviewFrame(byte[] data, Camera camera) {
-                            new Thread(new ProcessStillTask(data, camera, calculateCaptureRotation(), new ProcessStillTask.OnStillProcessedListener() {
-                                @Override
-                                public void onStillProcessed(final YuvImage yuv) {
-                                    callback.imageCaptured(yuv);
-                                }
-                            })).start();
+                            Camera.Parameters parameters = camera.getParameters();
+                            int width = parameters.getPreviewSize().width;
+                            int height = parameters.getPreviewSize().height;
+                            int rotation = calculatePreviewRotation();
+
+                            YuvOperator yuvOperator = new YuvOperator(data, width, height);
+                            yuvOperator.rotate(rotation);
+                            data = yuvOperator.getYuvData();
+
+                            int yuvOutputWidth = width;
+                            int yuvOutputHeight = height;
+                            if (rotation == 90 || rotation == 270) {
+                                yuvOutputWidth = height;
+                                yuvOutputHeight = width;
+                            }
+
+                            YuvImage yuvImage = new YuvImage(data, parameters.getPreviewFormat(), yuvOutputWidth, yuvOutputHeight, null);
+                            ByteArrayOutputStream out = new ByteArrayOutputStream();
+                            yuvImage.compressToJpeg(new Rect(0, 0, yuvImage.getWidth(), yuvImage.getHeight()), 100, out);
+                            callback.imageCaptured(out.toByteArray());
                         }
                     });
                     break;
@@ -774,7 +789,7 @@ public class Camera1 extends CameraImpl {
             }
         }
 
-        return new File(mediaStorageDir.getPath() + File.separator +  "video.mp4");
+        return new File(mediaStorageDir.getPath() + File.separator + "video.mp4");
     }
 
     private CamcorderProfile getCamcorderProfile(@VideoQuality int videoQuality) {

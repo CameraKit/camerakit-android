@@ -10,8 +10,6 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
-import android.graphics.Rect;
-import android.graphics.YuvImage;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
@@ -28,7 +26,6 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -442,13 +439,6 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
                 CKImage image = new CKImage(postProcessor.getJpeg());
                 if (callback != null) callback.callback(image);
                 mEventDispatcher.dispatch(image);
-            }
-
-            @Override
-            public void imageCaptured(YuvImage yuvImage) {
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                yuvImage.compressToJpeg(new Rect(0, 0, yuvImage.getWidth(), yuvImage.getHeight()), 100, out);
-                imageCaptured(out.toByteArray());
             }
         });
     }
