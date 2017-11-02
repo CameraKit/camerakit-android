@@ -67,7 +67,7 @@ public class BitmapOperator {
     }
 
     static {
-        System.loadLibrary("JniBitmapOperations");
+        System.loadLibrary("JniBitmapOperator");
     }
 
     private native ByteBuffer jniStoreBitmapData(Bitmap bitmap);
