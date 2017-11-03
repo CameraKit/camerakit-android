@@ -68,10 +68,7 @@ public class PostProcessor {
             new CenterCrop(cropWidth, cropHeight, cropAspectRatio).apply(bitmapOperator);
         }
 
-        bitmap = bitmapOperator.getBitmapAndFree();
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, jpegQuality, out);
-        return out.toByteArray();
+        return bitmapOperator.getJpegAndFree(jpegQuality);
     }
 
     private Bitmap getBitmap() throws IOException {

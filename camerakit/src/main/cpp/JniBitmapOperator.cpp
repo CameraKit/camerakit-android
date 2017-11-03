@@ -4,6 +4,7 @@
 #include <android/bitmap.h>
 #include <cstring>
 #include <unistd.h>
+#include "jpge.h"
 
 #define  LOG_TAG    "DEBUG"
 #define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG,LOG_TAG,__VA_ARGS__)
@@ -14,10 +15,11 @@ extern "C"
 JNIEXPORT jobject JNICALL
 Java_com_wonderkiln_camerakit_BitmapOperator_jniStoreBitmapData(JNIEnv *env, jobject obj,
                                                                 jobject bitmap);
-JNIEXPORT jobject JNICALL
+JNIEXPORT jbyteArray JNICALL
 Java_com_wonderkiln_camerakit_BitmapOperator_jniGetJpegData(JNIEnv *env,
                                                             jobject obj,
-                                                            jobject handle);
+                                                            jobject handle,
+                                                            jint quality);
 JNIEXPORT jobject JNICALL
 Java_com_wonderkiln_camerakit_BitmapOperator_jniGetBitmapFromStoredBitmapData(JNIEnv *env,
                                                                               jobject obj,
@@ -80,12 +82,6 @@ void convertIntToArgb(uint32_t pixel, ARGB *argb) {
     argb->green = ((pixel >> 16) & 0xff);
     argb->blue = ((pixel >> 8) & 0xff);
     argb->alpha = (pixel & 0xff);
-}
-
-uint16_t make565(int red, int green, int blue) {
-    return (uint16_t) (((red << 8) & 0xf800) |
-                       ((green << 3) & 0x07e0) |
-                       ((blue >> 3) & 0x001f));
 }
 
 JNIEXPORT void JNICALL Java_com_wonderkiln_camerakit_BitmapOperator_jniCropBitmap(
@@ -196,11 +192,52 @@ Java_com_wonderkiln_camerakit_BitmapOperator_jniFreeBitmapData(JNIEnv *env, jobj
     delete jniBitmap;
 }
 
-JNIEXPORT jobject JNICALL
+JNIEXPORT jbyteArray JNICALL
 Java_com_wonderkiln_camerakit_BitmapOperator_jniGetJpegData(JNIEnv *env,
                                                             jobject obj,
-                                                            jobject handle) {
+                                                            jobject handle,
+                                                            jint quality) {
     JniBitmap *jniBitmap = (JniBitmap *) env->GetDirectBufferAddress(handle);
+    if (jniBitmap->_storedBitmapPixels == NULL) {
+        return NULL;
+    }
+
+    int width = jniBitmap->_bitmapInfo.width;
+    int height = jniBitmap->_bitmapInfo.height;
+
+    int rgbBufferSize = width * height * 3;
+    unsigned char *rgbBuffer = new unsigned char[rgbBufferSize];
+    unsigned char *rgbData = new unsigned char[rgbBufferSize];
+    unsigned char *rgbTemp = rgbData;
+    uint32_t *bitmapTemp = jniBitmap->_storedBitmapPixels;
+    for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
+            rgbTemp[0] = ((bitmapTemp[0]) & 0xff);
+            rgbTemp[1] = ((bitmapTemp[0] >> 8) & 0xff);
+            rgbTemp[2] = ((bitmapTemp[0] >> 16) & 0xff);
+
+            rgbTemp += 3;
+            bitmapTemp++;
+        }
+    }
+
+    int m_quality = quality;
+    jpge::params config;
+    config.m_quality = m_quality;
+
+    bool success = jpge::compress_image_to_jpeg_file_in_memory(rgbBuffer, rgbBufferSize, width, height, 3,
+                                                               rgbData, config);
+    delete[] rgbData;
+
+    if (success) {
+        jbyteArray array = env->NewByteArray(rgbBufferSize);
+        env->SetByteArrayRegion(array, 0, rgbBufferSize, reinterpret_cast<jbyte *>(rgbBuffer));
+
+        delete[] rgbBuffer;
+
+        return array;
+    }
+
     return NULL;
 }
 
