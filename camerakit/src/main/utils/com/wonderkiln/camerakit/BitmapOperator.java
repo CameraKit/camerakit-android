@@ -42,6 +42,17 @@ public class BitmapOperator {
         jniFlipBitmapVertical(handler);
     }
 
+    public byte[] getJpeg() {
+        if (handler == null) return null;
+        return jniGetJpegData(handler);
+    }
+
+    public byte[] getJpegAndFree() {
+        final byte[] jpeg = getJpeg();
+        freeBitmap();
+        return jpeg;
+    }
+
     public Bitmap getBitmap() {
         if (handler == null) return null;
         return jniGetBitmapFromStoredBitmapData(handler);
@@ -73,6 +84,8 @@ public class BitmapOperator {
     private native ByteBuffer jniStoreBitmapData(Bitmap bitmap);
 
     private native Bitmap jniGetBitmapFromStoredBitmapData(ByteBuffer handler);
+
+    private native byte[] jniGetJpegData(ByteBuffer handler);
 
     private native void jniFreeBitmapData(ByteBuffer handler);
 
