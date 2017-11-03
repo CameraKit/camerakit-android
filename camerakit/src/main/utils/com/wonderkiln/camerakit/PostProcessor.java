@@ -44,17 +44,28 @@ public class PostProcessor {
             return null;
         }
 
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+
         BitmapOperator bitmapOperator = new BitmapOperator(bitmap);
-        new ExifPostProcessor(picture).apply(bitmapOperator);
+        bitmap.recycle();
+
+        ExifPostProcessor exifPostProcessor = new ExifPostProcessor(picture);
+        exifPostProcessor.apply(bitmapOperator);
 
         if (facing == FACING_FRONT) {
             bitmapOperator.flipBitmapHorizontal();
         }
 
-        bitmap = bitmapOperator.getBitmap();
-
         if (cropAspectRatio != null) {
-            new CenterCrop(bitmap.getWidth(), bitmap.getHeight(), cropAspectRatio).apply(bitmapOperator);
+            int cropWidth = width;
+            int cropHeight = height;
+            if (exifPostProcessor.areDimensionsFlipped()) {
+                cropWidth = height;
+                cropHeight = width;
+            }
+
+            new CenterCrop(cropWidth, cropHeight, cropAspectRatio).apply(bitmapOperator);
         }
 
         bitmap = bitmapOperator.getBitmapAndFree();
@@ -67,6 +78,7 @@ public class PostProcessor {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeByteArray(picture, 0, picture.length, options);
+
         return BitmapRegionDecoder.newInstance(
                 picture,
                 0,
@@ -116,6 +128,24 @@ public class PostProcessor {
                 case ExifInterface.ORIENTATION_UNDEFINED:
                     break;
             }
+        }
+
+        public boolean areDimensionsFlipped() {
+            switch (orientation) {
+                case ExifInterface.ORIENTATION_TRANSPOSE:
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                case ExifInterface.ORIENTATION_TRANSVERSE:
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    return true;
+                case ExifInterface.ORIENTATION_FLIP_HORIZONTAL:
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                case ExifInterface.ORIENTATION_FLIP_VERTICAL:
+                case ExifInterface.ORIENTATION_NORMAL:
+                case ExifInterface.ORIENTATION_UNDEFINED:
+                    return false;
+            }
+
+            return false;
         }
 
         private static int getExifOrientation(InputStream inputStream) throws IOException {
