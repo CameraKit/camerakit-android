@@ -27,7 +27,7 @@ Try out all the unique features using the CameraKit Demo from the Google Play st
 Add __CameraKit__ to the dependencies block in your `app` level `build.gradle`:
 
 ```groovy
-compile 'com.wonderkiln:camerakit:0.11.2'
+compile 'com.wonderkiln:camerakit:0.12.0'
 ```
 
 ## Usage
@@ -35,7 +35,7 @@ compile 'com.wonderkiln:camerakit:0.11.2'
 To use CameraKit, simply add a `CameraView` to your layout:
 
 ```xml
-<com.flurgle.camerakit.CameraView
+<com.wonderkiln.camerakit.CameraView
     android:id="@+id/camera"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
