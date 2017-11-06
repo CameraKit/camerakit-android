@@ -87,3 +87,6 @@
 
   Thanks for helping us help you!
 -->
+
+<!-- Love CameraKit-Android? Please consider supporting our collective:
+👉  https://opencollective.com/CameraKit-Android/donate -->
