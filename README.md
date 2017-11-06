@@ -4,7 +4,9 @@
     </a>
 </p>
 <p align="center">
-    <a href="https://join-slack.camerakit.website"><a href="#backers" alt="sponsors on Open Collective"><img src="https://opencollective.com/CameraKit-Android/backers/badge.svg" /></a> <a href="#sponsors" alt="Sponsors on Open Collective"><img src="https://opencollective.com/CameraKit-Android/sponsors/badge.svg" /></a> <img src="https://join-slack.camerakit.website/badge.svg" alt="Build Status"></a>
+    <a href="#backers" alt="Backers on Open Collective"><img src="https://opencollective.com/CameraKit-Android/backers/badge.svg" /></a> 
+    <a href="#sponsors" alt="Sponsors on Open Collective"><img src="https://opencollective.com/CameraKit-Android/sponsors/badge.svg" /></a>
+    <a href="https://join-slack.camerakit.website"><img src="https://join-slack.camerakit.website/badge.svg" alt="Build Status"></a>
     <a href="https://circleci.com/gh/wonderkiln/CameraKit-Android/tree/master"><img src="https://circleci.com/gh/wonderkiln/CameraKit-Android/tree/master.svg?style=shield" alt="CircleCI"></a>
     <a href="https://codeclimate.com/github/wonderkiln/CameraKit-Android"><img src="https://codeclimate.com/github/wonderkiln/CameraKit-Android/badges/gpa.svg" alt="Code Climate"></a>
     <a href="https://codeclimate.com/github/wonderkiln/CameraKit-Android"><img src="https://codeclimate.com/github/wonderkiln/CameraKit-Android/badges/coverage.svg" alt="Code Climate"></a>
