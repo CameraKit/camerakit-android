@@ -24,9 +24,7 @@
 
         <attr name="ckZoom" format="enum">
             <enum name="off" value="0" />
-
-            <!-- TODO: Set to unique value when feature added -->
-            <enum name="pinch" value="0" />
+            <enum name="pinch" value="1" />
         </attr>
 
 
@@ -59,6 +57,8 @@
         <attr name="ckCropOutput" format="boolean" />
 
         <attr name="ckVideoBitRate" format="integer" />
+
+        <attr name="ckDoubleTapToToggleFacing" format="boolean" />
 
         <attr name="android:adjustViewBounds" />
 

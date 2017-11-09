@@ -23,6 +23,13 @@ public class SurfaceViewPreview extends PreviewImpl {
 
         final View view = View.inflate(context, R.layout.surface_view, parent);
         mContainer = view.findViewById(R.id.surface_view_container);
+        mContainer.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View view, int i, int i1, int i2, int i3, int i4, int i5, int i6, int i7) {
+                setSize(mContainer.getWidth(), mContainer.getHeight());
+            }
+        });
+
         mSurfaceView = mContainer.findViewById(R.id.surface_view);
 
         final SurfaceHolder holder = mSurfaceView.getHolder();
@@ -34,13 +41,11 @@ public class SurfaceViewPreview extends PreviewImpl {
 
             @Override
             public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-                setSize(width, height);
                 if (isReady()) dispatchSurfaceChanged();
             }
 
             @Override
             public void surfaceDestroyed(SurfaceHolder holder) {
-                setSize(0, 0);
             }
         });
     }
@@ -72,7 +77,17 @@ public class SurfaceViewPreview extends PreviewImpl {
 
     @Override
     boolean isReady() {
-        return getWidth() != 0 && getHeight() != 0 && getWidth() == getPreviewWidth() && getHeight() == getPreviewHeight();
+        return getPreviewWidth() != 0 && getPreviewHeight() != 0;
+    }
+
+    @Override
+    float getX() {
+        return mContainer.getChildAt(0).getX();
+    }
+
+    @Override
+    float getY() {
+        return mContainer.getChildAt(0).getY();
     }
 
     @TargetApi(15)
