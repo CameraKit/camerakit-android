@@ -20,6 +20,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:ckCropOutput="false"
+                app:ckDefaultZoom="2.0"
                 app:ckDoubleTapToToggleFacing="true"
                 app:ckFacing="back"
                 app:ckFlash="off"

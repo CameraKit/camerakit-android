@@ -11,7 +11,7 @@ import android.widget.FrameLayout;
 
 public abstract class CameraViewLayout extends FrameLayout {
 
-    private float zoom = 0.0f;
+    protected float zoom = 0.0f;
 
     private ScaleGestureDetector scaleGestureDetector;
     private GestureDetector gestureDetector;

@@ -27,6 +27,7 @@
             <enum name="pinch" value="1" />
         </attr>
 
+        <attr name="ckDefaultZoom" format="float" />
 
         <attr name="ckMethod" format="enum">
             <enum name="standard" value="0" />

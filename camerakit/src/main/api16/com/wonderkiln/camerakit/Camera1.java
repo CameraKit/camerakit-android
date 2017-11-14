@@ -66,9 +66,6 @@ public class Camera1 extends CameraImpl {
     @CaptureMethod
     private int mMethod;
 
-    @Zoom
-    private int mZoom;
-
     @VideoQuality
     private int mVideoQuality;
 
@@ -76,7 +73,8 @@ public class Camera1 extends CameraImpl {
 
     private Handler mHandler = new Handler();
 
-    private int zoom = 0;
+    private float zoom = 0;
+    private int defaultZoomPercent = -1;
 
     private VideoCapturedCallback mVideoCallback;
 
@@ -246,11 +244,6 @@ public class Camera1 extends CameraImpl {
     }
 
     @Override
-    void setZoom(@Zoom int zoom) {
-        this.mZoom = zoom;
-    }
-
-    @Override
     void setVideoQuality(int videoQuality) {
         this.mVideoQuality = videoQuality;
     }
@@ -261,11 +254,53 @@ public class Camera1 extends CameraImpl {
     }
 
     @Override
+    void setDefaultZoomPercent(int zoom) {
+        synchronized (mCameraLock) {
+            this.defaultZoomPercent = zoom;
+            if (mCameraParameters != null) {
+                mCameraParameters.setZoom(getZoomForPercent(zoom));
+                mCamera.setParameters(mCameraParameters);
+            }
+        }
+    }
+
+    private int getZoomForPercent(int zoomPercent) {
+        List<Integer> zoomRatios = mCameraParameters.getZoomRatios();
+        int lowerIndex = -1;
+        int upperIndex = -1;
+
+        for (int i = 0; i < zoomRatios.size(); i++) {
+            if (zoomRatios.get(i) < zoomPercent) {
+                lowerIndex = i;
+            } else if (zoomRatios.get(i) > zoomPercent) {
+                upperIndex = i;
+                break;
+            }
+        }
+
+        if (lowerIndex < 0) {
+            return 0;
+        }
+
+        if (lowerIndex + 1 == upperIndex) {
+            return lowerIndex;
+        }
+
+        if (upperIndex >= 0) {
+            return upperIndex;
+        }
+
+        return zoomRatios.size() - 1;
+    }
+
+    @Override
     void setZoomFactor(float zoom) {
         synchronized (mCameraLock) {
-            this.zoom = (int) (mCameraParameters.getMaxZoom() * zoom);
-            mCameraParameters.setZoom(this.zoom);
-            mCamera.setParameters(mCameraParameters);
+            this.zoom = zoom;
+            if (mCameraParameters != null) {
+                mCameraParameters.setZoom((int) (this.zoom * mCameraParameters.getMaxZoom()));
+                mCamera.setParameters(mCameraParameters);
+            }
         }
     }
 
@@ -739,7 +774,11 @@ public class Camera1 extends CameraImpl {
             notifyErrorListener(e);
         }
 
-        mCameraParameters.setZoom(this.zoom);
+        if (this.defaultZoomPercent >= 1) {
+            mCameraParameters.setZoom(getZoomForPercent(this.defaultZoomPercent));
+        } else {
+            mCameraParameters.setZoom((int) (mCameraParameters.getMaxZoom() * this.zoom));
+        }
 
         mCamera.setParameters(mCameraParameters);
 

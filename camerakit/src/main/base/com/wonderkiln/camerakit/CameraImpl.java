@@ -23,10 +23,10 @@ abstract class CameraImpl {
     abstract void setFlash(@Flash int flash);
     abstract void setFocus(@Focus int focus);
     abstract void setMethod(@CaptureMethod int method);
-    abstract void setZoom(@Zoom int zoom);
     abstract void setVideoQuality(@VideoQuality int videoQuality);
     abstract void setVideoBitRate(int videoBitRate);
 
+    abstract void setDefaultZoomPercent(int zoom);
     abstract void setZoomFactor(float zoom);
     abstract void setFocusArea(float x, float y);
 

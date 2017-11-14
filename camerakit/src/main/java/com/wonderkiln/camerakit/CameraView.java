@@ -65,6 +65,8 @@ public class CameraView extends CameraViewLayout implements LifecycleObserver {
     @Zoom
     private int mZoom;
 
+    private float mDefaultZoom;
+
     @Permissions
     private int mPermissions;
 
@@ -111,6 +113,7 @@ public class CameraView extends CameraViewLayout implements LifecycleObserver {
                 mFocus = a.getInteger(com.wonderkiln.camerakit.R.styleable.CameraView_ckFocus, CameraKit.Defaults.DEFAULT_FOCUS);
                 mMethod = a.getInteger(com.wonderkiln.camerakit.R.styleable.CameraView_ckMethod, CameraKit.Defaults.DEFAULT_METHOD);
                 mZoom = a.getInteger(com.wonderkiln.camerakit.R.styleable.CameraView_ckZoom, CameraKit.Defaults.DEFAULT_ZOOM);
+                mDefaultZoom = a.getFloat(R.styleable.CameraView_ckDefaultZoom, CameraKit.Defaults.DEFAULT_DEFAULT_ZOOM);
                 mPermissions = a.getInteger(com.wonderkiln.camerakit.R.styleable.CameraView_ckPermissions, CameraKit.Defaults.DEFAULT_PERMISSIONS);
                 mVideoQuality = a.getInteger(com.wonderkiln.camerakit.R.styleable.CameraView_ckVideoQuality, CameraKit.Defaults.DEFAULT_VIDEO_QUALITY);
                 mJpegQuality = a.getInteger(com.wonderkiln.camerakit.R.styleable.CameraView_ckJpegQuality, CameraKit.Defaults.DEFAULT_JPEG_QUALITY);
@@ -142,6 +145,7 @@ public class CameraView extends CameraViewLayout implements LifecycleObserver {
         setFocus(mFocus);
         setMethod(mMethod);
         setZoom(mZoom);
+        setDefaultZoom(mDefaultZoom);
         setPermissions(mPermissions);
         setVideoQuality(mVideoQuality);
         setVideoBitRate(mVideoBitRate);
@@ -385,7 +389,11 @@ public class CameraView extends CameraViewLayout implements LifecycleObserver {
 
     public void setZoom(@Zoom int zoom) {
         this.mZoom = zoom;
-        mCameraImpl.setZoom(mZoom);
+    }
+
+    public void setDefaultZoom(float zoom) {
+        this.mDefaultZoom = zoom;
+        mCameraImpl.setDefaultZoomPercent((int) (zoom * 100));
     }
 
     public void setPermissions(@Permissions int permissions) {
