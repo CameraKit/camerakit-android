@@ -775,7 +775,9 @@ public class Camera1 extends CameraImpl {
         }
 
         if (this.defaultZoomPercent >= 1) {
-            mCameraParameters.setZoom(getZoomForPercent(this.defaultZoomPercent));
+            int zoomToSet = getZoomForPercent(this.defaultZoomPercent);
+            mCameraParameters.setZoom(zoomToSet);
+            this.zoom = (float) zoomToSet / (float) mCameraParameters.getMaxZoom();
         } else {
             mCameraParameters.setZoom((int) (mCameraParameters.getMaxZoom() * this.zoom));
         }
