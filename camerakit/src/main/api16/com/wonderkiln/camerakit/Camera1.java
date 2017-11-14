@@ -5,6 +5,7 @@ import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
+import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -611,6 +612,17 @@ public class Camera1 extends CameraImpl {
 
             collectCameraProperties();
             adjustCameraParameters();
+
+            if (Build.VERSION.SDK_INT >= 16) {
+                mCamera.setAutoFocusMoveCallback(new Camera.AutoFocusMoveCallback() {
+                    @Override
+                    public void onAutoFocusMoving(boolean b, Camera camera) {
+                        CameraKitEvent event = new CameraKitEvent(CameraKitEvent.TYPE_FOCUS_MOVED);
+                        event.getData().putBoolean("started", b);
+                        mEventDispatcher.dispatch(event);
+                    }
+                });
+            }
 
             mEventDispatcher.dispatch(new CameraKitEvent(CameraKitEvent.TYPE_CAMERA_OPEN));
         }

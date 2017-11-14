@@ -1,5 +1,6 @@
 package com.wonderkiln.camerakit;
 
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 
 public class CameraKitEvent {
@@ -12,17 +13,22 @@ public class CameraKitEvent {
     public static final String TYPE_FACING_CHANGED = "CKFacingChangedEvent";
     public static final String TYPE_FLASH_CHANGED = "CKFlashChangedEvent";
 
-    public static final String TYPE_IMAGE_CAPTURED = "CKVideoCapturedEvent";
+    public static final String TYPE_IMAGE_CAPTURED = "CKImageCapturedEvent";
     public static final String TYPE_VIDEO_CAPTURED = "CKVideoCapturedEvent";
+
+    public static final String TYPE_FOCUS_MOVED = "CKFocusMovedEvent";
 
     private String type;
     private String message;
+
+    private Bundle data;
 
     private CameraKitEvent() {
     }
 
     CameraKitEvent(@NonNull String type) {
         this.type = type;
+        data = new Bundle();
     }
 
     protected void setMessage(String message) {
@@ -41,6 +47,15 @@ public class CameraKitEvent {
         }
 
         return "";
+    }
+
+    @NonNull
+    public Bundle getData() {
+        if (data != null) {
+            return data;
+        }
+
+        return new Bundle();
     }
 
     @Override
