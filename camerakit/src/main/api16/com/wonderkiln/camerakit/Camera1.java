@@ -257,7 +257,7 @@ public class Camera1 extends CameraImpl {
     void setDefaultZoomPercent(int zoom) {
         synchronized (mCameraLock) {
             this.defaultZoomPercent = zoom;
-            if (mCameraParameters != null) {
+            if (mCameraParameters != null && mCameraParameters.isZoomSupported()) {
                 mCameraParameters.setZoom(getZoomForPercent(zoom));
                 mCamera.setParameters(mCameraParameters);
             }
@@ -297,7 +297,7 @@ public class Camera1 extends CameraImpl {
     void setZoomFactor(float zoom) {
         synchronized (mCameraLock) {
             this.zoom = zoom;
-            if (mCameraParameters != null) {
+            if (mCameraParameters != null && mCameraParameters.isZoomSupported()) {
                 mCameraParameters.setZoom((int) (this.zoom * mCameraParameters.getMaxZoom()));
                 mCamera.setParameters(mCameraParameters);
             }
@@ -774,12 +774,14 @@ public class Camera1 extends CameraImpl {
             notifyErrorListener(e);
         }
 
-        if (this.defaultZoomPercent >= 1) {
-            int zoomToSet = getZoomForPercent(this.defaultZoomPercent);
-            mCameraParameters.setZoom(zoomToSet);
-            this.zoom = (float) zoomToSet / (float) mCameraParameters.getMaxZoom();
-        } else {
-            mCameraParameters.setZoom((int) (mCameraParameters.getMaxZoom() * this.zoom));
+        if (mCameraParameters.isZoomSupported()) {
+            if (this.defaultZoomPercent >= 1) {
+                int zoomToSet = getZoomForPercent(this.defaultZoomPercent);
+                mCameraParameters.setZoom(zoomToSet);
+                this.zoom = (float) zoomToSet / (float) mCameraParameters.getMaxZoom();
+            } else {
+                mCameraParameters.setZoom((int) (mCameraParameters.getMaxZoom() * this.zoom));
+            }
         }
 
         mCamera.setParameters(mCameraParameters);
