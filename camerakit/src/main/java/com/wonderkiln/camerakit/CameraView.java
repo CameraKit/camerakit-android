@@ -26,6 +26,8 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
+import com.google.android.gms.vision.text.TextRecognizer;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -128,7 +130,10 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
         mEventDispatcher = new EventDispatcher();
 
         mPreviewImpl = new SurfaceViewPreview(context, this);
-        mCameraImpl = new Camera1(mEventDispatcher, mPreviewImpl);
+        TextRecognizer recognizer = new TextRecognizer.Builder(context).build();
+        recognizer.setProcessor(new TextProcessor());
+
+        mCameraImpl = new Camera1(mEventDispatcher, mPreviewImpl, recognizer);
 
         mIsStarted = false;
 
