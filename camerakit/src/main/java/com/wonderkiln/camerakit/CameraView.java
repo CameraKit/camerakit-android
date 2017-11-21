@@ -35,7 +35,10 @@ import android.view.Surface;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.vision.text.TextRecognizer;
+import com.wonderkiln.camerakit.textrecognition.GooglePlayServicesUnavailableException;
 import com.wonderkiln.camerakit.textrecognition.TextProcessor;
 import java.io.File;
 import java.util.ArrayList;
@@ -428,10 +431,16 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
         captureImage(null);
     }
 
-    public void setTextDetectionListener(final CameraKitEventCallback<CameraKitTextDetect> callback) {
+    public void setTextDetectionListener(final CameraKitEventCallback<CameraKitTextDetect> callback) throws GooglePlayServicesUnavailableException {
         TextRecognizer textRecognizer = new TextRecognizer.Builder(getContext()).build();
         textRecognizer.setProcessor(new TextProcessor(mEventDispatcher, callback));
-        mCameraImpl.setTextDetector(textRecognizer);
+        int code = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(getContext().getApplicationContext());
+        if (code != ConnectionResult.SUCCESS) {
+            throw new GooglePlayServicesUnavailableException();
+        }
+        if (textRecognizer.isOperational()) {
+            mCameraImpl.setTextDetector(textRecognizer);
+        }
     }
 
     public void captureImage(final CameraKitEventCallback<CameraKitImage> callback) {

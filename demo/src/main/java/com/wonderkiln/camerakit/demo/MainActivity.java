@@ -29,6 +29,7 @@ import com.wonderkiln.camerakit.CameraKitEventCallback;
 import com.wonderkiln.camerakit.CameraKitTextDetect;
 import com.wonderkiln.camerakit.CameraView;
 
+import com.wonderkiln.camerakit.textrecognition.GooglePlayServicesUnavailableException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,12 +69,16 @@ public class MainActivity extends AppCompatActivity {
 
         camera.setMethod(cameraMethod);
         camera.setCropOutput(cropOutput);
-        camera.setTextDetectionListener(new CameraKitEventCallback<CameraKitTextDetect>() {
-            @Override
-            public void callback(CameraKitTextDetect event) {
-                Log.d(TAG, "Found some text: " + event.getTextBlock().getText());
-            }
-        });
+        try {
+            camera.setTextDetectionListener(new CameraKitEventCallback<CameraKitTextDetect>() {
+                @Override
+                public void callback(CameraKitTextDetect event) {
+                    Log.d(TAG, "Found some text: " + event.getTextBlock().getText());
+                }
+            });
+        } catch (GooglePlayServicesUnavailableException e) {
+            // I hope text detection wasn't a huge part of your app
+        }
     }
 
     @Override
