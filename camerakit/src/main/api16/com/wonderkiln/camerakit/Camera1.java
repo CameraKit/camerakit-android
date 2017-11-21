@@ -531,7 +531,6 @@ public class Camera1 extends CameraImpl {
             mEventDispatcher.dispatch(new CameraKitEvent(CameraKitEvent.TYPE_CAMERA_OPEN));
 
             if (mTextDetector != null) {
-                // start text detection thread
                 mFrameProcessor = new FrameProcessingRunnable(mTextDetector, mPreviewSize, mCamera);
                 mFrameProcessor.start();
             }
@@ -716,90 +715,6 @@ public class Camera1 extends CameraImpl {
     private void collectCameraProperties() {
         mCameraProperties = new CameraProperties(mCameraParameters.getVerticalViewAngle(),
                 mCameraParameters.getHorizontalViewAngle());
-    }
-
-    private static class SizePair {
-        private com.google.android.gms.common.images.Size mPreview;
-        private com.google.android.gms.common.images.Size mPicture;
-
-        public SizePair(android.hardware.Camera.Size previewSize,
-                        android.hardware.Camera.Size pictureSize) {
-            mPreview = new com.google.android.gms.common.images.Size(previewSize.width, previewSize.height);
-            if (pictureSize != null) {
-                mPicture = new com.google.android.gms.common.images.Size(pictureSize.width, pictureSize.height);
-            }
-        }
-
-        public com.google.android.gms.common.images.Size previewSize() {
-            return mPreview;
-        }
-
-        @SuppressWarnings("unused")
-        public com.google.android.gms.common.images.Size pictureSize() {
-            return mPicture;
-        }
-    }
-
-    private static final float ASPECT_RATIO_TOLERANCE = 0.01f;
-
-
-    private static List<SizePair> generateValidPreviewSizeList(Camera camera) {
-        Camera.Parameters parameters = camera.getParameters();
-        List<android.hardware.Camera.Size> supportedPreviewSizes =
-                parameters.getSupportedPreviewSizes();
-        List<android.hardware.Camera.Size> supportedPictureSizes =
-                parameters.getSupportedPictureSizes();
-        List<SizePair> validPreviewSizes = new ArrayList<>();
-        for (android.hardware.Camera.Size previewSize : supportedPreviewSizes) {
-            float previewAspectRatio = (float) previewSize.width / (float) previewSize.height;
-
-            // By looping through the picture sizes in order, we favor the higher resolutions.
-            // We choose the highest resolution in order to support taking the full resolution
-            // picture later.
-            for (android.hardware.Camera.Size pictureSize : supportedPictureSizes) {
-                float pictureAspectRatio = (float) pictureSize.width / (float) pictureSize.height;
-                if (Math.abs(previewAspectRatio - pictureAspectRatio) < ASPECT_RATIO_TOLERANCE) {
-                    validPreviewSizes.add(new SizePair(previewSize, pictureSize));
-                    break;
-                }
-            }
-        }
-
-        // If there are no picture sizes with the same aspect ratio as any preview sizes, allow all
-        // of the preview sizes and hope that the camera can handle it.  Probably unlikely, but we
-        // still account for it.
-        if (validPreviewSizes.size() == 0) {
-            Log.w(TAG, "No preview sizes have a corresponding same-aspect-ratio picture size");
-            for (android.hardware.Camera.Size previewSize : supportedPreviewSizes) {
-                // The null picture size will let us know that we shouldn't set a picture size.
-                validPreviewSizes.add(new SizePair(previewSize, null));
-            }
-        }
-
-        return validPreviewSizes;
-    }
-
-
-    private static SizePair selectSizePair(Camera camera, int desiredWidth, int desiredHeight) {
-        List<SizePair> validPreviewSizes = generateValidPreviewSizeList(camera);
-
-        // The method for selecting the best size is to minimize the sum of the differences between
-        // the desired values and the actual values for width and height.  This is certainly not the
-        // only way to select the best size, but it provides a decent tradeoff between using the
-        // closest aspect ratio vs. using the closest pixel area.
-        SizePair selectedPair = null;
-        int minDiff = Integer.MAX_VALUE;
-        for (SizePair sizePair : validPreviewSizes) {
-            com.google.android.gms.common.images.Size size = sizePair.previewSize();
-            int diff = Math.abs(size.getWidth() - desiredWidth) +
-                    Math.abs(size.getHeight() - desiredHeight);
-            if (diff < minDiff) {
-                selectedPair = sizePair;
-                minDiff = diff;
-            }
-        }
-
-        return selectedPair;
     }
 
     private TreeSet<AspectRatio> findCommonAspectRatios(List<Camera.Size> previewSizes, List<Camera.Size> pictureSizes) {
