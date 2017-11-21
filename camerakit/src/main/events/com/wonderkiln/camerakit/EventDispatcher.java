@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-class EventDispatcher {
+public class EventDispatcher {
 
     private Handler mainThreadHandler;
 

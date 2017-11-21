@@ -91,6 +91,7 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
     private boolean mIsStarted;
 
     private EventDispatcher mEventDispatcher;
+    private TextRecognizer textRecognizer;
 
     public CameraView(@NonNull Context context) {
         super(context, null);
@@ -131,11 +132,7 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
         mEventDispatcher = new EventDispatcher();
 
         mPreviewImpl = new SurfaceViewPreview(context, this);
-        TextRecognizer recognizer = new TextRecognizer.Builder(context).build();
-        recognizer.setProcessor(new TextProcessor());
-
         mCameraImpl = new Camera1(mEventDispatcher, mPreviewImpl);
-        mCameraImpl.setTextDetector(recognizer);
 
         mIsStarted = false;
 
@@ -432,6 +429,12 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
 
     public void captureImage() {
         captureImage(null);
+    }
+
+    public void setTextDetectionListener(final CameraKitEventCallback<CameraKitTextDetect> callback) {
+        textRecognizer = new TextRecognizer.Builder(getContext()).build();
+        textRecognizer.setProcessor(new TextProcessor(mEventDispatcher, callback));
+        mCameraImpl.setTextDetector(textRecognizer);
     }
 
     public void captureImage(final CameraKitEventCallback<CameraKitImage> callback) {
