@@ -1,4 +1,4 @@
-package com.wonderkiln.camerakit;
+package com.wonderkiln.camerakit.textrecognition;
 
 import android.util.Log;
 import android.util.SparseArray;
