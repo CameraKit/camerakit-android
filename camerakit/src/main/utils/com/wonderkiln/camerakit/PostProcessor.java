@@ -7,7 +7,6 @@ import android.graphics.Rect;
 import android.support.media.ExifInterface;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -76,12 +75,15 @@ public class PostProcessor {
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeByteArray(picture, 0, picture.length, options);
 
+        BitmapFactory.Options regionOptions = new BitmapFactory.Options();
+        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+
         return BitmapRegionDecoder.newInstance(
                 picture,
                 0,
                 picture.length,
                 true
-        ).decodeRegion(new Rect(0, 0, options.outWidth, options.outHeight), null);
+        ).decodeRegion(new Rect(0, 0, options.outWidth, options.outHeight), regionOptions);
     }
 
     private static class ExifPostProcessor {
