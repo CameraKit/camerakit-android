@@ -11,6 +11,10 @@ import com.wonderkiln.camerakit.Size;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
+/*
+Adapted/Copied from:
+https://github.com/googlesamples/android-vision/blob/master/visionSamples/ocr-codelab/ocr-reader-complete/app/src/main/java/com/google/android/gms/samples/vision/ocrreader/ui/camera/CameraSource.java#L1080
+*/
 
 /**
  * This runnable controls access to the underlying receiver, calling it to process frames when
