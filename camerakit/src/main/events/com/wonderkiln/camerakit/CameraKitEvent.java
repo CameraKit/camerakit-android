@@ -12,7 +12,7 @@ public class CameraKitEvent {
     public static final String TYPE_FACING_CHANGED = "CKFacingChangedEvent";
     public static final String TYPE_FLASH_CHANGED = "CKFlashChangedEvent";
 
-    public static final String TYPE_IMAGE_CAPTURED = "CKVideoCapturedEvent";
+    public static final String TYPE_IMAGE_CAPTURED = "CKImageCapturedEvent";
     public static final String TYPE_VIDEO_CAPTURED = "CKVideoCapturedEvent";
 
     private String type;
