@@ -14,6 +14,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,8 +25,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.wonderkiln.camerakit.CameraKit;
+import com.wonderkiln.camerakit.CameraKitEventCallback;
+import com.wonderkiln.camerakit.CameraKitTextDetect;
 import com.wonderkiln.camerakit.CameraView;
 
+import com.wonderkiln.camerakit.textrecognition.GooglePlayServicesUnavailableException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +37,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity {
+
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     @BindView(R.id.activityMain)
     DrawerLayout drawerLayout;
@@ -63,6 +69,16 @@ public class MainActivity extends AppCompatActivity {
 
         camera.setMethod(cameraMethod);
         camera.setCropOutput(cropOutput);
+        try {
+            camera.setTextDetectionListener(new CameraKitEventCallback<CameraKitTextDetect>() {
+                @Override
+                public void callback(CameraKitTextDetect event) {
+                    Log.d(TAG, "Found some text: " + event.getTextBlock().getText());
+                }
+            });
+        } catch (GooglePlayServicesUnavailableException e) {
+            // I hope text detection wasn't a huge part of your app
+        }
     }
 
     @Override

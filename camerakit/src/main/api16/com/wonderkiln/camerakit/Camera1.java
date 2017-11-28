@@ -14,6 +14,10 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.google.android.gms.vision.Detector;
+import com.google.android.gms.vision.text.TextBlock;
+import com.wonderkiln.camerakit.textrecognition.FrameProcessingRunnable;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -75,10 +79,14 @@ public class Camera1 extends CameraImpl {
     @VideoQuality
     private int mVideoQuality;
 
+    private Detector<TextBlock> mTextDetector;
+
     private int mVideoBitRate;
 
     private Handler mainHandler = new Handler(Looper.getMainLooper());
     private Handler mHandler = new Handler();
+
+    private FrameProcessingRunnable mFrameProcessor;
 
     private VideoCapturedCallback mVideoCallback;
 
@@ -86,6 +94,7 @@ public class Camera1 extends CameraImpl {
 
     Camera1(EventDispatcher eventDispatcher, PreviewImpl preview) {
         super(eventDispatcher, preview);
+
         preview.setCallback(new PreviewImpl.Callback() {
             @Override
             public void onSurfaceChanged() {
@@ -137,6 +146,9 @@ public class Camera1 extends CameraImpl {
 
         releaseMediaRecorder();
         releaseCamera();
+        if (mFrameProcessor != null) {
+            mFrameProcessor.cleanup();
+        }
     }
 
     void setDisplayAndDeviceOrientation() {
@@ -253,6 +265,11 @@ public class Camera1 extends CameraImpl {
     @Override
     void setZoom(@Zoom int zoom) {
         this.mZoom = zoom;
+    }
+
+    @Override
+    void setTextDetector(Detector<TextBlock> detector) {
+        this.mTextDetector = detector;
     }
 
     @Override
@@ -512,6 +529,11 @@ public class Camera1 extends CameraImpl {
             adjustCameraParameters();
 
             mEventDispatcher.dispatch(new CameraKitEvent(CameraKitEvent.TYPE_CAMERA_OPEN));
+
+            if (mTextDetector != null) {
+                mFrameProcessor = new FrameProcessingRunnable(mTextDetector, mPreviewSize, mCamera);
+                mFrameProcessor.start();
+            }
         }
     }
 
@@ -538,6 +560,9 @@ public class Camera1 extends CameraImpl {
                 mVideoSize = null;
 
                 mEventDispatcher.dispatch(new CameraKitEvent(CameraKitEvent.TYPE_CAMERA_CLOSE));
+                if (mFrameProcessor != null) {
+                    mFrameProcessor.release();
+                }
             }
         }
     }
@@ -990,5 +1015,4 @@ public class Camera1 extends CameraImpl {
             return normalized;
         }
     }
-
 }

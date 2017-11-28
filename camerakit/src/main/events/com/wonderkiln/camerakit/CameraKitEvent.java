@@ -15,6 +15,8 @@ public class CameraKitEvent {
     public static final String TYPE_IMAGE_CAPTURED = "CKVideoCapturedEvent";
     public static final String TYPE_VIDEO_CAPTURED = "CKVideoCapturedEvent";
 
+    public static final String TYPE_TEXT_DETECTED = "CKTextDetectedEvent";
+
     private String type;
     private String message;
 
