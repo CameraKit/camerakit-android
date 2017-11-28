@@ -59,6 +59,9 @@ abstract class PreviewImpl {
         return mHeight;
     }
 
+    abstract float getX();
+    abstract float getY();
+
     void setPreviewParameters(final int width, final int height, final int format) {
         this.mPreviewWidth = width;
         this.mPreviewHeight = height;

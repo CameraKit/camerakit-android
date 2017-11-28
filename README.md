@@ -25,17 +25,17 @@ With CameraKit you are able to seamlessly do the following...
 - Multiple capture methods.
   - `METHOD_STANDARD`: an image captured normally using the camera APIs.
   - `METHOD_STILL`: a freeze frame of the `CameraView` preview (similar to SnapChat and Instagram) for devices with slower cameras.
-  - **Coming soon:** `METHOD_SPEED`: automatic capture method determination based on measured speed.
+  - `METHOD_SPEED`: automatic capture method determination based on measured speed.
 - Built-in continuous focus.
 - Built-in tap to focus.
-- **Coming soon:** Built-in pinch to zoom.
+- Built-in pinch to zoom.
 
 
 ## Setup
 Add __CameraKit__ to the dependencies block in your `app` level `build.gradle`:
 
 ```groovy		
-compile 'com.wonderkiln:camerakit:0.12.1'		
+compile 'com.wonderkiln:camerakit:0.13.0'
 ```		
 
 

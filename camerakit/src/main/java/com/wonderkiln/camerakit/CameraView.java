@@ -30,9 +30,7 @@ import android.support.v4.hardware.display.DisplayManagerCompat;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.Display;
-import android.view.MotionEvent;
 import android.view.Surface;
-import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import com.google.android.gms.common.ConnectionResult;
@@ -40,11 +38,22 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.vision.text.TextRecognizer;
 import com.wonderkiln.camerakit.textrecognition.GooglePlayServicesUnavailableException;
 import com.wonderkiln.camerakit.textrecognition.TextProcessor;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CameraView extends FrameLayout implements LifecycleObserver {
+import static com.wonderkiln.camerakit.CameraKit.Constants.FACING_BACK;
+import static com.wonderkiln.camerakit.CameraKit.Constants.FACING_FRONT;
+import static com.wonderkiln.camerakit.CameraKit.Constants.FLASH_AUTO;
+import static com.wonderkiln.camerakit.CameraKit.Constants.FLASH_OFF;
+import static com.wonderkiln.camerakit.CameraKit.Constants.FLASH_ON;
+import static com.wonderkiln.camerakit.CameraKit.Constants.FLASH_TORCH;
+import static com.wonderkiln.camerakit.CameraKit.Constants.PERMISSIONS_LAZY;
+import static com.wonderkiln.camerakit.CameraKit.Constants.PERMISSIONS_PICTURE;
+import static com.wonderkiln.camerakit.CameraKit.Constants.PERMISSIONS_STRICT;
+
+public class CameraView extends CameraViewLayout implements LifecycleObserver {
 
     private static Handler sWorkerHandler;
 
@@ -72,6 +81,8 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
     @Zoom
     private int mZoom;
 
+    private float mDefaultZoom;
+
     @Permissions
     private int mPermissions;
 
@@ -80,6 +91,7 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
     private int mJpegQuality;
     private int mVideoBitRate;
     private boolean mCropOutput;
+    private boolean mDoubleTapToToggleFacing;
 
     private boolean mAdjustViewBounds;
 
@@ -93,19 +105,18 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
 
     private EventDispatcher mEventDispatcher;
 
+    private FocusMarkerLayout focusMarkerLayout;
+
     public CameraView(@NonNull Context context) {
-        super(context, null);
-        init(context, null);
+        this(context, null);
     }
 
-    @SuppressWarnings("all")
     public CameraView(@NonNull Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
-        init(context, attrs);
+        this(context, attrs, 0);
     }
 
-    @SuppressWarnings("WrongConstant")
-    private void init(@NonNull Context context, @Nullable AttributeSet attrs) {
+    public CameraView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
         if (attrs != null) {
             TypedArray a = context.getTheme().obtainStyledAttributes(
                     attrs,
@@ -118,11 +129,13 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
                 mFocus = a.getInteger(com.wonderkiln.camerakit.R.styleable.CameraView_ckFocus, CameraKit.Defaults.DEFAULT_FOCUS);
                 mMethod = a.getInteger(com.wonderkiln.camerakit.R.styleable.CameraView_ckMethod, CameraKit.Defaults.DEFAULT_METHOD);
                 mZoom = a.getInteger(com.wonderkiln.camerakit.R.styleable.CameraView_ckZoom, CameraKit.Defaults.DEFAULT_ZOOM);
+                mDefaultZoom = a.getFloat(R.styleable.CameraView_ckDefaultZoom, CameraKit.Defaults.DEFAULT_DEFAULT_ZOOM);
                 mPermissions = a.getInteger(com.wonderkiln.camerakit.R.styleable.CameraView_ckPermissions, CameraKit.Defaults.DEFAULT_PERMISSIONS);
                 mVideoQuality = a.getInteger(com.wonderkiln.camerakit.R.styleable.CameraView_ckVideoQuality, CameraKit.Defaults.DEFAULT_VIDEO_QUALITY);
                 mJpegQuality = a.getInteger(com.wonderkiln.camerakit.R.styleable.CameraView_ckJpegQuality, CameraKit.Defaults.DEFAULT_JPEG_QUALITY);
                 mCropOutput = a.getBoolean(com.wonderkiln.camerakit.R.styleable.CameraView_ckCropOutput, CameraKit.Defaults.DEFAULT_CROP_OUTPUT);
                 mVideoBitRate = a.getInteger(R.styleable.CameraView_ckVideoBitRate, CameraKit.Defaults.DEFAULT_VIDEO_BIT_RATE);
+                mDoubleTapToToggleFacing = a.getBoolean(R.styleable.CameraView_ckDoubleTapToToggleFacing, CameraKit.Defaults.DEFAULT_DOUBLE_TAP_TO_TOGGLE_FACING);
                 mAdjustViewBounds = a.getBoolean(com.wonderkiln.camerakit.R.styleable.CameraView_android_adjustViewBounds, CameraKit.Defaults.DEFAULT_ADJUST_VIEW_BOUNDS);
             } finally {
                 a.recycle();
@@ -148,6 +161,7 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
         setFocus(mFocus);
         setMethod(mMethod);
         setZoom(mZoom);
+        setDefaultZoom(mDefaultZoom);
         setPermissions(mPermissions);
         setVideoQuality(mVideoQuality);
         setVideoBitRate(mVideoBitRate);
@@ -161,20 +175,8 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
                 }
             };
 
-            final FocusMarkerLayout focusMarkerLayout = new FocusMarkerLayout(getContext());
+            focusMarkerLayout = new FocusMarkerLayout(getContext());
             addView(focusMarkerLayout);
-            focusMarkerLayout.setOnTouchListener(new OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent motionEvent) {
-                    int action = motionEvent.getAction();
-                    if (motionEvent.getAction() == MotionEvent.ACTION_UP && mFocus == CameraKit.Constants.FOCUS_TAP_WITH_MARKER) {
-                        focusMarkerLayout.focus(motionEvent.getX(), motionEvent.getY());
-                    }
-
-                    mPreviewImpl.getView().dispatchTouchEvent(motionEvent);
-                    return true;
-                }
-            });
         }
         mLifecycle = null;
     }
@@ -312,6 +314,42 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
         mCameraImpl.stop();
     }
 
+
+    @Override
+    protected CameraImpl getCameraImpl() {
+        return mCameraImpl;
+    }
+
+    @Override
+    protected PreviewImpl getPreviewImpl() {
+        return mPreviewImpl;
+    }
+
+    @Override
+    protected void onZoom(float zoom) {
+        if (mZoom == CameraKit.Constants.ZOOM_PINCH) {
+            mCameraImpl.setZoomFactor(zoom);
+        }
+    }
+
+    @Override
+    protected void onTapToFocus(float x, float y) {
+        if (mFocus == CameraKit.Constants.FOCUS_TAP || mFocus == CameraKit.Constants.FOCUS_TAP_WITH_MARKER) {
+            focusMarkerLayout.focus(x, y);
+
+            float px = x - getPreviewImpl().getX();
+            float py = y - getPreviewImpl().getY();
+            mCameraImpl.setFocusArea(px / (float) getPreviewImpl().getWidth(), py / (float) getPreviewImpl().getHeight());
+        }
+    }
+
+    @Override
+    protected void onToggleFacing() {
+        if (mDoubleTapToToggleFacing) {
+            toggleFacing();
+        }
+    }
+
     @Nullable
     public CameraProperties getCameraProperties() {
         return mCameraImpl.getCameraProperties();
@@ -367,7 +405,11 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
 
     public void setZoom(@Zoom int zoom) {
         this.mZoom = zoom;
-        mCameraImpl.setZoom(mZoom);
+    }
+
+    public void setDefaultZoom(float zoom) {
+        this.mDefaultZoom = zoom;
+        mCameraImpl.setDefaultZoomPercent((int) (zoom * 100));
     }
 
     public void setPermissions(@Permissions int permissions) {

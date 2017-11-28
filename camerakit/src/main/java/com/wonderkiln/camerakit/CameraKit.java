@@ -55,6 +55,7 @@ public class CameraKit {
         static final int DEFAULT_FLASH = Constants.FLASH_OFF;
         static final int DEFAULT_FOCUS = Constants.FOCUS_CONTINUOUS;
         static final int DEFAULT_ZOOM = Constants.ZOOM_OFF;
+        static final float DEFAULT_DEFAULT_ZOOM = 1.f;
         static final int DEFAULT_METHOD = Constants.METHOD_STANDARD;
         static final int DEFAULT_PERMISSIONS = Constants.PERMISSIONS_STRICT;
         static final int DEFAULT_VIDEO_QUALITY = Constants.VIDEO_QUALITY_480P;
@@ -62,6 +63,7 @@ public class CameraKit {
         static final int DEFAULT_JPEG_QUALITY = 100;
         static final int DEFAULT_VIDEO_BIT_RATE = 0;
         static final boolean DEFAULT_CROP_OUTPUT = false;
+        static final boolean DEFAULT_DOUBLE_TAP_TO_TOGGLE_FACING = false;
         static final boolean DEFAULT_ADJUST_VIEW_BOUNDS = false;
 
     }

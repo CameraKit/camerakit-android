@@ -28,8 +28,13 @@ abstract class CameraImpl {
     abstract void setMethod(@CaptureMethod int method);
     abstract void setZoom(@Zoom int zoom);
     abstract void setTextDetector(Detector<TextBlock> detector);
+
     abstract void setVideoQuality(@VideoQuality int videoQuality);
     abstract void setVideoBitRate(int videoBitRate);
+
+    abstract void setDefaultZoomPercent(int zoom);
+    abstract void setZoomFactor(float zoom);
+    abstract void setFocusArea(float x, float y);
 
     abstract void captureImage(ImageCapturedCallback callback);
     interface ImageCapturedCallback {

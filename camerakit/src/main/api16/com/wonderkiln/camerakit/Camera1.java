@@ -5,14 +5,12 @@ import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
+import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.view.MotionEvent;
-import android.view.View;
 
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.text.TextBlock;
@@ -73,9 +71,6 @@ public class Camera1 extends CameraImpl {
     @CaptureMethod
     private int mMethod;
 
-    @Zoom
-    private int mZoom;
-
     @VideoQuality
     private int mVideoQuality;
 
@@ -83,10 +78,11 @@ public class Camera1 extends CameraImpl {
 
     private int mVideoBitRate;
 
-    private Handler mainHandler = new Handler(Looper.getMainLooper());
     private Handler mHandler = new Handler();
-
     private FrameProcessingRunnable mFrameProcessor;
+
+    private float zoom = 0;
+    private int defaultZoomPercent = -1;
 
     private VideoCapturedCallback mVideoCallback;
 
@@ -220,7 +216,6 @@ public class Camera1 extends CameraImpl {
             switch (focus) {
                 case FOCUS_CONTINUOUS:
                     if (mCameraParameters != null) {
-                        detachFocusTapListener();
                         final List<String> modes = mCameraParameters.getSupportedFocusModes();
                         if (modes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
                             mCameraParameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
@@ -232,7 +227,6 @@ public class Camera1 extends CameraImpl {
 
                 case FOCUS_TAP:
                     if (mCameraParameters != null) {
-                        attachFocusTapListener();
                         final List<String> modes = mCameraParameters.getSupportedFocusModes();
                         if (modes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
                             mCameraParameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
@@ -242,7 +236,6 @@ public class Camera1 extends CameraImpl {
 
                 case FOCUS_OFF:
                     if (mCameraParameters != null) {
-                        detachFocusTapListener();
                         final List<String> modes = mCameraParameters.getSupportedFocusModes();
                         if (modes.contains(Camera.Parameters.FOCUS_MODE_FIXED)) {
                             mCameraParameters.setFocusMode(Camera.Parameters.FOCUS_MODE_FIXED);
@@ -280,6 +273,119 @@ public class Camera1 extends CameraImpl {
     @Override
     void setVideoBitRate(int videoBitRate) {
         this.mVideoBitRate = videoBitRate;
+    }
+
+    @Override
+    void setDefaultZoomPercent(int zoom) {
+        synchronized (mCameraLock) {
+            this.defaultZoomPercent = zoom;
+            if (mCameraParameters != null && mCameraParameters.isZoomSupported()) {
+                mCameraParameters.setZoom(getZoomForPercent(zoom));
+                mCamera.setParameters(mCameraParameters);
+            }
+        }
+    }
+
+    private int getZoomForPercent(int zoomPercent) {
+        List<Integer> zoomRatios = mCameraParameters.getZoomRatios();
+        int lowerIndex = -1;
+        int upperIndex = -1;
+
+        for (int i = 0; i < zoomRatios.size(); i++) {
+            if (zoomRatios.get(i) < zoomPercent) {
+                lowerIndex = i;
+            } else if (zoomRatios.get(i) > zoomPercent) {
+                upperIndex = i;
+                break;
+            }
+        }
+
+        if (lowerIndex < 0) {
+            return 0;
+        }
+
+        if (lowerIndex + 1 == upperIndex) {
+            return lowerIndex;
+        }
+
+        if (upperIndex >= 0) {
+            return upperIndex;
+        }
+
+        return zoomRatios.size() - 1;
+    }
+
+    @Override
+    void setZoomFactor(float zoom) {
+        synchronized (mCameraLock) {
+            this.zoom = zoom;
+            if (mCameraParameters != null && mCameraParameters.isZoomSupported()) {
+                mCameraParameters.setZoom((int) (this.zoom * mCameraParameters.getMaxZoom()));
+                mCamera.setParameters(mCameraParameters);
+            }
+        }
+    }
+
+    @Override
+    void setFocusArea(float x, float y) {
+        synchronized (mCameraLock) {
+            if (mCamera != null) {
+                Camera.Parameters parameters = getCameraParameters();
+                if (parameters == null) return;
+
+                String focusMode = parameters.getFocusMode();
+                Rect rect = calculateFocusArea(x, y);
+
+                List<Camera.Area> meteringAreas = new ArrayList<>();
+                meteringAreas.add(new Camera.Area(rect, getFocusMeteringAreaWeight()));
+                if (parameters.getMaxNumFocusAreas() != 0 && focusMode != null &&
+                        (focusMode.equals(Camera.Parameters.FOCUS_MODE_AUTO) ||
+                                focusMode.equals(Camera.Parameters.FOCUS_MODE_MACRO) ||
+                                focusMode.equals(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE) ||
+                                focusMode.equals(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO))
+                        ) {
+                    parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+                    parameters.setFocusAreas(meteringAreas);
+                    if (parameters.getMaxNumMeteringAreas() > 0) {
+                        parameters.setMeteringAreas(meteringAreas);
+                    }
+                    if (!parameters.getSupportedFocusModes().contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
+                        return; //cannot autoFocus
+                    }
+                    mCamera.setParameters(parameters);
+                    mCamera.autoFocus(new Camera.AutoFocusCallback() {
+                        @Override
+                        public void onAutoFocus(boolean success, Camera camera) {
+                            resetFocus(success, camera);
+                        }
+                    });
+                } else if (parameters.getMaxNumMeteringAreas() > 0) {
+                    if (!parameters.getSupportedFocusModes().contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
+                        return; //cannot autoFocus
+                    }
+                    parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+                    parameters.setFocusAreas(meteringAreas);
+                    parameters.setMeteringAreas(meteringAreas);
+
+                    mCamera.setParameters(parameters);
+                    mCamera.autoFocus(new Camera.AutoFocusCallback() {
+                        @Override
+                        public void onAutoFocus(boolean success, Camera camera) {
+                            resetFocus(success, camera);
+                        }
+                    });
+                } else {
+                    mCamera.autoFocus(new Camera.AutoFocusCallback() {
+                        @Override
+                        public void onAutoFocus(boolean success, Camera camera) {
+                            if (mAutofocusCallback != null) {
+                                mAutofocusCallback.onAutoFocus(success, camera);
+                            }
+                        }
+                    });
+                }
+            }
+        }
     }
 
     @Override
@@ -528,6 +634,17 @@ public class Camera1 extends CameraImpl {
             collectCameraProperties();
             adjustCameraParameters();
 
+            if (Build.VERSION.SDK_INT >= 16) {
+                mCamera.setAutoFocusMoveCallback(new Camera.AutoFocusMoveCallback() {
+                    @Override
+                    public void onAutoFocusMoving(boolean b, Camera camera) {
+                        CameraKitEvent event = new CameraKitEvent(CameraKitEvent.TYPE_FOCUS_MOVED);
+                        event.getData().putBoolean("started", b);
+                        mEventDispatcher.dispatch(event);
+                    }
+                });
+            }
+
             mEventDispatcher.dispatch(new CameraKitEvent(CameraKitEvent.TYPE_CAMERA_OPEN));
 
             if (mTextDetector != null) {
@@ -696,6 +813,16 @@ public class Camera1 extends CameraImpl {
             setFlash(mFlash);
         } catch (Exception e) {
             notifyErrorListener(e);
+        }
+
+        if (mCameraParameters.isZoomSupported()) {
+            if (this.defaultZoomPercent >= 1) {
+                int zoomToSet = getZoomForPercent(this.defaultZoomPercent);
+                mCameraParameters.setZoom(zoomToSet);
+                this.zoom = (float) zoomToSet / (float) mCameraParameters.getMaxZoom();
+            } else {
+                mCameraParameters.setZoom((int) (mCameraParameters.getMaxZoom() * this.zoom));
+            }
         }
 
         mCamera.setParameters(mCameraParameters);
@@ -892,78 +1019,6 @@ public class Camera1 extends CameraImpl {
         return FOCUS_METERING_AREA_WEIGHT_DEFAULT;
     }
 
-    private void detachFocusTapListener() {
-        mPreview.getView().setOnTouchListener(null);
-    }
-
-    private void attachFocusTapListener() {
-        mPreview.getView().setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_UP) {
-                    synchronized (mCameraLock) {
-                        if (mCamera != null) {
-                            Camera.Parameters parameters = getCameraParameters();
-                            if (parameters == null) return false;
-
-                            String focusMode = parameters.getFocusMode();
-                            Rect rect = calculateFocusArea(event.getX(), event.getY());
-                            List<Camera.Area> meteringAreas = new ArrayList<>();
-                            meteringAreas.add(new Camera.Area(rect, getFocusMeteringAreaWeight()));
-                            if (parameters.getMaxNumFocusAreas() != 0 && focusMode != null &&
-                                    (focusMode.equals(Camera.Parameters.FOCUS_MODE_AUTO) ||
-                                            focusMode.equals(Camera.Parameters.FOCUS_MODE_MACRO) ||
-                                            focusMode.equals(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE) ||
-                                            focusMode.equals(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO))
-                                    ) {
-                                parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
-                                parameters.setFocusAreas(meteringAreas);
-                                if (parameters.getMaxNumMeteringAreas() > 0) {
-                                    parameters.setMeteringAreas(meteringAreas);
-                                }
-                                if (!parameters.getSupportedFocusModes().contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
-                                    return false; //cannot autoFocus
-                                }
-                                mCamera.setParameters(parameters);
-                                mCamera.autoFocus(new Camera.AutoFocusCallback() {
-                                    @Override
-                                    public void onAutoFocus(boolean success, Camera camera) {
-                                        resetFocus(success, camera);
-                                    }
-                                });
-                            } else if (parameters.getMaxNumMeteringAreas() > 0) {
-                                if (!parameters.getSupportedFocusModes().contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
-                                    return false; //cannot autoFocus
-                                }
-                                parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
-                                parameters.setFocusAreas(meteringAreas);
-                                parameters.setMeteringAreas(meteringAreas);
-
-                                mCamera.setParameters(parameters);
-                                mCamera.autoFocus(new Camera.AutoFocusCallback() {
-                                    @Override
-                                    public void onAutoFocus(boolean success, Camera camera) {
-                                        resetFocus(success, camera);
-                                    }
-                                });
-                            } else {
-                                mCamera.autoFocus(new Camera.AutoFocusCallback() {
-                                    @Override
-                                    public void onAutoFocus(boolean success, Camera camera) {
-                                        if (mAutofocusCallback != null) {
-                                            mAutofocusCallback.onAutoFocus(success, camera);
-                                        }
-                                    }
-                                });
-                            }
-                        }
-                    }
-                }
-                return true;
-            }
-        });
-    }
-
     private void resetFocus(final boolean success, final Camera camera) {
         mHandler.removeCallbacksAndMessages(null);
         mHandler.postDelayed(new Runnable() {
@@ -992,27 +1047,20 @@ public class Camera1 extends CameraImpl {
     }
 
     private Rect calculateFocusArea(float x, float y) {
-        int buffer = getFocusAreaSize() / 2;
-        int centerX = calculateCenter(x, mPreview.getView().getWidth(), buffer);
-        int centerY = calculateCenter(y, mPreview.getView().getHeight(), buffer);
-        return new Rect(
-                centerX - buffer,
-                centerY - buffer,
-                centerX + buffer,
-                centerY + buffer
-        );
-    }
+        int padding = getFocusAreaSize() / 2;
+        int centerX = (int) (x * 2000);
+        int centerY = (int) (y * 2000);
 
-    private static int calculateCenter(float coord, int dimen, int buffer) {
-        int normalized = (int) ((coord / dimen) * 2000 - 1000);
-        if (Math.abs(normalized) + buffer > 1000) {
-            if (normalized > 0) {
-                return 1000 - buffer;
-            } else {
-                return -1000 + buffer;
-            }
-        } else {
-            return normalized;
-        }
+        int left = centerX - padding;
+        int top = centerY - padding;
+        int right = centerX + padding;
+        int bottom = centerY + padding;
+
+        if (left < 0) left = 0;
+        if (right > 2000) right = 2000;
+        if (top < 0) top = 0;
+        if (bottom > 2000) bottom = 2000;
+
+        return new Rect(left - 1000, top - 1000, right - 1000, bottom - 1000);
     }
 }

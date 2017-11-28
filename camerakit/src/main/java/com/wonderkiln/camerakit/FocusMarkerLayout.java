@@ -30,6 +30,8 @@ public class FocusMarkerLayout extends FrameLayout {
     }
 
     public void focus(float mx, float my) {
+        mx *= getWidth();
+        my *= getHeight();
         int x = (int) (mx - mFocusMarkerContainer.getWidth() / 2);
         int y = (int) (my - mFocusMarkerContainer.getWidth() / 2);
 
