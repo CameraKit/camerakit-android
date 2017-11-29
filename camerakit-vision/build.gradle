@@ -20,15 +20,13 @@ android {
 }
 
 dependencies {
-    compile project(':camerakit-core')
-    compile project(':camerakit-vision')
 }
 
 install {
     repositories.mavenInstaller {
         pom.project {
             groupId 'com.wonderkiln'
-            artifactId 'camerakit'
+            artifactId 'camerakit-vision'
             name 'CameraKit-Android'
             packaging 'aar'
         }
@@ -53,3 +51,4 @@ bintray {
         }
     }
 }
+
