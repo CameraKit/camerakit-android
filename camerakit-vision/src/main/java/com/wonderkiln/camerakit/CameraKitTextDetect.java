@@ -1,7 +1,5 @@
 package com.wonderkiln.camerakit;
 
-import com.wonderkiln.camerakit.textrecognition.TextProcessor.CameraKitTextBlock;
-
 public class CameraKitTextDetect extends CameraKitEvent {
 
     private CameraKitTextBlock textBlock;

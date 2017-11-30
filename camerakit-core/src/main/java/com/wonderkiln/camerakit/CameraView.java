@@ -32,7 +32,7 @@ import android.util.AttributeSet;
 import android.view.Display;
 import android.view.Surface;
 import android.view.WindowManager;
-import android.widget.FrameLayout;
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.vision.text.TextRecognizer;
@@ -42,16 +42,6 @@ import com.wonderkiln.camerakit.textrecognition.TextProcessor;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.wonderkiln.camerakit.CameraKit.Constants.FACING_BACK;
-import static com.wonderkiln.camerakit.CameraKit.Constants.FACING_FRONT;
-import static com.wonderkiln.camerakit.CameraKit.Constants.FLASH_AUTO;
-import static com.wonderkiln.camerakit.CameraKit.Constants.FLASH_OFF;
-import static com.wonderkiln.camerakit.CameraKit.Constants.FLASH_ON;
-import static com.wonderkiln.camerakit.CameraKit.Constants.FLASH_TORCH;
-import static com.wonderkiln.camerakit.CameraKit.Constants.PERMISSIONS_LAZY;
-import static com.wonderkiln.camerakit.CameraKit.Constants.PERMISSIONS_PICTURE;
-import static com.wonderkiln.camerakit.CameraKit.Constants.PERMISSIONS_STRICT;
 
 public class CameraView extends CameraViewLayout implements LifecycleObserver {
 
@@ -263,6 +253,10 @@ public class CameraView extends CameraViewLayout implements LifecycleObserver {
     public void onPause(LifecycleOwner owner) {
         mLifecycle = owner.getLifecycle();
         stop();
+    }
+
+    public void addController(CameraKitController controller) {
+
     }
 
     public void start() {

@@ -1,4 +1,4 @@
-package com.wonderkiln.camerakit.textrecognition;
+package com.wonderkiln.camerakit;
 
 import android.graphics.ImageFormat;
 import android.hardware.Camera;
@@ -6,7 +6,6 @@ import android.util.Log;
 
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.Frame;
-import com.wonderkiln.camerakit.Size;
 
 import java.nio.ByteBuffer;
 import java.util.HashMap;

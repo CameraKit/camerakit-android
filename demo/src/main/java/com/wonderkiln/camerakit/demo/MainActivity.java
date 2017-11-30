@@ -29,7 +29,7 @@ import com.wonderkiln.camerakit.CameraKitEventCallback;
 import com.wonderkiln.camerakit.CameraKitTextDetect;
 import com.wonderkiln.camerakit.CameraView;
 
-import com.wonderkiln.camerakit.textrecognition.GooglePlayServicesUnavailableException;
+import com.wonderkiln.camerakit.GooglePlayServicesUnavailableException;
 import java.util.ArrayList;
 import java.util.List;
 
