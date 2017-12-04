@@ -465,10 +465,10 @@ public class Camera1 extends CameraImpl {
     }
 
     @Override
-    void captureVideo(VideoCapturedCallback callback) {
+    void captureVideo(File videoFile, VideoCapturedCallback callback) {
         synchronized (mCameraLock) {
             try {
-                if (prepareMediaRecorder()) {
+                if (prepareMediaRecorder(videoFile)) {
                     mMediaRecorder.start();
                     mRecording = true;
                     this.mVideoCallback = callback;
@@ -882,7 +882,7 @@ public class Camera1 extends CameraImpl {
         return output;
     }
 
-    private boolean prepareMediaRecorder() throws IOException {
+    private boolean prepareMediaRecorder(File videoFile) throws IOException {
         synchronized (mCameraLock) {
             mCamera.unlock();
 
@@ -895,7 +895,7 @@ public class Camera1 extends CameraImpl {
             CamcorderProfile profile = getCamcorderProfile(mVideoQuality);
             mMediaRecorder.setProfile(profile);
 
-            File videoFile = getVideoFile();
+            if (videoFile == null) videoFile = getVideoFile();
             if (videoFile == null) {
                 return false;
             }

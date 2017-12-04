@@ -467,11 +467,19 @@ public class CameraView extends CameraViewLayout {
     }
 
     public void captureVideo() {
-        captureVideo(null);
+        captureVideo(null, null);
     }
 
-    public void captureVideo(final CameraKitEventCallback<CameraKitVideo> callback) {
-        mCameraImpl.captureVideo(new CameraImpl.VideoCapturedCallback() {
+    public void captureVideo(File videoFile) {
+        captureVideo(videoFile, null);
+    }
+
+    public void captureVideo(CameraKitEventCallback<CameraKitVideo> callback) {
+        captureVideo(null, callback);
+    }
+
+    public void captureVideo(File videoFile, final CameraKitEventCallback<CameraKitVideo> callback) {
+        mCameraImpl.captureVideo(videoFile, new CameraImpl.VideoCapturedCallback() {
             @Override
             public void videoCaptured(File file) {
                 CameraKitVideo video = new CameraKitVideo(file);

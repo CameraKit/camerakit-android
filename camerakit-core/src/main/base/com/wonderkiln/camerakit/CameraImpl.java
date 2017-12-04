@@ -40,7 +40,7 @@ abstract class CameraImpl {
         void imageCaptured(byte[] jpeg);
     }
 
-    abstract void captureVideo(VideoCapturedCallback callback);
+    abstract void captureVideo(File videoFile, VideoCapturedCallback callback);
     interface VideoCapturedCallback {
         void videoCaptured(File file);
     }
