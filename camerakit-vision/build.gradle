@@ -20,15 +20,15 @@ android {
 }
 
 dependencies {
-    compile project(':camerakit-core')
-    compile project(':camerakit-vision')
+    api project(':camerakit-core')
+    implementation 'com.google.android.gms:play-services-vision:11.6.2'
 }
 
 install {
     repositories.mavenInstaller {
         pom.project {
             groupId 'com.wonderkiln'
-            artifactId 'camerakit'
+            artifactId 'camerakit-vision'
             name 'CameraKit-Android'
             packaging 'aar'
         }
@@ -53,3 +53,4 @@ bintray {
         }
     }
 }
+

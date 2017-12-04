@@ -17,19 +17,34 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    sourceSets {
+        main.java.srcDirs += 'src/main/base'
+        main.java.srcDirs += 'src/main/api16'
+        main.java.srcDirs += 'src/main/api21'
+        main.java.srcDirs += 'src/main/types'
+        main.java.srcDirs += 'src/main/events'
+        main.java.srcDirs += 'src/main/utils'
+        main.java.srcDirs += 'src/main/vision'
+    }
+    externalNativeBuild {
+        cmake {
+            path 'src/main/cpp/CMakeLists.txt'
+        }
+    }
 }
 
 dependencies {
-    compile project(':camerakit-core')
-    compile project(':camerakit-vision')
+    compile 'com.android.support:appcompat-v7:27.0.2'
+    compile 'com.android.support:exifinterface:27.0.2'
+    implementation 'com.google.android.gms:play-services-vision:11.6.2'
 }
 
 install {
     repositories.mavenInstaller {
         pom.project {
             groupId 'com.wonderkiln'
-            artifactId 'camerakit'
-            name 'CameraKit-Android'
+            artifactId 'camerakit-core'
+            name 'CameraKit-Core-Android'
             packaging 'aar'
         }
     }
@@ -43,7 +58,7 @@ bintray {
     configurations = ['archives']
     pkg {
         repo = 'snapshots'
-        name = 'CameraKit-Android'
+        name = 'CameraKit-Core-Android'
         userOrg = 'wonderkiln'
         vcsUrl = 'https://github.com/wonderkiln/CameraKit-Android.git'
         version {

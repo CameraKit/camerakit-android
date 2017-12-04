@@ -1,3 +1,16 @@
+ext {
+    versionName = '0.13.0-Snapshot'
+
+    bintrayUser = System.getenv('BINTRAY_USER')
+    bintrayKey = System.getenv('BINTRAY_KEY')
+
+    compileSdkVersion = 27
+    buildToolsVersion = '27.0.0'
+
+    minSdkVersion = 15
+    targetSdkVersion = 27
+}
+
 buildscript {
     repositories {
         jcenter()
