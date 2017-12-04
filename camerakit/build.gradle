@@ -1,6 +1,6 @@
 apply plugin: 'com.android.library'
 
-def ver = '0.12.2'
+def ver = '0.12.3-Snapshot'
 
 def isSnapshot(version) {
     return version.contains('-Snapshot') || System.getenv('CIRCLE_TAG') == null || System.getenv('CIRCLE_TAG').length() == 0
