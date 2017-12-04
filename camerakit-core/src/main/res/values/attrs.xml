@@ -22,12 +22,9 @@
             <enum name="tapWithMarker" value="3" />
         </attr>
 
-        <attr name="ckZoom" format="enum">
-            <enum name="off" value="0" />
-            <enum name="pinch" value="1" />
-        </attr>
+        <attr name="ckPinchToZoom" format="boolean" />
 
-        <attr name="ckDefaultZoom" format="float" />
+        <attr name="ckZoom" format="float" />
 
         <attr name="ckMethod" format="enum">
             <enum name="standard" value="0" />

@@ -28,12 +28,8 @@ public class CameraKit {
         public static final int FOCUS_TAP = 2;
         public static final int FOCUS_TAP_WITH_MARKER = 3;
 
-        public static final int ZOOM_OFF = 0;
-        public static final int ZOOM_PINCH = 1;
-
         public static final int METHOD_STANDARD = 0;
         public static final int METHOD_STILL = 1;
-        public static final int METHOD_SPEED = 2;
 
         public static final int PERMISSIONS_STRICT = 0;
         public static final int PERMISSIONS_LAZY = 1;
@@ -54,8 +50,8 @@ public class CameraKit {
         static final int DEFAULT_FACING = Constants.FACING_BACK;
         static final int DEFAULT_FLASH = Constants.FLASH_OFF;
         static final int DEFAULT_FOCUS = Constants.FOCUS_CONTINUOUS;
-        static final int DEFAULT_ZOOM = Constants.ZOOM_OFF;
-        static final float DEFAULT_DEFAULT_ZOOM = 1.f;
+        static final boolean DEFAULT_PINCH_TO_ZOOM = true;
+        static final float DEFAULT_ZOOM = 1.f;
         static final int DEFAULT_METHOD = Constants.METHOD_STANDARD;
         static final int DEFAULT_PERMISSIONS = Constants.PERMISSIONS_STRICT;
         static final int DEFAULT_VIDEO_QUALITY = Constants.VIDEO_QUALITY_480P;
