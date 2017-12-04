@@ -25,6 +25,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.hardware.display.DisplayManagerCompat;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Display;
 import android.view.Surface;
 import android.view.WindowManager;
@@ -111,7 +112,7 @@ public class CameraView extends CameraViewLayout {
                 mFlash = a.getInteger(R.styleable.CameraView_ckFlash, CameraKit.Defaults.DEFAULT_FLASH);
                 mFocus = a.getInteger(R.styleable.CameraView_ckFocus, CameraKit.Defaults.DEFAULT_FOCUS);
                 mMethod = a.getInteger(R.styleable.CameraView_ckMethod, CameraKit.Defaults.DEFAULT_METHOD);
-                mPinchToZoom = a.getBoolean(R.styleable.CameraView_ckZoom, CameraKit.Defaults.DEFAULT_PINCH_TO_ZOOM);
+                mPinchToZoom = a.getBoolean(R.styleable.CameraView_ckPinchToZoom, CameraKit.Defaults.DEFAULT_PINCH_TO_ZOOM);
                 mZoom = a.getFloat(R.styleable.CameraView_ckZoom, CameraKit.Defaults.DEFAULT_ZOOM);
                 mPermissions = a.getInteger(R.styleable.CameraView_ckPermissions, CameraKit.Defaults.DEFAULT_PERMISSIONS);
                 mVideoQuality = a.getInteger(R.styleable.CameraView_ckVideoQuality, CameraKit.Defaults.DEFAULT_VIDEO_QUALITY);
@@ -286,9 +287,9 @@ public class CameraView extends CameraViewLayout {
     }
 
     @Override
-    protected void onZoom(float zoom) {
+    protected void onZoom(float modifier, boolean start) {
         if (mPinchToZoom) {
-            mCameraImpl.setZoomFactor(zoom);
+            mCameraImpl.modifyZoom((modifier - 1) * 0.8f + 1);
         }
     }
 
@@ -369,7 +370,7 @@ public class CameraView extends CameraViewLayout {
 
     public void setZoom(float zoom) {
         this.mZoom = zoom;
-        mCameraImpl.setDefaultZoomPercent((int) (zoom * 100));
+        mCameraImpl.setZoom(zoom);
     }
 
     public void setPermissions(@Permissions int permissions) {
@@ -456,7 +457,8 @@ public class CameraView extends CameraViewLayout {
                 PostProcessor postProcessor = new PostProcessor(jpeg);
                 postProcessor.setJpegQuality(mJpegQuality);
                 postProcessor.setFacing(mFacing);
-                if (mCropOutput) postProcessor.setCropOutput(AspectRatio.of(getWidth(), getHeight()));
+                if (mCropOutput)
+                    postProcessor.setCropOutput(AspectRatio.of(getWidth(), getHeight()));
 
                 CameraKitImage image = new CameraKitImage(postProcessor.getJpeg());
                 if (callback != null) callback.callback(image);

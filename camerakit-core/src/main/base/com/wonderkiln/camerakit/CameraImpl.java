@@ -31,8 +31,8 @@ abstract class CameraImpl {
     abstract void setVideoQuality(@VideoQuality int videoQuality);
     abstract void setVideoBitRate(int videoBitRate);
 
-    abstract void setDefaultZoomPercent(int zoom);
-    abstract void setZoomFactor(float zoom);
+    abstract void setZoom(float zoomFactor);
+    abstract void modifyZoom(float modifier);
     abstract void setFocusArea(float x, float y);
 
     abstract void captureImage(ImageCapturedCallback callback);

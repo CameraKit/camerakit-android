@@ -11,8 +11,6 @@ import android.widget.FrameLayout;
 
 public abstract class CameraViewLayout extends FrameLayout {
 
-    protected float zoom = 0.0f;
-
     private ScaleGestureDetector scaleGestureDetector;
     private GestureDetector gestureDetector;
 
@@ -46,7 +44,7 @@ public abstract class CameraViewLayout extends FrameLayout {
 
     protected abstract PreviewImpl getPreviewImpl();
 
-    protected abstract void onZoom(float zoom);
+    protected abstract void onZoom(float zoom, boolean start);
 
     protected abstract void onTapToFocus(float x, float y);
 
@@ -71,13 +69,13 @@ public abstract class CameraViewLayout extends FrameLayout {
 
         @Override
         public boolean onScale(ScaleGestureDetector scaleGestureDetector) {
-            zoom = Math.max(0, Math.min(1, ((1 + zoom) * scaleGestureDetector.getScaleFactor()) - 1));
-            onZoom(zoom);
+            onZoom(scaleGestureDetector.getScaleFactor(), false);
             return true;
         }
 
         @Override
         public boolean onScaleBegin(ScaleGestureDetector scaleGestureDetector) {
+            onZoom(scaleGestureDetector.getScaleFactor(), true);
             return true;
         }
 

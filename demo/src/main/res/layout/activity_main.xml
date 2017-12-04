@@ -28,7 +28,7 @@
                 app:ckMethod="standard"
                 app:ckPinchToZoom="true"
                 app:ckVideoQuality="highest"
-                app:ckZoom="1.0" />
+                app:ckZoom="2.0" />
 
         </FrameLayout>
 
