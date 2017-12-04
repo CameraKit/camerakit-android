@@ -23,6 +23,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.wonderkiln.camerakit.CameraKit;
 import com.wonderkiln.camerakit.CameraKitEventCallback;
@@ -69,16 +70,6 @@ public class MainActivity extends AppCompatActivity {
 
         camera.setMethod(cameraMethod);
         camera.setCropOutput(cropOutput);
-        try {
-            camera.setTextDetectionListener(new CameraKitEventCallback<CameraKitTextDetect>() {
-                @Override
-                public void callback(CameraKitTextDetect event) {
-                    Log.d(TAG, "Found some text: " + event.getTextBlock().getText());
-                }
-            });
-        } catch (GooglePlayServicesUnavailableException e) {
-            // I hope text detection wasn't a huge part of your app
-        }
     }
 
     @Override
