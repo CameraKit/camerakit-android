@@ -26,7 +26,6 @@ abstract class CameraImpl {
     abstract void setFlash(@Flash int flash);
     abstract void setFocus(@Focus int focus);
     abstract void setMethod(@CaptureMethod int method);
-    abstract void setZoom(@Zoom int zoom);
     abstract void setTextDetector(Detector<TextBlock> detector);
 
     abstract void setVideoQuality(@VideoQuality int videoQuality);

@@ -14,7 +14,6 @@ import android.util.Log;
 
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.text.TextBlock;
-import com.wonderkiln.camerakit.textrecognition.FrameProcessingRunnable;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -253,11 +252,6 @@ public class Camera1 extends CameraImpl {
     @Override
     void setMethod(@CaptureMethod int method) {
         this.mMethod = method;
-    }
-
-    @Override
-    void setZoom(@Zoom int zoom) {
-        this.mZoom = zoom;
     }
 
     @Override
