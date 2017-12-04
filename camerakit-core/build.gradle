@@ -39,11 +39,12 @@ dependencies {
     implementation 'com.google.android.gms:play-services-vision:11.6.2'
 }
 
+group = 'com.wonderkiln'
+version = rootProject.ext.versionName
+
 install {
     repositories.mavenInstaller {
         pom.project {
-            groupId 'com.wonderkiln'
-            artifactId 'camerakit-core'
             name 'CameraKit-Core-Android'
             packaging 'aar'
         }
