@@ -29,7 +29,7 @@ install {
         pom.project {
             groupId 'com.wonderkiln'
             artifactId 'camerakit-vision'
-            name 'CameraKit-Android'
+            name 'CameraKit-Vision-Android'
             packaging 'aar'
         }
     }
@@ -43,7 +43,7 @@ bintray {
     configurations = ['archives']
     pkg {
         repo = 'snapshots'
-        name = 'CameraKit-Android'
+        name = 'CameraKit-Vision-Android'
         userOrg = 'wonderkiln'
         vcsUrl = 'https://github.com/wonderkiln/CameraKit-Android.git'
         version {
