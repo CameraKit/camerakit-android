@@ -36,8 +36,6 @@ import android.view.WindowManager;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.vision.text.TextRecognizer;
-import com.wonderkiln.camerakit.textrecognition.GooglePlayServicesUnavailableException;
-import com.wonderkiln.camerakit.textrecognition.TextProcessor;
 
 import java.io.File;
 import java.util.ArrayList;
