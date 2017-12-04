@@ -32,6 +32,7 @@ import android.view.WindowManager;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.vision.text.TextRecognizer;
+import com.wonderkiln.camerakit.core.R;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -103,23 +104,23 @@ public class CameraView extends CameraViewLayout {
         if (attrs != null) {
             TypedArray a = context.getTheme().obtainStyledAttributes(
                     attrs,
-                    com.wonderkiln.camerakit.R.styleable.CameraView,
+                    R.styleable.CameraView,
                     0, 0);
 
             try {
-                mFacing = a.getInteger(com.wonderkiln.camerakit.R.styleable.CameraView_ckFacing, CameraKit.Defaults.DEFAULT_FACING);
-                mFlash = a.getInteger(com.wonderkiln.camerakit.R.styleable.CameraView_ckFlash, CameraKit.Defaults.DEFAULT_FLASH);
-                mFocus = a.getInteger(com.wonderkiln.camerakit.R.styleable.CameraView_ckFocus, CameraKit.Defaults.DEFAULT_FOCUS);
-                mMethod = a.getInteger(com.wonderkiln.camerakit.R.styleable.CameraView_ckMethod, CameraKit.Defaults.DEFAULT_METHOD);
-                mZoom = a.getInteger(com.wonderkiln.camerakit.R.styleable.CameraView_ckZoom, CameraKit.Defaults.DEFAULT_ZOOM);
+                mFacing = a.getInteger(R.styleable.CameraView_ckFacing, CameraKit.Defaults.DEFAULT_FACING);
+                mFlash = a.getInteger(R.styleable.CameraView_ckFlash, CameraKit.Defaults.DEFAULT_FLASH);
+                mFocus = a.getInteger(R.styleable.CameraView_ckFocus, CameraKit.Defaults.DEFAULT_FOCUS);
+                mMethod = a.getInteger(R.styleable.CameraView_ckMethod, CameraKit.Defaults.DEFAULT_METHOD);
+                mZoom = a.getInteger(R.styleable.CameraView_ckZoom, CameraKit.Defaults.DEFAULT_ZOOM);
                 mDefaultZoom = a.getFloat(R.styleable.CameraView_ckDefaultZoom, CameraKit.Defaults.DEFAULT_DEFAULT_ZOOM);
-                mPermissions = a.getInteger(com.wonderkiln.camerakit.R.styleable.CameraView_ckPermissions, CameraKit.Defaults.DEFAULT_PERMISSIONS);
-                mVideoQuality = a.getInteger(com.wonderkiln.camerakit.R.styleable.CameraView_ckVideoQuality, CameraKit.Defaults.DEFAULT_VIDEO_QUALITY);
-                mJpegQuality = a.getInteger(com.wonderkiln.camerakit.R.styleable.CameraView_ckJpegQuality, CameraKit.Defaults.DEFAULT_JPEG_QUALITY);
-                mCropOutput = a.getBoolean(com.wonderkiln.camerakit.R.styleable.CameraView_ckCropOutput, CameraKit.Defaults.DEFAULT_CROP_OUTPUT);
+                mPermissions = a.getInteger(R.styleable.CameraView_ckPermissions, CameraKit.Defaults.DEFAULT_PERMISSIONS);
+                mVideoQuality = a.getInteger(R.styleable.CameraView_ckVideoQuality, CameraKit.Defaults.DEFAULT_VIDEO_QUALITY);
+                mJpegQuality = a.getInteger(R.styleable.CameraView_ckJpegQuality, CameraKit.Defaults.DEFAULT_JPEG_QUALITY);
+                mCropOutput = a.getBoolean(R.styleable.CameraView_ckCropOutput, CameraKit.Defaults.DEFAULT_CROP_OUTPUT);
                 mVideoBitRate = a.getInteger(R.styleable.CameraView_ckVideoBitRate, CameraKit.Defaults.DEFAULT_VIDEO_BIT_RATE);
                 mDoubleTapToToggleFacing = a.getBoolean(R.styleable.CameraView_ckDoubleTapToToggleFacing, CameraKit.Defaults.DEFAULT_DOUBLE_TAP_TO_TOGGLE_FACING);
-                mAdjustViewBounds = a.getBoolean(com.wonderkiln.camerakit.R.styleable.CameraView_android_adjustViewBounds, CameraKit.Defaults.DEFAULT_ADJUST_VIEW_BOUNDS);
+                mAdjustViewBounds = a.getBoolean(R.styleable.CameraView_android_adjustViewBounds, CameraKit.Defaults.DEFAULT_ADJUST_VIEW_BOUNDS);
             } finally {
                 a.recycle();
             }
