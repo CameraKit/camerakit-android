@@ -8,6 +8,8 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.wonderkiln.camerakit.core.R;
+
 public class SurfaceViewPreview extends PreviewImpl {
 
     private Context mContext;
@@ -29,6 +31,7 @@ public class SurfaceViewPreview extends PreviewImpl {
                 setSize(mContainer.getWidth(), mContainer.getHeight());
             }
         });
+
 
         mSurfaceView = mContainer.findViewById(R.id.surface_view);
 
