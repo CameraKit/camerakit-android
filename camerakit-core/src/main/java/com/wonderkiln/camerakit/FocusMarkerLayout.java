@@ -10,6 +10,8 @@ import android.view.LayoutInflater;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
+import com.wonderkiln.camerakit.core.R;
+
 public class FocusMarkerLayout extends FrameLayout {
 
     private FrameLayout mFocusMarkerContainer;
@@ -23,8 +25,8 @@ public class FocusMarkerLayout extends FrameLayout {
         super(context, attrs);
         LayoutInflater.from(getContext()).inflate(R.layout.layout_focus_marker, this);
 
-        mFocusMarkerContainer = (FrameLayout) findViewById(R.id.focusMarkerContainer);
-        mFill = (ImageView) findViewById(R.id.fill);
+        mFocusMarkerContainer = findViewById(R.id.focusMarkerContainer);
+        mFill = findViewById(R.id.fill);
 
         mFocusMarkerContainer.setAlpha(0);
     }
