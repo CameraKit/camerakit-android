@@ -155,8 +155,15 @@ public class Camera1 extends CameraImpl {
         this.mDisplayOrientation = displayOrientation;
         this.mDeviceOrientation = deviceOrientation;
 
-        if (isCameraOpened()) {
-            mCamera.setDisplayOrientation(calculatePreviewRotation());
+        synchronized (mCameraLock) {
+            if (isCameraOpened()) {
+                try {
+                    mCamera.setDisplayOrientation(calculatePreviewRotation());
+                } catch (RuntimeException e) {
+                    // Camera is released. Ignore. Orientations are still valid in local member fields
+                    // so next time camera starts it will have correct configuration.
+                }
+            }
         }
     }
 
