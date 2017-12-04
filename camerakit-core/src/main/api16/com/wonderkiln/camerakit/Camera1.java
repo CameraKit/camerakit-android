@@ -440,7 +440,7 @@ public class Camera1 extends CameraImpl {
                             Camera.Parameters parameters = camera.getParameters();
                             int width = parameters.getPreviewSize().width;
                             int height = parameters.getPreviewSize().height;
-                            int rotation = calculatePreviewRotation();
+                            int rotation = calculateCaptureRotation();
 
                             YuvOperator yuvOperator = new YuvOperator(data, width, height);
                             yuvOperator.rotate(rotation);
