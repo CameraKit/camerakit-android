@@ -8,6 +8,7 @@ import android.media.MediaRecorder;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -77,6 +78,9 @@ public class Camera1 extends CameraImpl {
 
     private int mVideoBitRate;
 
+    private boolean mLockVideoAspectRatio;
+
+    private Handler mainHandler = new Handler(Looper.getMainLooper());
     private Handler mHandler = new Handler();
     private FrameProcessingRunnable mFrameProcessor;
 
@@ -396,6 +400,11 @@ public class Camera1 extends CameraImpl {
     }
 
     @Override
+    void setLockVideoAspectRatio(boolean lockVideoAspectRatio) {
+        this.mLockVideoAspectRatio = lockVideoAspectRatio;
+    }
+
+    @Override
     void captureImage(final ImageCapturedCallback callback) {
         switch (mMethod) {
             case METHOD_STANDARD:
@@ -587,7 +596,27 @@ public class Camera1 extends CameraImpl {
                     mCameraParameters.getSupportedPreviewSizes(),
                     mCameraParameters.getSupportedPictureSizes()
             );
-            AspectRatio targetRatio = aspectRatios.size() > 0 ? aspectRatios.last() : null;
+
+            AspectRatio targetRatio = null;
+
+            if (mLockVideoAspectRatio) {
+                TreeSet<AspectRatio> videoAspectRatios = findCommonAspectRatios(
+                        mCameraParameters.getSupportedPreviewSizes(),
+                        mCameraParameters.getSupportedPictureSizes()
+                );
+
+                Iterator<AspectRatio> descendingIterator = aspectRatios.descendingIterator();
+                while (targetRatio == null && descendingIterator.hasNext()) {
+                    AspectRatio ratio = descendingIterator.next();
+                    if (videoAspectRatios.contains(ratio)) {
+                        targetRatio = ratio;
+                    }
+                }
+            }
+
+            if (targetRatio == null) {
+                targetRatio = aspectRatios.size() > 0 ? aspectRatios.last() : null;
+            }
 
             Iterator<Size> descendingSizes = sizes.descendingIterator();
             Size size;

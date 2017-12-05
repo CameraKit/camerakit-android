@@ -57,6 +57,7 @@
         <attr name="ckVideoBitRate" format="integer" />
 
         <attr name="ckDoubleTapToToggleFacing" format="boolean" />
+        <attr name="ckLockVideoAspectRatio" format="boolean" />
 
         <attr name="android:adjustViewBounds" />
 

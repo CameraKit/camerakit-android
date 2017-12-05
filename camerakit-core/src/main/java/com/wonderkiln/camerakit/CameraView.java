@@ -75,6 +75,7 @@ public class CameraView extends CameraViewLayout {
     private int mVideoQuality;
     private int mJpegQuality;
     private int mVideoBitRate;
+    private boolean mLockVideoAspectRatio;
     private boolean mCropOutput;
     private boolean mDoubleTapToToggleFacing;
 
@@ -120,6 +121,7 @@ public class CameraView extends CameraViewLayout {
                 mCropOutput = a.getBoolean(R.styleable.CameraView_ckCropOutput, CameraKit.Defaults.DEFAULT_CROP_OUTPUT);
                 mVideoBitRate = a.getInteger(R.styleable.CameraView_ckVideoBitRate, CameraKit.Defaults.DEFAULT_VIDEO_BIT_RATE);
                 mDoubleTapToToggleFacing = a.getBoolean(R.styleable.CameraView_ckDoubleTapToToggleFacing, CameraKit.Defaults.DEFAULT_DOUBLE_TAP_TO_TOGGLE_FACING);
+                mLockVideoAspectRatio = a.getBoolean(R.styleable.CameraView_ckLockVideoAspectRatio, false);
                 mAdjustViewBounds = a.getBoolean(R.styleable.CameraView_android_adjustViewBounds, CameraKit.Defaults.DEFAULT_ADJUST_VIEW_BOUNDS);
             } finally {
                 a.recycle();
@@ -149,6 +151,7 @@ public class CameraView extends CameraViewLayout {
         setPermissions(mPermissions);
         setVideoQuality(mVideoQuality);
         setVideoBitRate(mVideoBitRate);
+        setLockVideoAspectRatio(mLockVideoAspectRatio);
 
         if (!isInEditMode()) {
             mDisplayOrientationDetector = new DisplayOrientationDetector(context) {
@@ -385,6 +388,11 @@ public class CameraView extends CameraViewLayout {
     public void setVideoBitRate(int videoBirRate) {
         this.mVideoBitRate = videoBirRate;
         mCameraImpl.setVideoBitRate(mVideoBitRate);
+    }
+
+    public void setLockVideoAspectRatio(boolean lockVideoAspectRatio) {
+        this.mLockVideoAspectRatio = lockVideoAspectRatio;
+        mCameraImpl.setLockVideoAspectRatio(lockVideoAspectRatio);
     }
 
     public void setJpegQuality(int jpegQuality) {
