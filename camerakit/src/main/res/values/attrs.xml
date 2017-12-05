@@ -60,6 +60,8 @@
 
         <attr name="ckVideoBitRate" format="integer" />
 
+        <attr name="ckLockVideoAspectRatio" format="boolean" />
+
         <attr name="android:adjustViewBounds" />
 
     </declare-styleable>

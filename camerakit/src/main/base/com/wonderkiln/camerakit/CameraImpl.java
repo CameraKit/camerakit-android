@@ -26,6 +26,7 @@ abstract class CameraImpl {
     abstract void setZoom(@Zoom int zoom);
     abstract void setVideoQuality(@VideoQuality int videoQuality);
     abstract void setVideoBitRate(int videoBitRate);
+    abstract void setLockVideoAspectRatio(boolean lockVideoAspectRatio);
 
     abstract void captureImage(ImageCapturedCallback callback);
     interface ImageCapturedCallback {
