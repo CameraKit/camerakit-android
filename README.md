@@ -15,6 +15,8 @@
 
 CameraKit takes one of the hardest Android APIs and makes it into a high level and easy to use library that solves all of your problems.
 
+<a href='https://play.google.com/store/apps/details?id=com.wonderkiln.camerakit.demo&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img height="100px" alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png'/></a>
+
 With CameraKit you are able to seamlessly do the following...
 
 - Image and video capture seamlessly working with the same preview session.
@@ -25,17 +27,17 @@ With CameraKit you are able to seamlessly do the following...
 - Multiple capture methods.
   - `METHOD_STANDARD`: an image captured normally using the camera APIs.
   - `METHOD_STILL`: a freeze frame of the `CameraView` preview (similar to SnapChat and Instagram) for devices with slower cameras.
-  - **Coming soon:** `METHOD_SPEED`: automatic capture method determination based on measured speed.
+  - `METHOD_SPEED`: automatic capture method determination based on measured speed.
 - Built-in continuous focus.
 - Built-in tap to focus.
-- **Coming soon:** Built-in pinch to zoom.
+- Built-in pinch to zoom.
 
 
 ## Setup
 Add __CameraKit__ to the dependencies block in your `app` level `build.gradle`:
 
 ```groovy		
-compile 'com.wonderkiln:camerakit:0.12.3'		
+compile 'com.wonderkiln:camerakit:0.13.0'
 ```		
 
 

@@ -20,8 +20,8 @@ android {
 }
 
 dependencies {
-    compile project(':camerakit-core')
-    compile project(':camerakit-vision')
+    api project(':camerakit-core')
+    implementation 'com.google.android.gms:play-services-vision:11.6.2'
 }
 
 group = 'com.wonderkiln'
@@ -30,7 +30,7 @@ version = rootProject.ext.versionName
 install {
     repositories.mavenInstaller {
         pom.project {
-            name 'CameraKit-Android'
+            name 'CameraKit-Vision-Android'
             packaging 'aar'
         }
     }
@@ -44,7 +44,7 @@ bintray {
     configurations = ['archives']
     pkg {
         repo = 'snapshots'
-        name = 'CameraKit-Android'
+        name = 'CameraKit-Vision-Android'
         userOrg = 'wonderkiln'
         vcsUrl = 'https://github.com/wonderkiln/CameraKit-Android.git'
         version {
@@ -54,3 +54,4 @@ bintray {
         }
     }
 }
+
