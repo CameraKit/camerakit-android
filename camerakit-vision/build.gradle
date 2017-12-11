@@ -20,7 +20,7 @@ android {
 }
 
 dependencies {
-    api project(':camerakit-core')
+    api project(':camerakit')
     implementation 'com.google.android.gms:play-services-vision:11.6.2'
 }
 
