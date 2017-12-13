@@ -37,7 +37,7 @@ With CameraKit you are able to seamlessly do the following...
 Add __CameraKit__ to the dependencies block in your `app` level `build.gradle`:
 
 ```groovy		
-compile 'com.wonderkiln:camerakit:0.13.0'
+compile 'com.wonderkiln:camerakit:0.13.1'
 ```		
 
 
@@ -67,6 +67,14 @@ protected void onPause() {
     cameraView.stop();
     super.onPause();
 }
+```
+
+## ProGuard
+
+Starting in version 0.13.0 you need to add the following options to your Proguard rules:
+
+```
+-dontwarn com.google.android.gms.**
 ```
 
 ## Detailed Documentation
