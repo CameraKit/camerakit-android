@@ -647,7 +647,7 @@ public class Camera1 extends CameraImpl {
         Camera.Parameters resolutionLess = mCamera.getParameters();
 
         if (getPreviewResolution() != null) {
-            if (mDeviceOrientation == 0 || mDeviceOrientation == 180) {
+            if (mDisplayOrientation == 0 || mDisplayOrientation == 180) {
                 mPreview.setPreviewParameters(
                         getPreviewResolution().getWidth(),
                         getPreviewResolution().getHeight(),
