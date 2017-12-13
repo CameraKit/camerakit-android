@@ -1,5 +1,5 @@
 ext {
-    versionName = '0.13.1-Snapshot'
+    versionName = '0.13.1'
 
     bintrayUser = System.getenv('BINTRAY_USER')
     bintrayKey = System.getenv('BINTRAY_KEY')
