@@ -69,6 +69,14 @@ protected void onPause() {
 }
 ```
 
+## ProGuard
+
+Starting in version 0.13.0 you need to add the following options to your Proguard rules:
+
+```
+-dontwarn com.google.android.gms.**
+```
+
 ## Detailed Documentation
 To check out detailed docs, visit our [Documentation Website](http://docs.camerakit.website)
 
