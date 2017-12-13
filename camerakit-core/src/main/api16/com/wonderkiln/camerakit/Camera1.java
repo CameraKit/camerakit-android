@@ -722,8 +722,7 @@ public class Camera1 extends CameraImpl {
 
     private int calculatePreviewRotation() {
         if (mCameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-            int result = (mCameraInfo.orientation + mDisplayOrientation) % 360;
-            return (360 - result) % 360;
+            return (360 - ((mCameraInfo.orientation + mDisplayOrientation) % 360)) % 360;
         } else {
             return (mCameraInfo.orientation - mDisplayOrientation + 360) % 360;
         }
@@ -786,28 +785,19 @@ public class Camera1 extends CameraImpl {
     }
 
     private void adjustCameraParameters(int currentTry) {
-        boolean invertPreviewSizes = (mCameraInfo.orientation + mDeviceOrientation) % 180 == 90;
         boolean haveToReadjust = false;
         Camera.Parameters resolutionLess = mCamera.getParameters();
 
         if (getPreviewResolution() != null) {
-            if (mDisplayOrientation == 0 || mDisplayOrientation == 180) {
-                mPreview.setPreviewParameters(
-                        getPreviewResolution().getWidth(),
-                        getPreviewResolution().getHeight(),
-                        mCameraParameters.getPreviewFormat()
-                );
-            } else {
-                mPreview.setPreviewParameters(
-                        getPreviewResolution().getHeight(),
-                        getPreviewResolution().getWidth(),
-                        mCameraParameters.getPreviewFormat()
-                );
-            }
+            mPreview.setPreviewParameters(
+                    getPreviewResolution().getWidth(),
+                    getPreviewResolution().getHeight(),
+                    mCameraParameters.getPreviewFormat()
+            );
 
             mCameraParameters.setPreviewSize(
-                    invertPreviewSizes ? getPreviewResolution().getHeight() : getPreviewResolution().getWidth(),
-                    invertPreviewSizes ? getPreviewResolution().getWidth() : getPreviewResolution().getHeight()
+                    getPreviewResolution().getWidth(),
+                    getPreviewResolution().getHeight()
             );
 
             try {

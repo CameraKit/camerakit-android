@@ -76,6 +76,7 @@ public class SurfaceViewPreview extends PreviewImpl {
     @Override
     void setDisplayOrientation(int displayOrientation) {
         mDisplayOrientation = displayOrientation;
+        mContainer.setDisplayOrientation(displayOrientation);
     }
 
     @Override

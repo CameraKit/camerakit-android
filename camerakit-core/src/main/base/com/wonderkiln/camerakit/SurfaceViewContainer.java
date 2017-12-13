@@ -10,6 +10,7 @@ import android.widget.FrameLayout;
 public class SurfaceViewContainer extends FrameLayout {
 
     private Size mPreviewSize;
+    private int mDisplayOrientation;
 
     public SurfaceViewContainer(@NonNull Context context) {
         super(context);
@@ -57,7 +58,16 @@ public class SurfaceViewContainer extends FrameLayout {
     }
 
     public void setPreviewSize(Size previewSize) {
-        this.mPreviewSize = previewSize;
+        setPreviewSize(previewSize, mDisplayOrientation);
+    }
+
+    public void setPreviewSize(Size previewSize, int displayOrientation) {
+        if (mDisplayOrientation == 0 || mDisplayOrientation == 180) {
+            this.mPreviewSize = previewSize;
+        } else if ((displayOrientation == 90 || displayOrientation == 270) && (mDisplayOrientation != 90 && mDisplayOrientation != 270)) {
+            this.mPreviewSize = new Size(previewSize.getHeight(), previewSize.getWidth());
+        }
+
         if (getChildCount() > 0) {
             post(new Runnable() {
                 @Override
@@ -65,6 +75,14 @@ public class SurfaceViewContainer extends FrameLayout {
                     layoutChild(getWidth(), getHeight());
                 }
             });
+        }
+    }
+
+    public void setDisplayOrientation(int displayOrientation) {
+        if (mPreviewSize != null) {
+            setPreviewSize(mPreviewSize, displayOrientation);
+        } else {
+            this.mDisplayOrientation = displayOrientation;
         }
     }
 
