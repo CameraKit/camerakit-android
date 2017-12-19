@@ -1,8 +1,5 @@
 package com.wonderkiln.camerakit;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.BitmapRegionDecoder;
 import android.graphics.Rect;
 import android.support.media.ExifInterface;
 
@@ -36,18 +33,10 @@ public class PostProcessor {
     }
 
     public byte[] getJpeg() {
-        Bitmap bitmap;
-        try {
-            bitmap = getBitmap();
-        } catch (IOException e) {
-            return null;
-        }
+        BitmapOperator bitmapOperator = new BitmapOperator(picture);
 
-        int width = bitmap.getWidth();
-        int height = bitmap.getHeight();
-
-        BitmapOperator bitmapOperator = new BitmapOperator(bitmap);
-        bitmap.recycle();
+        int width = bitmapOperator.getWidth();
+        int height = bitmapOperator.getHeight();
 
         ExifPostProcessor exifPostProcessor = new ExifPostProcessor(picture);
         exifPostProcessor.apply(bitmapOperator);
@@ -68,22 +57,6 @@ public class PostProcessor {
         }
 
         return bitmapOperator.getJpegAndFree(jpegQuality);
-    }
-
-    private Bitmap getBitmap() throws IOException {
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeByteArray(picture, 0, picture.length, options);
-
-        BitmapFactory.Options regionOptions = new BitmapFactory.Options();
-        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-
-        return BitmapRegionDecoder.newInstance(
-                picture,
-                0,
-                picture.length,
-                true
-        ).decodeRegion(new Rect(0, 0, options.outWidth, options.outHeight), regionOptions);
     }
 
     private static class ExifPostProcessor {

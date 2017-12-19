@@ -5,6 +5,7 @@
 #include <cstring>
 #include <unistd.h>
 #include "jpge.h"
+#include "jpgd.h"
 
 #define  LOG_TAG    "DEBUG"
 #define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG,LOG_TAG,__VA_ARGS__)
@@ -14,7 +15,7 @@ extern "C"
 {
 JNIEXPORT jobject JNICALL
 Java_com_wonderkiln_camerakit_BitmapOperator_jniStoreBitmapData(JNIEnv *env, jobject obj,
-                                                                jobject bitmap);
+                                                                jbyteArray bitmap);
 JNIEXPORT jbyteArray JNICALL
 Java_com_wonderkiln_camerakit_BitmapOperator_jniGetJpegData(JNIEnv *env,
                                                             jobject obj,
@@ -24,6 +25,12 @@ JNIEXPORT jobject JNICALL
 Java_com_wonderkiln_camerakit_BitmapOperator_jniGetBitmapFromStoredBitmapData(JNIEnv *env,
                                                                               jobject obj,
                                                                               jobject handle);
+JNIEXPORT jint JNICALL
+Java_com_wonderkiln_camerakit_BitmapOperator_jniGetWidth(JNIEnv *env, jobject obj,
+                                                         jobject handle);
+JNIEXPORT jint JNICALL
+Java_com_wonderkiln_camerakit_BitmapOperator_jniGetHeight(JNIEnv *env, jobject obj,
+                                                          jobject handle);
 JNIEXPORT void JNICALL
 Java_com_wonderkiln_camerakit_BitmapOperator_jniFreeBitmapData(JNIEnv *env, jobject obj,
                                                                jobject handle);
@@ -61,7 +68,8 @@ Java_com_wonderkiln_camerakit_BitmapOperator_jniFlipBitmapVertical(JNIEnv *env, 
 class JniBitmap {
 public:
     uint32_t *_storedBitmapPixels;
-    AndroidBitmapInfo _bitmapInfo;
+    uint32_t _width;
+    uint32_t _height;
 
     JniBitmap() {
         _storedBitmapPixels = NULL;
@@ -91,7 +99,7 @@ JNIEXPORT void JNICALL Java_com_wonderkiln_camerakit_BitmapOperator_jniCropBitma
     if (jniBitmap->_storedBitmapPixels == NULL)
         return;
     uint32_t *previousData = jniBitmap->_storedBitmapPixels;
-    uint32_t oldWidth = jniBitmap->_bitmapInfo.width;
+    uint32_t oldWidth = jniBitmap->_width;
     uint32_t newWidth = right - left, newHeight = bottom - top;
     uint32_t *newBitmapPixels = new uint32_t[newWidth * newHeight];
     uint32_t *whereToGet = previousData + left + top * oldWidth;
@@ -104,8 +112,8 @@ JNIEXPORT void JNICALL Java_com_wonderkiln_camerakit_BitmapOperator_jniCropBitma
     //done copying , so replace old data with new one
     delete[] previousData;
     jniBitmap->_storedBitmapPixels = newBitmapPixels;
-    jniBitmap->_bitmapInfo.width = newWidth;
-    jniBitmap->_bitmapInfo.height = newHeight;
+    jniBitmap->_width = newWidth;
+    jniBitmap->_height = newHeight;
 }
 
 JNIEXPORT void JNICALL Java_com_wonderkiln_camerakit_BitmapOperator_jniRotateBitmapCcw90(
@@ -114,10 +122,10 @@ JNIEXPORT void JNICALL Java_com_wonderkiln_camerakit_BitmapOperator_jniRotateBit
     if (jniBitmap->_storedBitmapPixels == NULL)
         return;
     uint32_t *previousData = jniBitmap->_storedBitmapPixels;
-    uint32_t newWidth = jniBitmap->_bitmapInfo.height;
-    uint32_t newHeight = jniBitmap->_bitmapInfo.width;
-    jniBitmap->_bitmapInfo.width = newWidth;
-    jniBitmap->_bitmapInfo.height = newHeight;
+    uint32_t newWidth = jniBitmap->_height;
+    uint32_t newHeight = jniBitmap->_width;
+    jniBitmap->_width = newWidth;
+    jniBitmap->_height = newHeight;
     uint32_t *newBitmapPixels = new uint32_t[newWidth * newHeight];
     int whereToGet = 0;
     for (int x = 0; x < newWidth; ++x)
@@ -135,10 +143,10 @@ JNIEXPORT void JNICALL Java_com_wonderkiln_camerakit_BitmapOperator_jniRotateBit
     if (jniBitmap->_storedBitmapPixels == NULL)
         return;
     uint32_t *previousData = jniBitmap->_storedBitmapPixels;
-    uint32_t newWidth = jniBitmap->_bitmapInfo.height;
-    uint32_t newHeight = jniBitmap->_bitmapInfo.width;
-    jniBitmap->_bitmapInfo.width = newWidth;
-    jniBitmap->_bitmapInfo.height = newHeight;
+    uint32_t newWidth = jniBitmap->_height;
+    uint32_t newHeight = jniBitmap->_width;
+    jniBitmap->_width = newWidth;
+    jniBitmap->_height = newHeight;
     uint32_t *newBitmapPixels = new uint32_t[newWidth * newHeight];
     int whereToGet = 0;
     jniBitmap->_storedBitmapPixels = newBitmapPixels;
@@ -158,8 +166,8 @@ Java_com_wonderkiln_camerakit_BitmapOperator_jniRotateBitmap180(JNIEnv *env, job
         return;
     uint32_t *pixels = jniBitmap->_storedBitmapPixels;
     uint32_t *pixels2 = jniBitmap->_storedBitmapPixels;
-    uint32_t width = jniBitmap->_bitmapInfo.width;
-    uint32_t height = jniBitmap->_bitmapInfo.height;
+    uint32_t width = jniBitmap->_width;
+    uint32_t height = jniBitmap->_height;
     int whereToGet = 0;
     for (int y = height - 1; y >= height / 2; --y)
         for (int x = width - 1; x >= 0; --x) {
@@ -179,6 +187,24 @@ Java_com_wonderkiln_camerakit_BitmapOperator_jniRotateBitmap180(JNIEnv *env, job
             ++whereToGet;
         }
     }
+}
+
+JNIEXPORT jint JNICALL
+Java_com_wonderkiln_camerakit_BitmapOperator_jniGetWidth(JNIEnv *env, jobject obj,
+                                                         jobject handle) {
+    JniBitmap *jniBitmap = (JniBitmap *) env->GetDirectBufferAddress(handle);
+    if (jniBitmap->_storedBitmapPixels == NULL)
+        return -1;
+    return jniBitmap->_width;
+}
+
+JNIEXPORT jint JNICALL
+Java_com_wonderkiln_camerakit_BitmapOperator_jniGetHeight(JNIEnv *env, jobject obj,
+                                                          jobject handle) {
+    JniBitmap *jniBitmap = (JniBitmap *) env->GetDirectBufferAddress(handle);
+    if (jniBitmap->_storedBitmapPixels == NULL)
+        return -1;
+    return jniBitmap->_height;
 }
 
 JNIEXPORT void JNICALL
@@ -202,8 +228,8 @@ Java_com_wonderkiln_camerakit_BitmapOperator_jniGetJpegData(JNIEnv *env,
         return NULL;
     }
 
-    int width = jniBitmap->_bitmapInfo.width;
-    int height = jniBitmap->_bitmapInfo.height;
+    int width = jniBitmap->_width;
+    int height = jniBitmap->_height;
 
     int rgbBufferSize = width * height * 3;
     unsigned char *rgbBuffer = new unsigned char[rgbBufferSize];
@@ -225,7 +251,8 @@ Java_com_wonderkiln_camerakit_BitmapOperator_jniGetJpegData(JNIEnv *env,
     jpge::params config;
     config.m_quality = m_quality;
 
-    bool success = jpge::compress_image_to_jpeg_file_in_memory(rgbBuffer, rgbBufferSize, width, height, 3,
+    bool success = jpge::compress_image_to_jpeg_file_in_memory(rgbBuffer, rgbBufferSize, width,
+                                                               height, 3,
                                                                rgbData, config);
     delete[] rgbData;
 
@@ -266,8 +293,8 @@ Java_com_wonderkiln_camerakit_BitmapOperator_jniGetBitmapFromStoredBitmapData(JN
                                                        valueOfBitmapConfigFunction, configName);
     jobject newBitmap = env->CallStaticObjectMethod(bitmapCls,
                                                     createBitmapFunction,
-                                                    jniBitmap->_bitmapInfo.width,
-                                                    jniBitmap->_bitmapInfo.height, bitmapConfig);
+                                                    jniBitmap->_width,
+                                                    jniBitmap->_height, bitmapConfig);
 
     int ret;
     void *bitmapPixels;
@@ -276,8 +303,8 @@ Java_com_wonderkiln_camerakit_BitmapOperator_jniGetBitmapFromStoredBitmapData(JN
         return NULL;
     }
     uint32_t *newBitmapPixels = (uint32_t *) bitmapPixels;
-    int pixelsCount = jniBitmap->_bitmapInfo.height
-                      * jniBitmap->_bitmapInfo.width;
+    int pixelsCount = jniBitmap->_height
+                      * jniBitmap->_width;
     memcpy(newBitmapPixels, jniBitmap->_storedBitmapPixels,
            sizeof(uint32_t) * pixelsCount);
     AndroidBitmap_unlockPixels(env, newBitmap);
@@ -286,31 +313,38 @@ Java_com_wonderkiln_camerakit_BitmapOperator_jniGetBitmapFromStoredBitmapData(JN
 
 JNIEXPORT jobject JNICALL
 Java_com_wonderkiln_camerakit_BitmapOperator_jniStoreBitmapData(JNIEnv *env, jobject obj,
-                                                                jobject bitmap) {
-    AndroidBitmapInfo bitmapInfo;
-    uint32_t *storedBitmapPixels = NULL;
-    int ret;
-    if ((ret = AndroidBitmap_getInfo(env, bitmap, &bitmapInfo)) < 0) {
-        LOGE("AndroidBitmap_getInfo() failed ! error=%d", ret);
-        return NULL;
+                                                                jbyteArray bitmap) {
+    jsize bitmapLength = env->GetArrayLength(bitmap);
+
+    jbyte *bitmapBytes = env->GetByteArrayElements(bitmap, false);
+    unsigned char *bitmapChars = (unsigned char *) bitmapBytes;
+
+    static const int requestedComps = 4;
+    int actualComps, width, height;
+
+    unsigned char *decodedBytes = jpgd::decompress_jpeg_image_from_memory(
+            bitmapChars, bitmapLength, &width, &height, &actualComps, requestedComps);
+
+    uint32_t *pixels = new uint32_t[width * height];
+    uint32_t *pixelsTemp = pixels;
+    for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
+            pixelsTemp[0] = (uint32_t) decodedBytes[0] |
+                            (uint32_t) decodedBytes[1] << 8 |
+                            (uint32_t) decodedBytes[2] << 16 |
+                            (uint32_t) decodedBytes[3] << 24;
+
+            pixelsTemp++;
+            decodedBytes += 4;
+        }
     }
-    if (bitmapInfo.format != ANDROID_BITMAP_FORMAT_RGBA_8888) {
-        LOGE("Bitmap format is not RGBA_8888!");
-        return NULL;
-    }
-    void *bitmapPixels;
-    if ((ret = AndroidBitmap_lockPixels(env, bitmap, &bitmapPixels)) < 0) {
-        LOGE("AndroidBitmap_lockPixels() failed ! error=%d", ret);
-        return NULL;
-    }
-    uint32_t *src = (uint32_t *) bitmapPixels;
-    storedBitmapPixels = new uint32_t[bitmapInfo.height * bitmapInfo.width];
-    int pixelsCount = bitmapInfo.height * bitmapInfo.width;
-    memcpy(storedBitmapPixels, src, sizeof(uint32_t) * pixelsCount);
-    AndroidBitmap_unlockPixels(env, bitmap);
+
     JniBitmap *jniBitmap = new JniBitmap();
-    jniBitmap->_bitmapInfo = bitmapInfo;
-    jniBitmap->_storedBitmapPixels = storedBitmapPixels;
+
+    jniBitmap->_storedBitmapPixels = pixels;
+    jniBitmap->_width = (uint32_t) width;
+    jniBitmap->_height = (uint32_t) height;
+
     return env->NewDirectByteBuffer(jniBitmap, 0);
 }
 
@@ -321,8 +355,8 @@ Java_com_wonderkiln_camerakit_BitmapOperator_jniScaleNNBitmap(JNIEnv *env, jobje
     JniBitmap *jniBitmap = (JniBitmap *) env->GetDirectBufferAddress(handle);
     if (jniBitmap->_storedBitmapPixels == NULL)
         return;
-    uint32_t oldWidth = jniBitmap->_bitmapInfo.width;
-    uint32_t oldHeight = jniBitmap->_bitmapInfo.height;
+    uint32_t oldWidth = jniBitmap->_width;
+    uint32_t oldHeight = jniBitmap->_height;
     uint32_t *previousData = jniBitmap->_storedBitmapPixels;
     uint32_t *newBitmapPixels = new uint32_t[newWidth * newHeight];
     int x2, y2;
@@ -345,8 +379,8 @@ Java_com_wonderkiln_camerakit_BitmapOperator_jniScaleNNBitmap(JNIEnv *env, jobje
 
     delete[] previousData;
     jniBitmap->_storedBitmapPixels = newBitmapPixels;
-    jniBitmap->_bitmapInfo.width = newWidth;
-    jniBitmap->_bitmapInfo.height = newHeight;
+    jniBitmap->_width = newWidth;
+    jniBitmap->_height = newHeight;
 }
 
 JNIEXPORT void JNICALL
@@ -357,8 +391,8 @@ Java_com_wonderkiln_camerakit_BitmapOperator_jniScaleBIBitmap(JNIEnv *env, jobje
     JniBitmap *jniBitmap = (JniBitmap *) env->GetDirectBufferAddress(handle);
     if (jniBitmap->_storedBitmapPixels == NULL)
         return;
-    uint32_t oldWidth = jniBitmap->_bitmapInfo.width;
-    uint32_t oldHeight = jniBitmap->_bitmapInfo.height;
+    uint32_t oldWidth = jniBitmap->_width;
+    uint32_t oldHeight = jniBitmap->_height;
     uint32_t *previousData = jniBitmap->_storedBitmapPixels;
     uint32_t *newBitmapPixels = new uint32_t[newWidth * newHeight];
     int xTopLeft, yTopLeft;
@@ -446,8 +480,8 @@ Java_com_wonderkiln_camerakit_BitmapOperator_jniScaleBIBitmap(JNIEnv *env, jobje
     }
     delete[] previousData;
     jniBitmap->_storedBitmapPixels = newBitmapPixels;
-    jniBitmap->_bitmapInfo.width = newWidth;
-    jniBitmap->_bitmapInfo.height = newHeight;
+    jniBitmap->_width = newWidth;
+    jniBitmap->_height = newHeight;
 }
 
 JNIEXPORT void JNICALL
@@ -457,8 +491,8 @@ Java_com_wonderkiln_camerakit_BitmapOperator_jniFlipBitmapHorizontal(JNIEnv *env
     if (jniBitmap->_storedBitmapPixels == NULL)
         return;
     uint32_t *previousData = jniBitmap->_storedBitmapPixels;
-    int width = jniBitmap->_bitmapInfo.width, middle = width / 2, height =
-            jniBitmap->_bitmapInfo.height;
+    int width = jniBitmap->_width, middle = width / 2, height =
+            jniBitmap->_height;
     for (int y = 0; y < height; ++y) {
         uint32_t *idx1 = previousData + width * y;
         uint32_t *idx2 = previousData + width * (y + 1) - 1;
@@ -479,8 +513,8 @@ Java_com_wonderkiln_camerakit_BitmapOperator_jniFlipBitmapVertical(JNIEnv *env, 
     if (jniBitmap->_storedBitmapPixels == NULL)
         return;
     uint32_t *previousData = jniBitmap->_storedBitmapPixels;
-    int width = jniBitmap->_bitmapInfo.width, height =
-            jniBitmap->_bitmapInfo.height, middle = height / 2;
+    int width = jniBitmap->_width, height =
+            jniBitmap->_height, middle = height / 2;
     for (int y = 0; y < middle; ++y) {
         uint32_t *idx1 = previousData + width * y;
         uint32_t *idx2 = previousData + width * (height - y - 1);
