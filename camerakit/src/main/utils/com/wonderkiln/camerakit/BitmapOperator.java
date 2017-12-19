@@ -11,11 +11,11 @@ public class BitmapOperator {
     private BitmapOperator() {
     }
 
-    public BitmapOperator(final Bitmap bitmap) {
+    public BitmapOperator(final byte[] bitmap) {
         storeBitmap(bitmap);
     }
 
-    private void storeBitmap(final Bitmap bitmap) {
+    private void storeBitmap(final byte[] bitmap) {
         if (handler != null) freeBitmap();
         handler = jniStoreBitmapData(bitmap);
     }
@@ -64,6 +64,16 @@ public class BitmapOperator {
         return bitmap;
     }
 
+    public int getWidth() {
+        if (handler == null) return -1;
+        return jniGetWidth(handler);
+    }
+
+    public int getHeight() {
+        if (handler == null) return -1;
+        return jniGetHeight(handler);
+    }
+
     private void freeBitmap() {
         if (handler == null) return;
         jniFreeBitmapData(handler);
@@ -81,11 +91,15 @@ public class BitmapOperator {
         System.loadLibrary("JniBitmapOperator");
     }
 
-    private native ByteBuffer jniStoreBitmapData(Bitmap bitmap);
+    private native ByteBuffer jniStoreBitmapData(byte[] bitmap);
 
     private native Bitmap jniGetBitmapFromStoredBitmapData(ByteBuffer handler);
 
     private native byte[] jniGetJpegData(ByteBuffer handler, int quality);
+
+    private native int jniGetWidth(ByteBuffer handler);
+
+    private native int jniGetHeight(ByteBuffer handler);
 
     private native void jniFreeBitmapData(ByteBuffer handler);
 
