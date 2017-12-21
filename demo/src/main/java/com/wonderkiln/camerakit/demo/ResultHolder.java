@@ -1,6 +1,5 @@
 package com.wonderkiln.camerakit.demo;
 
-import android.graphics.Bitmap;
 import android.support.annotation.Nullable;
 
 import com.wonderkiln.camerakit.Size;
@@ -9,18 +8,18 @@ import java.io.File;
 
 public class ResultHolder {
 
-    private static Bitmap image;
+    private static byte[] image;
     private static File video;
     private static Size nativeCaptureSize;
     private static long timeToCallback;
 
 
-    public static void setImage(@Nullable Bitmap image) {
+    public static void setImage(@Nullable byte[] image) {
         ResultHolder.image = image;
     }
 
     @Nullable
-    public static Bitmap getImage() {
+    public static byte[] getImage() {
         return image;
     }
 

@@ -1,6 +1,7 @@
 package com.wonderkiln.camerakit.demo;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -46,11 +47,18 @@ public class PreviewActivity extends AppCompatActivity {
 
         setupToolbar();
 
-        Bitmap bitmap = ResultHolder.getImage();
+        byte[] jpeg = ResultHolder.getImage();
         File video = ResultHolder.getVideo();
 
-        if (bitmap != null) {
+        if (jpeg != null) {
             imageView.setVisibility(View.VISIBLE);
+
+            Bitmap bitmap = BitmapFactory.decodeByteArray(jpeg, 0, jpeg.length);
+
+            if (bitmap == null) {
+                finish();
+                return;
+            }
 
             imageView.setImageBitmap(bitmap);
 
