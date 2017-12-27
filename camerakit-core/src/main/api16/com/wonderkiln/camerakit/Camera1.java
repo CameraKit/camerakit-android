@@ -108,7 +108,6 @@ public class Camera1 extends CameraImpl {
                     if (!mShowingPreview) {
                         mCamera.startPreview();
                         mShowingPreview = true;
-                        mEventDispatcher.dispatch(new CameraKitEvent(CameraKitEvent.TYPE_PREVIEW_START));
                     }
                 }
             }
@@ -696,6 +695,7 @@ public class Camera1 extends CameraImpl {
             try {
                 mCamera.reconnect();
                 mCamera.setPreviewDisplay(mPreview.getSurfaceHolder());
+                mEventDispatcher.dispatch(new CameraKitEvent(CameraKitEvent.TYPE_PREVIEW_START));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
