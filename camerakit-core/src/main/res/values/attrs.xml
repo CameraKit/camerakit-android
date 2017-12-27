@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="CameraView">
+
+        <attr name="ckFacing" format="enum">
+            <enum name="back" value="0" />
+            <enum name="front" value="1" />
+        </attr>
+
+        <attr name="ckFlash" format="enum">
+            <enum name="off" value="0" />
+            <enum name="on" value="1" />
+            <enum name="auto" value="2" />
+            <enum name="torch" value="3" />
+        </attr>
+
+        <attr name="ckFocus" format="enum">
+            <enum name="off" value="0" />
+            <enum name="continuous" value="1" />
+            <enum name="tap" value="2" />
+            <enum name="tapWithMarker" value="3" />
+        </attr>
+
+        <attr name="ckPinchToZoom" format="boolean" />
+
+        <attr name="ckZoom" format="float" />
+
+        <attr name="ckMethod" format="enum">
+            <enum name="standard" value="0" />
+            <enum name="still" value="1" />
+
+            <!-- TODO: Set to unique value when feature added -->
+            <enum name="speed" value="0" />
+        </attr>
+
+        <attr name="ckPermissions" format="enum">
+            <enum name="strict" value="0" />
+            <enum name="lazy" value="1" />
+            <enum name="picture" value="2" />
+        </attr>
+
+        <attr name="ckJpegQuality" format="integer" />
+
+        <attr name="ckVideoQuality" format="enum">
+            <enum name="max480p" value="0" />
+            <enum name="max720p" value="1" />
+            <enum name="max1080p" value="2" />
+            <enum name="max2160p" value="3" />
+            <enum name="highest" value="4" />
+            <enum name="lowest" value="5" />
+            <enum name="qvga" value="6" />
+        </attr>
+
+        <attr name="ckCropOutput" format="boolean" />
+
+        <attr name="ckVideoBitRate" format="integer" />
+
+        <attr name="ckDoubleTapToToggleFacing" format="boolean" />
+        <attr name="ckLockVideoAspectRatio" format="boolean" />
+
+        <attr name="android:adjustViewBounds" />
+
+    </declare-styleable>
+
+</resources>

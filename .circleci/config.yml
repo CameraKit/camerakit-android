@@ -1,0 +1,30 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/camerakit-android
+    docker:
+      - image: dwillmc/android-27-alpha-ndk
+    environment:
+      JVM_OPTS: -Xmx3200m
+    steps:
+      - checkout
+      - restore_cache:
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "camerakit/build.gradle" }}
+      - run:
+          name: Download Dependencies
+          command: ./gradlew androidDependencies
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "camerakit/build.gradle" }}
+      - run:
+          name: Run Tests
+          command: ./gradlew lint test
+      - store_artifacts:
+          path: app/build/reports
+          destination: reports
+      - store_test_results:
+          path: app/build/test-results
+      - deploy:
+          name: Deploy Snapshot to Bintray
+          command: bash ./deploy.sh

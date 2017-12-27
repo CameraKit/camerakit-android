@@ -1,20 +1,15 @@
 apply plugin: 'com.android.library'
 
-ext {
-    PUBLISH_GROUP_ID = 'com.flurgle'
-    PUBLISH_ARTIFACT_ID = 'camerakit'
-    PUBLISH_VERSION = '0.9.18'
-}
-
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
-
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
     defaultConfig {
-        minSdkVersion 15
-        targetSdkVersion 25
-        versionCode 1
-        versionName "1.0"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionName rootProject.ext.versionName
+    }
+    lintOptions {
+        abortOnError false
     }
     buildTypes {
         release {
@@ -22,23 +17,40 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    sourceSets {
-        main.java.srcDirs += 'src/main/base'
-        main.java.srcDirs += 'src/main/api16'
-        main.java.srcDirs += 'src/main/api21'
-        main.java.srcDirs += 'src/main/types'
-        main.java.srcDirs += 'src/main/utils'
-    }
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:25.3.1'
-
-
-    compile 'android.arch.lifecycle:runtime:1.0.0-alpha1'
-    compile 'android.arch.lifecycle:extensions:1.0.0-alpha1'
-    annotationProcessor 'android.arch.lifecycle:compiler:1.0.0-alpha1'
+    compile project(':camerakit-core')
+    compile project(':camerakit-vision')
 }
 
-apply from: 'https://raw.githubusercontent.com/blundell/release-android-library/master/android-release-aar.gradle'
+group = 'com.wonderkiln'
+version = rootProject.ext.versionName
 
+install {
+    repositories.mavenInstaller {
+        pom.project {
+            name 'CameraKit-Android'
+            packaging 'aar'
+        }
+    }
+}
+
+bintray {
+    user = rootProject.ext.bintrayUser
+    key = rootProject.ext.bintrayKey
+    override = true
+    publish = true
+    configurations = ['archives']
+    pkg {
+        repo = 'snapshots'
+        name = 'CameraKit-Android'
+        userOrg = 'wonderkiln'
+        vcsUrl = 'https://github.com/wonderkiln/CameraKit-Android.git'
+        version {
+            name = rootProject.ext.versionName
+            vcsTag = rootProject.ext.versionName
+            released = new Date()
+        }
+    }
+}

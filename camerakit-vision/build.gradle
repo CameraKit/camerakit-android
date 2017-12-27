@@ -1,0 +1,57 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+    defaultConfig {
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionName rootProject.ext.versionName
+    }
+    lintOptions {
+        abortOnError false
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    api project(':camerakit-core')
+    implementation 'com.google.android.gms:play-services-vision:11.6.2'
+}
+
+group = 'com.wonderkiln'
+version = rootProject.ext.versionName
+
+install {
+    repositories.mavenInstaller {
+        pom.project {
+            name 'CameraKit-Vision-Android'
+            packaging 'aar'
+        }
+    }
+}
+
+bintray {
+    user = rootProject.ext.bintrayUser
+    key = rootProject.ext.bintrayKey
+    override = true
+    publish = true
+    configurations = ['archives']
+    pkg {
+        repo = 'snapshots'
+        name = 'CameraKit-Vision-Android'
+        userOrg = 'wonderkiln'
+        vcsUrl = 'https://github.com/wonderkiln/CameraKit-Android.git'
+        version {
+            name = rootProject.ext.versionName
+            vcsTag = rootProject.ext.versionName
+            released = new Date()
+        }
+    }
+}
+
