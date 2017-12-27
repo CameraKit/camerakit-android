@@ -108,6 +108,7 @@ public class Camera1 extends CameraImpl {
                     if (!mShowingPreview) {
                         mCamera.startPreview();
                         mShowingPreview = true;
+                        mEventDispatcher.dispatch(new CameraKitEvent(CameraKitEvent.TYPE_PREVIEW_START));
                     }
                 }
             }
