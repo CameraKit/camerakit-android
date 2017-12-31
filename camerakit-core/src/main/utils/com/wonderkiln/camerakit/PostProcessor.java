@@ -1,10 +1,8 @@
 package com.wonderkiln.camerakit;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.BitmapRegionDecoder;
 import android.graphics.Rect;
 import android.support.media.ExifInterface;
+import android.util.Log;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -36,24 +34,16 @@ public class PostProcessor {
     }
 
     public byte[] getJpeg() {
-        Bitmap bitmap;
-        try {
-            bitmap = getBitmap();
-        } catch (IOException e) {
-            return null;
-        }
+        JpegTransformer jpegTransformer = new JpegTransformer(picture);
 
-        int width = bitmap.getWidth();
-        int height = bitmap.getHeight();
-
-        BitmapOperator bitmapOperator = new BitmapOperator(bitmap);
-        bitmap.recycle();
+        int width = jpegTransformer.getWidth();
+        int height = jpegTransformer.getHeight();
 
         ExifPostProcessor exifPostProcessor = new ExifPostProcessor(picture);
-        exifPostProcessor.apply(bitmapOperator);
+        exifPostProcessor.apply(jpegTransformer);
 
         if (facing == FACING_FRONT) {
-            bitmapOperator.flipBitmapHorizontal();
+            jpegTransformer.flipHorizontal();
         }
 
         if (cropAspectRatio != null) {
@@ -64,26 +54,11 @@ public class PostProcessor {
                 cropHeight = width;
             }
 
-            new CenterCrop(cropWidth, cropHeight, cropAspectRatio).apply(bitmapOperator);
+            new CenterCrop(cropWidth, cropHeight, cropAspectRatio).apply(jpegTransformer);
         }
 
-        return bitmapOperator.getJpegAndFree(jpegQuality);
-    }
+        return jpegTransformer.getJpeg();
 
-    private Bitmap getBitmap() throws IOException {
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeByteArray(picture, 0, picture.length, options);
-
-        BitmapFactory.Options regionOptions = new BitmapFactory.Options();
-        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-
-        return BitmapRegionDecoder.newInstance(
-                picture,
-                0,
-                picture.length,
-                true
-        ).decodeRegion(new Rect(0, 0, options.outWidth, options.outHeight), regionOptions);
     }
 
     private static class ExifPostProcessor {
@@ -98,30 +73,30 @@ public class PostProcessor {
             }
         }
 
-        public void apply(BitmapOperator bitmapOperator) {
+        public void apply(JpegTransformer transformer) {
             switch (orientation) {
                 case ExifInterface.ORIENTATION_FLIP_HORIZONTAL:
-                    bitmapOperator.flipBitmapHorizontal();
+                    transformer.flipHorizontal();
                     break;
                 case ExifInterface.ORIENTATION_ROTATE_180:
-                    bitmapOperator.rotateBitmap(180);
+                    transformer.rotate(180);
                     break;
                 case ExifInterface.ORIENTATION_FLIP_VERTICAL:
-                    bitmapOperator.flipBitmapVertical();
+                    transformer.flipVertical();
                     break;
                 case ExifInterface.ORIENTATION_TRANSPOSE:
-                    bitmapOperator.rotateBitmap(90);
-                    bitmapOperator.flipBitmapHorizontal();
+                    transformer.rotate(90);
+                    transformer.flipHorizontal();
                     break;
                 case ExifInterface.ORIENTATION_ROTATE_90:
-                    bitmapOperator.rotateBitmap(90);
+                    transformer.rotate(90);
                     break;
                 case ExifInterface.ORIENTATION_TRANSVERSE:
-                    bitmapOperator.rotateBitmap(270);
-                    bitmapOperator.flipBitmapHorizontal();
+                    transformer.rotate(270);
+                    transformer.flipHorizontal();
                     break;
                 case ExifInterface.ORIENTATION_ROTATE_270:
-                    bitmapOperator.rotateBitmap(270);
+                    transformer.rotate(270);
                     break;
                 case ExifInterface.ORIENTATION_NORMAL:
                 case ExifInterface.ORIENTATION_UNDEFINED:
@@ -166,9 +141,9 @@ public class PostProcessor {
             this.aspectRatio = aspectRatio;
         }
 
-        public void apply(BitmapOperator bitmapOperator) {
+        public void apply(JpegTransformer transformer) {
             Rect crop = getCrop(width, height, aspectRatio);
-            bitmapOperator.cropBitmap(crop.left, crop.top, crop.right, crop.bottom);
+            transformer.crop(crop);
         }
 
         private static Rect getCrop(int currentWidth, int currentHeight, AspectRatio targetRatio) {

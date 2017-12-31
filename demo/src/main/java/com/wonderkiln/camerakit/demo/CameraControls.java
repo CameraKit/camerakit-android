@@ -5,8 +5,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.TypedArray;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
@@ -17,8 +15,8 @@ import android.view.animation.OvershootInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-import com.wonderkiln.camerakit.CameraKitEventCallback;
 import com.wonderkiln.camerakit.CameraKit;
+import com.wonderkiln.camerakit.CameraKitEventCallback;
 import com.wonderkiln.camerakit.CameraKitImage;
 import com.wonderkiln.camerakit.CameraKitVideo;
 import com.wonderkiln.camerakit.CameraView;
@@ -111,9 +109,8 @@ public class CameraControls extends LinearLayout {
         byte[] jpeg = image.getJpeg();
 
         long callbackTime = System.currentTimeMillis();
-        Bitmap bitmap = BitmapFactory.decodeByteArray(jpeg, 0, jpeg.length);
         ResultHolder.dispose();
-        ResultHolder.setImage(bitmap);
+        ResultHolder.setImage(jpeg);
         ResultHolder.setNativeCaptureSize(cameraView.getCaptureSize());
         ResultHolder.setTimeToCallback(callbackTime - captureStartTime);
         Intent intent = new Intent(getContext(), PreviewActivity.class);

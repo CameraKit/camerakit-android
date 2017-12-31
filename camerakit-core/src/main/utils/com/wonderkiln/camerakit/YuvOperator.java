@@ -50,7 +50,7 @@ public class YuvOperator {
     }
 
     static {
-        System.loadLibrary("JniYuvOperator");
+        System.loadLibrary("yuvOperator");
     }
 
     private native ByteBuffer jniStoreYuvData(byte[] data, int width, int height);
