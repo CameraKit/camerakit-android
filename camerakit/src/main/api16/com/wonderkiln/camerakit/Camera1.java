@@ -13,6 +13,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -330,7 +331,7 @@ public class Camera1 extends CameraImpl {
                             Camera.Parameters parameters = camera.getParameters();
                             int width = parameters.getPreviewSize().width;
                             int height = parameters.getPreviewSize().height;
-                            int rotation = calculatePreviewRotation();
+                            int rotation = calculateCaptureRotation();
 
                             YuvOperator yuvOperator = new YuvOperator(data, width, height);
                             yuvOperator.rotate(rotation);

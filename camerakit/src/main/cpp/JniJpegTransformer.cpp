@@ -51,29 +51,16 @@ public:
     int width;
     int height;
 
-    bool flipHorizontal;
-    bool flipVertical;
-
-    int rotation;
-
-    int cropLeft = 0;
-    int cropTop = 0;
-    int cropWidth = 0;
-    int cropHeight = 0;
+    tjhandle transformHandle;
 
     JpegTransformer() {
         jpeg = NULL;
         jpegSize = 0;
 
-        flipHorizontal = false;
-        flipVertical = false;
+        width = 0;
+        height = 0;
 
-        rotation = 0;
-
-        cropLeft = 0;
-        cropTop = 0;
-        cropWidth = 0;
-        cropHeight = 0;
+        transformHandle = NULL;
     }
 };
 
@@ -106,6 +93,10 @@ Java_com_wonderkiln_camerakit_JpegTransformer_jniStoreJpeg
     jpegTransformer->jpegSize = (unsigned long) jpegSize;
 
     tjDestroy(tjHandle);
+
+    tjhandle transformHandle = tjInitTransform();
+    jpegTransformer->transformHandle = transformHandle;
+
     return env->NewDirectByteBuffer(jpegTransformer, 0);
 }
 
@@ -113,50 +104,11 @@ JNIEXPORT jbyteArray JNICALL
 Java_com_wonderkiln_camerakit_JpegTransformer_jniCommit
         (JNIEnv *env, jobject obj, jobject handle) {
     JpegTransformer *jpegTransformer = (JpegTransformer *) env->GetDirectBufferAddress(handle);
-
-    unsigned char *jpeg = jpegTransformer->jpeg;
-    unsigned long jpegSize = jpegTransformer->jpegSize;
-
-    tjhandle tjHandle = tjInitTransform();
-
-    if (jpegTransformer->flipVertical) {
-        tjtransform *transform = new tjtransform();
-        transform->op = TJXOP_VFLIP;
-        tjTransform(tjHandle, jpeg, jpegSize, 1, &jpeg, &jpegSize, transform, 0);
-    }
-
-    if (jpegTransformer->flipHorizontal) {
-        tjtransform *transform = new tjtransform();
-        transform->op = TJXOP_HFLIP;
-        tjTransform(tjHandle, jpeg, jpegSize, 1, &jpeg, &jpegSize, transform, 0);
-    }
-
-    tjtransform *transform = new tjtransform();
-    if (jpegTransformer->rotation == 90) {
-        transform->op = TJXOP_ROT90;
-    } else if (jpegTransformer->rotation == 180) {
-        transform->op = TJXOP_ROT180;
-    } else if (jpegTransformer->rotation == 270) {
-        transform->op = TJXOP_ROT270;
-    }
-
-    if (jpegTransformer->cropWidth > 0) {
-        tjregion cropRegion;
-        cropRegion.x = jpegTransformer->cropLeft - (jpegTransformer->cropLeft % 16);
-        cropRegion.y = jpegTransformer->cropTop - (jpegTransformer->cropTop % 16);
-        cropRegion.w = jpegTransformer->cropWidth;
-        cropRegion.h = jpegTransformer->cropHeight;
-
-        transform->r = cropRegion;
-        transform->options = TJXOPT_CROP;
-    }
-
-    tjTransform(tjHandle, jpeg, jpegSize, 1, &jpeg, &jpegSize, transform, 0);
+    tjhandle tjHandle = jpegTransformer->transformHandle;
     tjDestroy(tjHandle);
 
-    jbyteArray array = env->NewByteArray((jsize) jpegSize);
-    env->SetByteArrayRegion(array, 0, (jsize) jpegSize, reinterpret_cast<jbyte *>(jpeg));
-
+    jbyteArray array = env->NewByteArray((jsize) jpegTransformer->jpegSize);
+    env->SetByteArrayRegion(array, 0, (jsize) jpegTransformer->jpegSize, reinterpret_cast<jbyte *>(jpegTransformer->jpeg));
     return array;
 }
 
@@ -178,29 +130,59 @@ JNIEXPORT void JNICALL
 Java_com_wonderkiln_camerakit_JpegTransformer_jniRotate
         (JNIEnv *env, jobject obj, jobject handle, jint degrees) {
     JpegTransformer *jpegTransformer = (JpegTransformer *) env->GetDirectBufferAddress(handle);
-    jpegTransformer->rotation = degrees;
+    tjhandle tjHandle = jpegTransformer->transformHandle;
+
+    tjtransform *transform = new tjtransform();
+    if (degrees == 90) {
+        transform->op = TJXOP_ROT90;
+    } else if (degrees == 180) {
+        transform->op = TJXOP_ROT180;
+    } else if (degrees == 270) {
+        transform->op = TJXOP_ROT270;
+    }
+
+    tjTransform(tjHandle, jpegTransformer->jpeg, jpegTransformer->jpegSize, 1, &jpegTransformer->jpeg, &jpegTransformer->jpegSize, transform, 0);
 }
 
 JNIEXPORT void JNICALL
 Java_com_wonderkiln_camerakit_JpegTransformer_jniFlipHorizontal
         (JNIEnv *env, jobject obj, jobject handle) {
     JpegTransformer *jpegTransformer = (JpegTransformer *) env->GetDirectBufferAddress(handle);
-    jpegTransformer->flipHorizontal = true;
+    tjhandle tjHandle = jpegTransformer->transformHandle;
+
+    tjtransform *transform = new tjtransform();
+    transform->op = TJXOP_HFLIP;
+
+    tjTransform(tjHandle, jpegTransformer->jpeg, jpegTransformer->jpegSize, 1, &jpegTransformer->jpeg, &jpegTransformer->jpegSize, transform, 0);
 }
 
 JNIEXPORT void JNICALL
 Java_com_wonderkiln_camerakit_JpegTransformer_jniFlipVertical
         (JNIEnv *env, jobject obj, jobject handle) {
     JpegTransformer *jpegTransformer = (JpegTransformer *) env->GetDirectBufferAddress(handle);
-    jpegTransformer->flipVertical = true;
+    tjhandle tjHandle = jpegTransformer->transformHandle;
+
+    tjtransform *transform = new tjtransform();
+    transform->op = TJXOP_VFLIP;
+
+    tjTransform(tjHandle, jpegTransformer->jpeg, jpegTransformer->jpegSize, 1, &jpegTransformer->jpeg, &jpegTransformer->jpegSize, transform, 0);
 }
 
 JNIEXPORT void JNICALL
 Java_com_wonderkiln_camerakit_JpegTransformer_jniCrop
         (JNIEnv *env, jobject obj, jobject handle, jint left, jint top, jint width, jint height) {
     JpegTransformer *jpegTransformer = (JpegTransformer *) env->GetDirectBufferAddress(handle);
-    jpegTransformer->cropLeft = left;
-    jpegTransformer->cropTop = top;
-    jpegTransformer->cropWidth = width;
-    jpegTransformer->cropHeight = height;
+    tjhandle tjHandle = jpegTransformer->transformHandle;
+
+    tjtransform *transform = new tjtransform();
+    tjregion cropRegion;
+    cropRegion.x = left - (left % 16);
+    cropRegion.y = top - (top % 16);
+    cropRegion.w = width;
+    cropRegion.h = height;
+
+    transform->r = cropRegion;
+    transform->options = TJXOPT_CROP;
+
+    tjTransform(tjHandle, jpegTransformer->jpeg, jpegTransformer->jpegSize, 1, &jpegTransformer->jpeg, &jpegTransformer->jpegSize, transform, 0);
 }
