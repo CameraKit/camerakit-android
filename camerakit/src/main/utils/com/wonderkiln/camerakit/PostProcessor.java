@@ -2,7 +2,6 @@ package com.wonderkiln.camerakit;
 
 import android.graphics.Rect;
 import android.support.media.ExifInterface;
-import android.util.Log;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -85,14 +84,14 @@ public class PostProcessor {
                     transformer.flipVertical();
                     break;
                 case ExifInterface.ORIENTATION_TRANSPOSE:
-                    transformer.rotate(90);
+                    transformer.rotate(270);
                     transformer.flipHorizontal();
                     break;
                 case ExifInterface.ORIENTATION_ROTATE_90:
                     transformer.rotate(90);
                     break;
                 case ExifInterface.ORIENTATION_TRANSVERSE:
-                    transformer.rotate(270);
+                    transformer.rotate(90);
                     transformer.flipHorizontal();
                     break;
                 case ExifInterface.ORIENTATION_ROTATE_270:
