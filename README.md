@@ -5,11 +5,13 @@
 </p>
 
 <p align="center" style="width: 100%;">
-    <a href="https://www.wonderkiln.com" target="_blank">
-        <img alt='CameraKit Header' src='.repo/gh-readme-wk.png' style="max-width: 49%;"/>
+    <a href="https://www.wonderkiln.com" target="_blank" style="width: 49%;
+display: inline-block;">
+        <img alt='CameraKit Header' src='.repo/gh-readme-wk.png'/>
     </a>
-    <a href="https://play.google.com/store/apps/details?id=com.wonderkiln.camerakit.demo&hl=en" target="_blank">
-        <img alt='CameraKit Header' src='.repo/gh-readme-app.png' style="max-width: 49%;"/>
+    <a href="https://play.google.com/store/apps/details?id=com.wonderkiln.camerakit.demo&hl=en" target="_blank" style="width: 49%;
+display: inline-block;">
+        <img alt='CameraKit Header' src='.repo/gh-readme-app.png'/>
     </a>
 </p>
 
