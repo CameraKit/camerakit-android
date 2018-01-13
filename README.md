@@ -3,7 +3,17 @@
         <img alt='CameraKit Header' src='.repo/gh-readme-header.png' />
     </a>
 </p>
-<p align="center">
+
+<p align="center" style="width: 100%;">
+    <a href="https://www.wonderkiln.com" target="_blank">
+        <img alt='CameraKit Header' src='.repo/gh-readme-wk.png' style="max-width: 49%;"/>
+    </a>
+    <a href="https://play.google.com/store/apps/details?id=com.wonderkiln.camerakit.demo&hl=en" target="_blank">
+        <img alt='CameraKit Header' src='.repo/gh-readme-app.png' style="max-width: 49%;"/>
+    </a>
+</p>
+
+<p align="center" style="width: 100%;">
     <a href="#backers" alt="Backers on Open Collective"><img src="https://opencollective.com/CameraKit-Android/backers/badge.svg" /></a> 
     <a href="#sponsors" alt="Sponsors on Open Collective"><img src="https://opencollective.com/CameraKit-Android/sponsors/badge.svg" /></a>
     <a href="https://join-slack.camerakit.website"><img src="https://join-slack.camerakit.website/badge.svg" alt="Build Status"></a>
@@ -14,8 +24,6 @@
 </p>
 
 CameraKit takes one of the hardest Android APIs and makes it into a high level and easy to use library that solves all of your problems.
-
-<a href='https://play.google.com/store/apps/details?id=com.wonderkiln.camerakit.demo&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img height="100px" alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png'/></a>
 
 With CameraKit you are able to seamlessly do the following...
 
