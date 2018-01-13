@@ -5,17 +5,15 @@
 </p>
 
 <p align="center" style="width: 100%;">
-    <a href="https://www.wonderkiln.com" target="_blank" style="width: 49%;
-display: inline-block;">
+    <a href="https://www.wonderkiln.com" target="_blank">
         <img alt='CameraKit Header' src='.repo/gh-readme-wk.png'/>
     </a>
-    <a href="https://play.google.com/store/apps/details?id=com.wonderkiln.camerakit.demo&hl=en" target="_blank" style="width: 49%;
-display: inline-block;">
+    <a href="https://play.google.com/store/apps/details?id=com.wonderkiln.camerakit.demo&hl=en" target="_blank">
         <img alt='CameraKit Header' src='.repo/gh-readme-app.png'/>
     </a>
 </p>
 
-<p align="center" style="width: 100%;">
+<p align="center">
     <a href="#backers" alt="Backers on Open Collective"><img src="https://opencollective.com/CameraKit-Android/backers/badge.svg" /></a> 
     <a href="#sponsors" alt="Sponsors on Open Collective"><img src="https://opencollective.com/CameraKit-Android/sponsors/badge.svg" /></a>
     <a href="https://join-slack.camerakit.website"><img src="https://join-slack.camerakit.website/badge.svg" alt="Build Status"></a>
