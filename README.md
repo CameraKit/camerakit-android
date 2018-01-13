@@ -4,7 +4,7 @@
     </a>
 </p>
 
-<p align="center" style="width: 100%;">
+<p align="center">
     <a href="https://www.wonderkiln.com" target="_blank">
         <img alt='CameraKit Header' src='.repo/gh-readme-wk.png'/>
     </a>
