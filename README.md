@@ -102,7 +102,7 @@ This is how we use the donations:
 
 ## Sponsors
 
-[[Become a sponsor](https://opencollective.com/CameraKit-Android#sponsor)] and your logo will show up here with a link to your website. [[Become a sponsor](https://opencollective.com/CameraKit-Android#sponsor)]
+[[Become a sponsor](https://opencollective.com/CameraKit-Android#sponsor)] and your logo will show up here with a link to your website.
 
 <a href="https://www.expensify.com/"><img src=".repo/expensify-logo.png" width="150"></a>
 
@@ -122,6 +122,11 @@ This is how we use the donations:
 [[Become a backer](https://opencollective.com/CameraKit-Android#backer)] and get your image on our README on Github with a link to your site.
 
 <a href="https://opencollective.com/CameraKit-Android#backers" target="_blank"><img src="https://opencollective.com/CameraKit-Android/backers.svg?width=890"></a>
+
+## Contributors
+
+This project exists thanks to all the people who contribute. [[Contribute]](CONTRIBUTING.md).
+<a href="graphs/contributors"><img src="https://opencollective.com/CameraKit-Android/contributors.svg?width=890" /></a>
 
 ---
 
