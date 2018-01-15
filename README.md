@@ -3,6 +3,16 @@
         <img alt='CameraKit Header' src='.repo/gh-readme-header.png' />
     </a>
 </p>
+
+<p align="center">
+    <a href="https://www.wonderkiln.com" target="_blank">
+        <img alt='CameraKit Header' src='.repo/gh-readme-wk.png'/>
+    </a>
+    <a href="https://play.google.com/store/apps/details?id=com.wonderkiln.camerakit.demo&hl=en" target="_blank">
+        <img alt='CameraKit Header' src='.repo/gh-readme-app.png'/>
+    </a>
+</p>
+
 <p align="center">
     <a href="#backers" alt="Backers on Open Collective"><img src="https://opencollective.com/CameraKit-Android/backers/badge.svg" /></a> 
     <a href="#sponsors" alt="Sponsors on Open Collective"><img src="https://opencollective.com/CameraKit-Android/sponsors/badge.svg" /></a>
@@ -14,8 +24,6 @@
 </p>
 
 CameraKit takes one of the hardest Android APIs and makes it into a high level and easy to use library that solves all of your problems.
-
-<a href='https://play.google.com/store/apps/details?id=com.wonderkiln.camerakit.demo&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img height="100px" alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png'/></a>
 
 With CameraKit you are able to seamlessly do the following...
 
@@ -77,25 +85,24 @@ Starting in version 0.13.0 you need to add the following options to your Proguar
 -dontwarn com.google.android.gms.**
 ```
 
-## Detailed Documentation
-To check out detailed docs, visit our [Documentation Website](http://docs.camerakit.website)
+## Documentation
+Check out our [Documentation Website](http://docs.camerakit.website) for more documentation on how to use to CameraKit.
 
-## Contributors
+# Sponsoring
 
-This project exists thanks to all the people who contribute. [[Contribute]](CONTRIBUTING.md).
-<a href="graphs/contributors"><img src="https://opencollective.com/CameraKit-Android/contributors.svg?width=890" /></a>
+Most of the core team members, CameraKit contributors and contributors in the ecosystem do this open source work in their free time. If you use CameraKit for a serious task, and you'd like us to invest more time on it, please donate. This project increases your income/productivity too. It makes development and applications faster and it reduces the required bandwidth.
 
+This is how we use the donations:
 
-## Backers
-
-Thank you to all our backers! 🙏 [[Become a backer](https://opencollective.com/CameraKit-Android#backer)]
-
-<a href="https://opencollective.com/CameraKit-Android#backers" target="_blank"><img src="https://opencollective.com/CameraKit-Android/backers.svg?width=890"></a>
-
+- Allow the core team to work on CameraKit
+- Thank contributors if they invested a large amount of time in contributing
+- Support projects in the ecosystem that are of great value for users
+- Infrastructure cost
+- Fees for money handling
 
 ## Sponsors
 
-Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [[Become a sponsor](https://opencollective.com/CameraKit-Android#sponsor)]
+[[Become a sponsor](https://opencollective.com/CameraKit-Android#sponsor)] and your logo will show up here with a link to your website.
 
 <a href="https://www.expensify.com/"><img src=".repo/expensify-logo.png" width="150"></a>
 
@@ -110,7 +117,18 @@ Support this project by becoming a sponsor. Your logo will show up here with a l
 <a href="https://opencollective.com/CameraKit-Android/sponsor/8/website" target="_blank"><img src="https://opencollective.com/CameraKit-Android/sponsor/8/avatar.svg"></a>
 <a href="https://opencollective.com/CameraKit-Android/sponsor/9/website" target="_blank"><img src="https://opencollective.com/CameraKit-Android/sponsor/9/avatar.svg"></a>
 
+## Backers
 
+[[Become a backer](https://opencollective.com/CameraKit-Android#backer)] and get your image on our README on Github with a link to your site.
+
+<a href="https://opencollective.com/CameraKit-Android#backers" target="_blank"><img src="https://opencollective.com/CameraKit-Android/backers.svg?width=890"></a>
+
+## Contributors
+
+This project exists thanks to all the people who contribute. [[Contribute]](CONTRIBUTING.md).
+<a href="graphs/contributors"><img src="https://opencollective.com/CameraKit-Android/contributors.svg?width=890" /></a>
+
+---
 
 ## License
 CameraKit is [MIT License](https://github.com/wonderkiln/CameraKit-Android/blob/master/LICENSE)
