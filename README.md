@@ -90,7 +90,7 @@ Check out our [Documentation Website](http://docs.camerakit.website) for more do
 
 # Sponsoring
 
-Most of the core team members, webpack contributors and contributors in the ecosystem do this open source work in their free time. If you use webpack for a serious task, and you'd like us to invest more time on it, please donate. This project increases your income/productivity too. It makes development and applications faster and it reduces the required bandwidth.
+Most of the core team members, CameraKit contributors and contributors in the ecosystem do this open source work in their free time. If you use CameraKit for a serious task, and you'd like us to invest more time on it, please donate. This project increases your income/productivity too. It makes development and applications faster and it reduces the required bandwidth.
 
 This is how we use the donations:
 
