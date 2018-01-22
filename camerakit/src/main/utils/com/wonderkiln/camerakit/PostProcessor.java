@@ -12,12 +12,14 @@ import static com.wonderkiln.camerakit.CameraKit.Constants.FACING_FRONT;
 public class PostProcessor {
 
     private byte[] picture;
+    private int rotation;
     private int jpegQuality;
     private int facing;
     private AspectRatio cropAspectRatio;
 
-    public PostProcessor(byte[] picture) {
+    public PostProcessor(byte[] picture, int rotation) {
         this.picture = picture;
+        this.rotation = rotation;
     }
 
     public void setJpegQuality(int jpegQuality) {
@@ -38,8 +40,12 @@ public class PostProcessor {
         int width = jpegTransformer.getWidth();
         int height = jpegTransformer.getHeight();
 
-        ExifPostProcessor exifPostProcessor = new ExifPostProcessor(picture);
-        exifPostProcessor.apply(jpegTransformer);
+        if (rotation != 0) {
+            jpegTransformer.rotate(rotation);
+        }
+
+//        ExifPostProcessor exifPostProcessor = new ExifPostProcessor(picture);
+//        exifPostProcessor.apply(jpegTransformer);
 
         if (facing == FACING_FRONT) {
             jpegTransformer.flipHorizontal();
@@ -48,7 +54,7 @@ public class PostProcessor {
         if (cropAspectRatio != null) {
             int cropWidth = width;
             int cropHeight = height;
-            if (exifPostProcessor.areDimensionsFlipped()) {
+            if (rotation % 180 == 90) {
                 cropWidth = height;
                 cropHeight = width;
             }

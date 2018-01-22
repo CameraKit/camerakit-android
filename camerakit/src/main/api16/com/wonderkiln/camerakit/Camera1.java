@@ -13,7 +13,6 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -293,14 +292,14 @@ public class Camera1 extends CameraImpl {
 
                         // Set the captureRotation right before taking a picture so it's accurate
                         int captureRotation = calculateCaptureRotation();
-                        mCameraParameters.setRotation(captureRotation);
+//                        mCameraParameters.setRotation(captureRotation);
                         mCamera.setParameters(mCameraParameters);
 
                         mCamera.takePicture(null, null, null,
                                 new Camera.PictureCallback() {
                                     @Override
                                     public void onPictureTaken(byte[] data, Camera camera) {
-                                        callback.imageCaptured(data);
+                                        callback.imageCaptured(data, calculateCaptureRotation());
 
                                         // Reset capturing state to allow photos to be taken
                                         capturingImage = false;
@@ -347,7 +346,7 @@ public class Camera1 extends CameraImpl {
                             YuvImage yuvImage = new YuvImage(data, parameters.getPreviewFormat(), yuvOutputWidth, yuvOutputHeight, null);
                             ByteArrayOutputStream out = new ByteArrayOutputStream();
                             yuvImage.compressToJpeg(new Rect(0, 0, yuvImage.getWidth(), yuvImage.getHeight()), 100, out);
-                            callback.imageCaptured(out.toByteArray());
+                            callback.imageCaptured(out.toByteArray(), 0);
                         }
                     });
                     break;
@@ -593,13 +592,13 @@ public class Camera1 extends CameraImpl {
             captureRotation = (mCameraInfo.orientation - mDisplayOrientation + 360) % 360;
         }
 
-        // Accommodate for any extra device rotation relative to fixed screen orientations
-        // (e.g. activity fixed in portrait, but user took photo/video in landscape)
-        if (mCameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-            captureRotation = ((captureRotation - (mDisplayOrientation - mDeviceOrientation)) + 360) % 360;
-        } else {  // back-facing camera
-            captureRotation = (captureRotation + (mDisplayOrientation - mDeviceOrientation) + 360) % 360;
-        }
+//        // Accommodate for any extra device rotation relative to fixed screen orientations
+//        // (e.g. activity fixed in portrait, but user took photo/video in landscape)
+//        if (mCameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+//            captureRotation = ((captureRotation - (mDisplayOrientation - mDeviceOrientation)) + 360) % 360;
+//        } else {  // back-facing camera
+//            captureRotation = (captureRotation + (mDisplayOrientation - mDeviceOrientation) + 360) % 360;
+//        }
 
         return captureRotation;
     }
@@ -688,7 +687,7 @@ public class Camera1 extends CameraImpl {
         }
 
         int rotation = calculateCaptureRotation();
-        mCameraParameters.setRotation(rotation);
+//        mCameraParameters.setRotation(rotation);
 
         setFocus(mFocus);
 
