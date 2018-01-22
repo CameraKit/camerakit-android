@@ -12,6 +12,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.SurfaceHolder;
 import android.view.View;
 
 import java.io.ByteArrayOutputStream;
@@ -88,26 +89,6 @@ public class Camera1 extends CameraImpl {
 
     Camera1(EventDispatcher eventDispatcher, PreviewImpl preview) {
         super(eventDispatcher, preview);
-        preview.setCallback(new PreviewImpl.Callback() {
-            @Override
-            public void onSurfaceChanged() {
-                if (mCamera != null) {
-                    if (mShowingPreview) {
-                        mCamera.stopPreview();
-                        mShowingPreview = false;
-                    }
-
-                    setDisplayAndDeviceOrientation();
-                    setupPreview();
-
-                    if (!mShowingPreview) {
-                        mCamera.startPreview();
-                        mShowingPreview = true;
-                    }
-                }
-            }
-        });
-
         mCameraInfo = new Camera.CameraInfo();
     }
 
@@ -115,13 +96,42 @@ public class Camera1 extends CameraImpl {
 
     @Override
     void start() {
-        setFacing(mFacing);
-        openCamera();
-        if (mPreview.isReady()) {
-            setDisplayAndDeviceOrientation();
-            setupPreview();
-            mCamera.startPreview();
-            mShowingPreview = true;
+        synchronized (mCameraLock) {
+            if (mCamera != null) {
+                return;
+            }
+
+            setFacing(mFacing);
+
+            mCamera = Camera.open(mCameraId);
+            mCameraParameters = mCamera.getParameters();
+
+            collectCameraProperties();
+            adjustCameraParameters();
+
+            mEventDispatcher.dispatch(new CameraKitEvent(CameraKitEvent.TYPE_CAMERA_OPEN));
+
+            mPreview.setCallback(new PreviewImpl.Callback() {
+                @Override
+                public void onSurfaceChanged(SurfaceHolder surfaceHolder) {
+                    synchronized (mCameraLock) {
+                        if (mCamera != null) {
+                            if (mShowingPreview) {
+                                mCamera.stopPreview();
+                                mShowingPreview = false;
+                            }
+
+                            setDisplayAndDeviceOrientation();
+                            setupPreview(surfaceHolder);
+
+                            if (!mShowingPreview) {
+                                mCamera.startPreview();
+                                mShowingPreview = true;
+                            }
+                        }
+                    }
+                }
+            });
         }
     }
 
@@ -135,6 +145,8 @@ public class Camera1 extends CameraImpl {
                 notifyErrorListener(e);
             }
         }
+        mPreview.setCallback(null);
+
         mShowingPreview = false;
 
         releaseMediaRecorder();
@@ -533,27 +545,10 @@ public class Camera1 extends CameraImpl {
 
     // Internal:
 
-    private void openCamera() {
-        synchronized (mCameraLock) {
-            if (mCamera != null) {
-                releaseCamera();
-            }
-
-            mCamera = Camera.open(mCameraId);
-            mCameraParameters = mCamera.getParameters();
-
-            collectCameraProperties();
-            adjustCameraParameters();
-
-            mEventDispatcher.dispatch(new CameraKitEvent(CameraKitEvent.TYPE_CAMERA_OPEN));
-        }
-    }
-
-    private void setupPreview() {
+    private void setupPreview(SurfaceHolder surfaceHolder) {
         synchronized (mCameraLock) {
             try {
-                mCamera.reconnect();
-                mCamera.setPreviewDisplay(mPreview.getSurfaceHolder());
+                mCamera.setPreviewDisplay(surfaceHolder);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -563,7 +558,6 @@ public class Camera1 extends CameraImpl {
     private void releaseCamera() {
         synchronized (mCameraLock) {
             if (mCamera != null) {
-                mCamera.lock();
                 mCamera.release();
                 mCamera = null;
                 mCameraParameters = null;

@@ -2,10 +2,6 @@ package com.wonderkiln.camerakit;
 
 import android.Manifest;
 import android.app.Activity;
-import android.arch.lifecycle.Lifecycle;
-import android.arch.lifecycle.LifecycleObserver;
-import android.arch.lifecycle.LifecycleOwner;
-import android.arch.lifecycle.OnLifecycleEvent;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.pm.PackageManager;
@@ -40,7 +36,7 @@ import static com.wonderkiln.camerakit.CameraKit.Constants.PERMISSIONS_LAZY;
 import static com.wonderkiln.camerakit.CameraKit.Constants.PERMISSIONS_PICTURE;
 import static com.wonderkiln.camerakit.CameraKit.Constants.PERMISSIONS_STRICT;
 
-public class CameraView extends FrameLayout implements LifecycleObserver {
+public class CameraView extends FrameLayout {
 
     private static Handler sWorkerHandler;
 
@@ -84,9 +80,6 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
     private CameraImpl mCameraImpl;
 
     private PreviewImpl mPreviewImpl;
-
-    private Lifecycle mLifecycle;
-    private boolean mIsStarted;
 
     private EventDispatcher mEventDispatcher;
 
@@ -132,8 +125,6 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
         mPreviewImpl = new SurfaceViewPreview(context, this);
         mCameraImpl = new Camera1(mEventDispatcher, mPreviewImpl);
 
-        mIsStarted = false;
-
         // Handle situations where there's only 1 camera & it's front facing OR it's a chromebook in laptop mode
         WindowManager windowService = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         boolean isChromebookInLaptopMode = (context.getPackageManager().hasSystemFeature("org.chromium.arc.device_management") && windowService.getDefaultDisplay().getRotation() == Surface.ROTATION_0);
@@ -175,7 +166,6 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
                 }
             });
         }
-        mLifecycle = null;
     }
 
     @Override
@@ -232,42 +222,7 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
-    public boolean isStarted() {
-        return mIsStarted;
-    }
-
-    @Override
-    public void setEnabled(boolean enabled) {
-        super.setEnabled(enabled);
-        if (mLifecycle != null && mLifecycle.getCurrentState().isAtLeast(Lifecycle.State.RESUMED)) {
-            // Potentially update the UI
-            if (enabled) {
-                start();
-            } else {
-                stop();
-            }
-        }
-    }
-
-    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-    public void onResume(LifecycleOwner owner) {
-        mLifecycle = owner.getLifecycle();
-        start();
-    }
-
-
-    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-    public void onPause(LifecycleOwner owner) {
-        mLifecycle = owner.getLifecycle();
-        stop();
-    }
-
     public void start() {
-        if (mIsStarted || !isEnabled()) {
-            // Already started, do nothing.
-            return;
-        }
-        mIsStarted = true;
         int cameraCheck = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA);
         int audioCheck = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.RECORD_AUDIO);
 
@@ -297,17 +252,21 @@ public class CameraView extends FrameLayout implements LifecycleObserver {
         sWorkerHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                mCameraImpl.start();
+                try {
+                    mCameraImpl.start();
+                } catch (Exception e) {
+                    postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                           mCameraImpl.start();
+                        }
+                    }, 300);
+                }
             }
-        }, 100);
+        }, 300);
     }
 
     public void stop() {
-        if (!mIsStarted) {
-            // Already stopped, do nothing.
-            return;
-        }
-        mIsStarted = false;
         mCameraImpl.stop();
     }
 

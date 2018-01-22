@@ -8,7 +8,7 @@ import android.view.View;
 abstract class PreviewImpl {
 
     interface Callback {
-        void onSurfaceChanged();
+        void onSurfaceChanged(SurfaceHolder surfaceHolder);
     }
 
     private Callback mCallback;
@@ -20,8 +20,25 @@ abstract class PreviewImpl {
     protected int mPreviewHeight;
     protected int mPreviewFormat;
 
+    protected SurfaceHolder mSurfaceHolder;
+
     void setCallback(Callback callback) {
+        if (callback == null) {
+            mCallback = new Callback() {
+                @Override
+                public void onSurfaceChanged(SurfaceHolder surfaceHolder) {
+
+                }
+            };
+
+            return;
+        }
+
         mCallback = callback;
+
+        if (mSurfaceHolder != null) {
+            mCallback.onSurfaceChanged(mSurfaceHolder);
+        }
     }
 
     abstract Surface getSurface();
@@ -34,8 +51,9 @@ abstract class PreviewImpl {
 
     abstract boolean isReady();
 
-    protected void dispatchSurfaceChanged() {
-        mCallback.onSurfaceChanged();
+    protected void dispatchSurfaceChanged(SurfaceHolder surfaceHolder) {
+        mSurfaceHolder = surfaceHolder;
+        mCallback.onSurfaceChanged(surfaceHolder);
     }
 
     SurfaceHolder getSurfaceHolder() {

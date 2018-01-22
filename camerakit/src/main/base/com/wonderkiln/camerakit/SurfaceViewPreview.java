@@ -26,7 +26,6 @@ public class SurfaceViewPreview extends PreviewImpl {
         mSurfaceView = mContainer.findViewById(R.id.surface_view);
 
         final SurfaceHolder holder = mSurfaceView.getHolder();
-
         holder.addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
@@ -35,7 +34,7 @@ public class SurfaceViewPreview extends PreviewImpl {
             @Override
             public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
                 setSize(width, height);
-                if (isReady()) dispatchSurfaceChanged();
+                if (isReady()) dispatchSurfaceChanged(holder);
             }
 
             @Override
