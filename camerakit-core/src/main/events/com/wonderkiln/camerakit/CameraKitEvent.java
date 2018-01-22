@@ -9,6 +9,7 @@ public class CameraKitEvent {
 
     public static final String TYPE_CAMERA_OPEN = "CKCameraOpenedEvent";
     public static final String TYPE_CAMERA_CLOSE = "CKCameraStoppedEvent";
+    public static final String TYPE_PREVIEW_START = "CKPreviewStartedEvent";
 
     public static final String TYPE_FACING_CHANGED = "CKFacingChangedEvent";
     public static final String TYPE_FLASH_CHANGED = "CKFlashChangedEvent";
