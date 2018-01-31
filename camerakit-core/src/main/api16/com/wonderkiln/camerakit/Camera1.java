@@ -51,6 +51,7 @@ public class Camera1 extends CameraImpl {
     private Size mVideoSize;
     private Size mPreviewSize;
     private MediaRecorder mMediaRecorder;
+    private File mCustomVideoFile;
     private Camera.AutoFocusCallback mAutofocusCallback;
     private boolean capturingImage = false;
 
@@ -483,6 +484,7 @@ public class Camera1 extends CameraImpl {
     void captureVideo(File videoFile, VideoCapturedCallback callback) {
         synchronized (mCameraLock) {
             try {
+                mCustomVideoFile = videoFile;
                 if (prepareMediaRecorder(videoFile)) {
                     mMediaRecorder.start();
                     mRecording = true;
@@ -946,10 +948,15 @@ public class Camera1 extends CameraImpl {
                 mMediaRecorder = null;
                 mCamera.lock();
             }
+            mCustomVideoFile = null;
         }
     }
 
     private File getVideoFile() {
+        if (mCustomVideoFile != null) {
+            return mCustomVideoFile;
+        }
+
         if (!Environment.getExternalStorageState().equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
             return null;
         }
