@@ -7,5 +7,5 @@ public class Video extends CameraProduct {
     public Video(Context context) {
         super(context);
     }
-    
+
 }
