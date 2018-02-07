@@ -17,27 +17,13 @@ CameraKit takes one of the hardest Android APIs and makes it into a high level a
 
 <a href='https://play.google.com/store/apps/details?id=com.camerakit.demo&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img height="100px" alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png'/></a>
 
-With CameraKit you are able to seamlessly do the following...
-
-- Image and video capture seamlessly working with the same preview session.
-- Automatic system permission handling.
-- Automatic preview scaling.
-  - Create a `CameraView` of any size (not just presets!).
-  - Automatic output cropping to match your `CameraView` bounds.
-- Multiple capture methods.
-  - `METHOD_STANDARD`: an image captured normally using the camera APIs.
-  - `METHOD_STILL`: a freeze frame of the `CameraView` preview (similar to SnapChat and Instagram) for devices with slower cameras.
-  - `METHOD_SPEED`: automatic capture method determination based on measured speed.
-- Built-in continuous cameraFocus.
-- Built-in tap to cameraFocus.
-- Built-in pinch to cameraZoom.
 
 
 ## Setup
 Add __CameraKit__ to the dependencies block in your `app` level `build.gradle`:
 
 ```groovy		
-compile 'com.wonderkiln:camerakit:0.13.0'
+implementation 'com.camerakit:camerakit:1.0.0'
 ```		
 
 
@@ -46,11 +32,10 @@ compile 'com.wonderkiln:camerakit:0.13.0'
 To use CameraKit, simply add a `CameraView` to your layout:
 
 ```xml
-<com.camerakit.addon.CameraPlugin
+<com.camerakit.CameraView
     android:id="@+id/camera"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:adjustViewBounds="true" />
+    android:layout_height="match_parent" />
 ```
 
 Make sure you override `onResume` and `onPause` in your activity, and make calls respectively to `CameraView.start()` and `CameraView.stop()`.
