@@ -29,7 +29,7 @@ public class Photo extends CameraProduct {
         mError = error;
     }
 
-    public CameraPending<PhotoJpeg> toJpeg() {
+    public CameraPending<PhotoJpeg> toJpegBytes() {
         mPendingJpeg = new CameraPending<>();
 
         if (mJpeg != null) {
@@ -37,6 +37,39 @@ public class Photo extends CameraProduct {
         }
 
         return mPendingJpeg;
+    }
+
+    public CameraPending<PhotoFile> toFile() {
+        String label = "camerakit";
+        return toGalleryFile(label);
+    }
+
+    public CameraPending<PhotoFile> toFile(String folderName) {
+        return toGalleryFile(folderName, System.currentTimeMillis() + ".jpg");
+    }
+
+    public CameraPending<PhotoFile> toFile(String folderName, String fileName) {
+        CameraPending<PhotoFile> output = new CameraPending<>();
+
+        toJpegBytes().whenReady(jpeg -> {
+           output.run(pending -> {
+               File directory = new File(mContext.getFilesDir(), folderName);
+
+               if (!directory.isDirectory()) {
+                   directory.mkdirs();
+               }
+
+               File imageFile = new File(directory, fileName);
+               FileOutputStream out = new FileOutputStream(imageFile);
+               out.write(jpeg.getBytes());
+               out.flush();
+               out.close();
+
+               pending.set(new PhotoFile(mContext, imageFile));
+           });
+        });
+
+        return output;
     }
 
     public CameraPending<PhotoFile> toGalleryFile() {
@@ -51,7 +84,7 @@ public class Photo extends CameraProduct {
     public CameraPending<PhotoFile> toGalleryFile(String folderName, String fileName) {
         CameraPending<PhotoFile> output = new CameraPending<>();
 
-        toJpeg().whenReady(jpeg -> {
+        toJpegBytes().whenReady(jpeg -> {
             output.run(pending -> {
                 File directory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES + File.separator + folderName);
 
@@ -59,7 +92,7 @@ public class Photo extends CameraProduct {
                     directory.mkdirs();
                 }
 
-                File imageFile = new File(directory, fileName + ".png");
+                File imageFile = new File(directory, fileName);
                 FileOutputStream out = new FileOutputStream(imageFile);
                 out.write(jpeg.getBytes());
                 out.flush();
