@@ -1,3 +1,8 @@
+plugins {
+    id 'com.jfrog.bintray' version '1.7.3'
+    id 'com.github.dcendents.android-maven' version '1.5'
+}
+
 apply plugin: 'com.android.library'
 
 android {
@@ -6,65 +11,129 @@ android {
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionName rootProject.ext.versionName
     }
-    lintOptions {
-        abortOnError false
-    }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
     sourceSets {
-        main.java.srcDirs += 'src/main/base'
-        main.java.srcDirs += 'src/main/api16'
-        main.java.srcDirs += 'src/main/api21'
-        main.java.srcDirs += 'src/main/types'
-        main.java.srcDirs += 'src/main/events'
-        main.java.srcDirs += 'src/main/utils'
-        main.java.srcDirs += 'src/main/vision'
-    }
-    externalNativeBuild {
-        cmake {
-            path 'src/main/cpp/CMakeLists.txt'
+        main {
+            java {
+                setSrcDirs([])
+                srcDir 'src/main/java/public/base'
+                srcDir 'src/main/java/public/types'
+                srcDir 'src/main/java/public/modules'
+                srcDir 'src/main/java/public/products'
+                srcDir 'src/main/java/core/base'
+                srcDir 'src/main/java/core/v1'
+            }
         }
     }
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:27.0.2'
-    compile 'com.android.support:exifinterface:27.0.2'
-    implementation 'com.google.android.gms:play-services-vision:11.6.2'
+    implementation 'com.camerakit:jpegkit:0.0.1'
+    testImplementation 'junit:junit:4.12'
 }
 
-group = 'com.wonderkiln'
-version = rootProject.ext.versionName
+ext.getBintrayUser = { ->
+    if (System.getenv('BINTRAY_USER')) {
+        return System.getenv('BINTRAY_USER')
+    }
+
+    Properties properties = new Properties()
+    properties.load(rootProject.file('local.properties').newDataInputStream())
+    return properties.getProperty('bintray.user')
+}
+
+ext.getBintrayKey = { ->
+    if (System.getenv('BINTRAY_KEY')) {
+        return System.getenv('BINTRAY_KEY')
+    }
+
+    Properties properties = new Properties()
+    properties.load(rootProject.file('local.properties').newDataInputStream())
+    return properties.getProperty('bintray.key')
+}
+
+task cleanDeployment {
+    doLast {
+        logger.lifecycle('CameraKit Deployment: Cleaning...')
+        logger.lifecycle('Deleting: ' + project.buildDir)
+        delete project.buildDir
+    }
+}
+
+task buildDeployment {
+    shouldRunAfter(cleanDeployment)
+    finalizedBy assemble
+
+    doFirst {
+        android.variantFilter { variant ->
+            if (variant.buildType.name == 'debug') {
+                variant.setIgnore(true)
+            }
+        }
+    }
+}
+
+task deploySnapshot {
+    shouldRunAfter(buildDeployment)
+
+    dependsOn cleanDeployment
+    dependsOn buildDeployment
+    finalizedBy bintrayUpload
+
+    doLast {
+        bintrayUpload.setVersionName(bintrayUpload.getVersionName() + '-Snapshot')
+        bintrayUpload.setUserOrg('camerakit')
+        bintrayUpload.setRepoName('camerakit-android-snapshots')
+        bintrayUpload.setOverride(true)
+        bintrayUpload.setPublish(true)
+
+        logger.lifecycle('Deploying version ' + bintrayUpload.getVersionName() + ' in ' + bintrayUpload.getRepoName())
+    }
+}
+
+task deployRelease {
+    shouldRunAfter(buildDeployment)
+
+    dependsOn cleanDeployment
+    dependsOn buildDeployment
+    finalizedBy bintrayUpload
+
+    doLast {
+        bintrayUpload.setUserOrg('camerakit')
+        bintrayUpload.setRepoName('camerakit-android')
+
+        logger.lifecycle('Deploying version ' + bintrayUpload.getVersionName() + ' in ' + bintrayUpload.getRepoName())
+    }
+}
+
+group = 'com.camerakit'
+version = '1.0.0'
 
 install {
     repositories.mavenInstaller {
         pom.project {
-            name 'CameraKit-Android'
+            name 'camerakit-android'
+            groupId 'com.camerakit'
+            artifactId 'camerakit'
             packaging 'aar'
         }
     }
 }
 
 bintray {
-    user = rootProject.ext.bintrayUser
-    key = rootProject.ext.bintrayKey
-    override = true
-    publish = true
+    user = getBintrayUser()
+    key = getBintrayKey()
     configurations = ['archives']
     pkg {
-        repo = 'snapshots'
-        name = 'CameraKit-Android'
-        userOrg = 'wonderkiln'
-        vcsUrl = 'https://github.com/wonderkiln/CameraKit-Android.git'
+        name = 'camerakit-android'
+        vcsUrl = 'https://github.com/CameraKit/camerakit-android.git'
+        licenses = ['MIT']
         version {
-            name = rootProject.ext.versionName
-            vcsTag = rootProject.ext.versionName
+            name = project.version
             released = new Date()
         }
     }

@@ -1,0 +1,24 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    defaultConfig {
+        applicationId 'com.camerakit.app'
+        minSdkVersion 16
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionName '1.0.0'
+        versionCode 1
+    }
+}
+
+dependencies {
+    implementation project(':camerakit')
+    implementation 'com.android.support:appcompat-v7:27.0.2'
+    implementation 'com.android.support:design:27.0.2'
+    implementation 'com.github.rubensousa:floatingtoolbar:1.5.1'
+}

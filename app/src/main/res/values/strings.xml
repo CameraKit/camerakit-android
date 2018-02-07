@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">CameraKit</string>
+    <string name="url_github">https://github.com/wonderkiln/camerakit-android</string>
+    <string name="url_website">http://camerakit.website</string>
+
+    <string name="about_dialog_title">About</string>
+    <string name="about_dialog_message">CameraKit is open source software distributed under the MIT license.\n\nFor more details visit www.camerakit.website/.</string>
+
+    <string name="drawer_open">Open Drawer</string>
+    <string name="drawer_close">Close Drawer</string>
+
+    <string-array name="photo_resolutions">
+        <item>highest</item>
+        <item>lowest</item>
+        <item>max480p</item>
+        <item>max720p</item>
+        <item>max1080p</item>
+        <item>max1440p</item>
+        <item>max2160p</item>
+        <item>max4320p</item>
+    </string-array>
+</resources>

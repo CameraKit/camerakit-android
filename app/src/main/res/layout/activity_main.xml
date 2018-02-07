@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/activityMain"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimaryReallyDark"
+    android:fitsSystemWindows="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:elevation="6dp"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:logo="@drawable/logomark_light"
+            app:title="CameraKit App" />
+
+        <com.camerakit.CameraView
+            android:id="@+id/camera"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:adjustViewBounds="true"
+            app:camera_facing="back" />
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/fabAnchor"
+        android:layout_width="56dp"
+        android:layout_height="122dp"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="7dp" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fabSettings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center_horizontal"
+        android:elevation="4dp"
+        android:src="@drawable/ic_settings"
+        app:layout_anchor="@+id/fabAnchor"
+        app:layout_anchorGravity="bottom|center_horizontal" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fabPhoto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:elevation="4dp"
+        android:src="@drawable/ic_camera"
+        android:tint="@color/colorPrimaryDark"
+        app:backgroundTint="#FFFFFF"
+        app:layout_anchor="@+id/fabAnchor"
+        app:layout_anchorGravity="top|center_horizontal"
+        app:rippleColor="#44131B1F" />
+
+    <View
+        android:id="@+id/toolbarAnchor"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_gravity="bottom" />
+
+    <com.github.rubensousa.floatingtoolbar.FloatingToolbar
+        android:id="@+id/toolbarSettings"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_gravity="center"
+        app:floatingAutoHide="false"
+        app:floatingMenu="@menu/camera_settings"
+        app:layout_anchor="@+id/toolbarAnchor"
+        app:layout_anchorGravity="center" />
+
+</android.support.design.widget.CoordinatorLayout>

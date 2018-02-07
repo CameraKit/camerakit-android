@@ -15,7 +15,7 @@
 
 CameraKit takes one of the hardest Android APIs and makes it into a high level and easy to use library that solves all of your problems.
 
-<a href='https://play.google.com/store/apps/details?id=com.wonderkiln.camerakit.demo&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img height="100px" alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png'/></a>
+<a href='https://play.google.com/store/apps/details?id=com.camerakit.demo&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img height="100px" alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png'/></a>
 
 With CameraKit you are able to seamlessly do the following...
 
@@ -28,9 +28,9 @@ With CameraKit you are able to seamlessly do the following...
   - `METHOD_STANDARD`: an image captured normally using the camera APIs.
   - `METHOD_STILL`: a freeze frame of the `CameraView` preview (similar to SnapChat and Instagram) for devices with slower cameras.
   - `METHOD_SPEED`: automatic capture method determination based on measured speed.
-- Built-in continuous focus.
-- Built-in tap to focus.
-- Built-in pinch to zoom.
+- Built-in continuous cameraFocus.
+- Built-in tap to cameraFocus.
+- Built-in pinch to cameraZoom.
 
 
 ## Setup
@@ -46,7 +46,7 @@ compile 'com.wonderkiln:camerakit:0.13.0'
 To use CameraKit, simply add a `CameraView` to your layout:
 
 ```xml
-<com.wonderkiln.camerakit.CameraView
+<com.camerakit.addon.CameraPlugin
     android:id="@+id/camera"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
