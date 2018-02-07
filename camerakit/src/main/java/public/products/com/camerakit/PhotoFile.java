@@ -1,16 +1,19 @@
 package com.camerakit;
 
-import android.content.Context;
-
 import java.io.File;
 
-public class PhotoFile extends Photo {
+public class PhotoFile {
 
+    private Photo mPhoto;
     private File mFile;
 
-    public PhotoFile(Context context, File file) {
-        super(context);
+    public PhotoFile(Photo photo, File file) {
+        mPhoto = photo;
         mFile = file;
+    }
+
+    public Photo getPhoto() {
+        return mPhoto;
     }
 
     public File getFile() {

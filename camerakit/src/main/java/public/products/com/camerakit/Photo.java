@@ -12,7 +12,7 @@ public class Photo extends CameraProduct {
     private byte[] mJpeg;
     private Throwable mError;
 
-    private CameraPending<PhotoJpeg> mPendingJpeg;
+    private CameraPending<PhotoBytes> mPendingBytes;
 
     public Photo(Context context) {
         super(context);
@@ -20,8 +20,8 @@ public class Photo extends CameraProduct {
 
     void set(byte[] jpeg) {
         mJpeg = jpeg;
-        if (mPendingJpeg != null) {
-            mPendingJpeg.set(new PhotoJpeg(mContext, mJpeg));
+        if (mPendingBytes != null) {
+            mPendingBytes.set(new PhotoBytes(Photo.this, mJpeg));
         }
     }
 
@@ -29,14 +29,14 @@ public class Photo extends CameraProduct {
         mError = error;
     }
 
-    public CameraPending<PhotoJpeg> toJpegBytes() {
-        mPendingJpeg = new CameraPending<>();
+    public CameraPending<PhotoBytes> toBytes() {
+        mPendingBytes = new CameraPending<>();
 
         if (mJpeg != null) {
-            mPendingJpeg.set(new PhotoJpeg(mContext, mJpeg));
+            mPendingBytes.set(new PhotoBytes(Photo.this, mJpeg));
         }
 
-        return mPendingJpeg;
+        return mPendingBytes;
     }
 
     public CameraPending<PhotoFile> toFile() {
@@ -51,7 +51,7 @@ public class Photo extends CameraProduct {
     public CameraPending<PhotoFile> toFile(String folderName, String fileName) {
         CameraPending<PhotoFile> output = new CameraPending<>();
 
-        toJpegBytes().whenReady(jpeg -> {
+        toBytes().whenReady(jpeg -> {
            output.run(pending -> {
                File directory = new File(mContext.getFilesDir(), folderName);
 
@@ -65,7 +65,7 @@ public class Photo extends CameraProduct {
                out.flush();
                out.close();
 
-               pending.set(new PhotoFile(mContext, imageFile));
+               pending.set(new PhotoFile(Photo.this, imageFile));
            });
         });
 
@@ -84,7 +84,7 @@ public class Photo extends CameraProduct {
     public CameraPending<PhotoFile> toGalleryFile(String folderName, String fileName) {
         CameraPending<PhotoFile> output = new CameraPending<>();
 
-        toJpegBytes().whenReady(jpeg -> {
+        toBytes().whenReady(jpeg -> {
             output.run(pending -> {
                 File directory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES + File.separator + folderName);
 
@@ -99,7 +99,7 @@ public class Photo extends CameraProduct {
                 out.close();
 
                 MediaScannerConnection.scanFile(mContext, new String[]{imageFile.getAbsolutePath()}, null, (path, uri) -> {
-                    pending.set(new PhotoFile(mContext, imageFile));
+                    pending.set(new PhotoFile(Photo.this, imageFile));
                 });
             });
         });
@@ -107,5 +107,21 @@ public class Photo extends CameraProduct {
         return output;
     }
 
+    public CameraPending<PhotoThumbnail> toThumbnail() {
+        CameraPending<PhotoThumbnail> output = new CameraPending<>();
+
+        toFile().whenReady(file -> {
+
+        });
+
+        return output;
+    }
+
+    public CameraPending<PhotoThumbnail> toThumbnail(PhotoFile file) {
+        CameraPending<PhotoThumbnail> output = new CameraPending<>();
+
+
+        return output;
+    }
 
 }

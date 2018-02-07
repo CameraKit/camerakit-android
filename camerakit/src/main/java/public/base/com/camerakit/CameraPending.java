@@ -3,7 +3,7 @@ package com.camerakit;
 import android.os.Handler;
 import android.os.HandlerThread;
 
-public class CameraPending<T extends CameraProduct> {
+public class CameraPending<T> {
 
     private static Handler mHandler;
     private static HandlerThread mHandlerThread;
@@ -71,7 +71,7 @@ public class CameraPending<T extends CameraProduct> {
         void error(Throwable error);
     }
 
-    public interface PendingProcess<T extends CameraProduct> {
+    public interface PendingProcess<T> {
         void run(CameraPending<T> pending) throws Exception;
     }
 

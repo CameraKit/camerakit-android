@@ -7,5 +7,5 @@ public class VideoFile extends Video {
     public VideoFile(Context context) {
         super(context);
     }
-    
+
 }

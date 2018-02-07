@@ -22,12 +22,19 @@
             app:logo="@drawable/logomark_light"
             app:title="CameraKit App" />
 
-        <com.camerakit.CameraView
-            android:id="@+id/camera"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:adjustViewBounds="true"
-            app:camera_facing="back" />
+            android:layout_height="match_parent">
+
+            <com.camerakit.CameraView
+                android:id="@+id/camera"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:adjustViewBounds="true"
+                app:camera_facing="back" />
+
+        </FrameLayout>
 
     </LinearLayout>
 

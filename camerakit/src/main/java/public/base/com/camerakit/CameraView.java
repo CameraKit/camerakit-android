@@ -27,8 +27,6 @@ public class CameraView extends OrientationLayout implements Preview.SurfaceCall
 
     private Preview mPreview;
 
-    private CameraSize mPreviewSize;
-
     private List<CameraModule> mModules;
 
     public CameraView(Context context) {
@@ -74,8 +72,13 @@ public class CameraView extends OrientationLayout implements Preview.SurfaceCall
                 if (cameraAspectRatio != null) {
                     width = (int) (((float) height / (float) cameraAspectRatio.getY()) * cameraAspectRatio.getX());
                     widthMeasureSpec = MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY);
-                } else if (mPreviewSize != null) {
-                    width = (int) (((float) height / (float) mPreviewSize.getHeight()) * mPreviewSize.getWidth());
+                } else if (getPreviewSize() != null) {
+                    CameraSize previewSize = getPreviewSize();
+                    if (getLastKnownDisplayOrientation() % 180 == 0) {
+                        previewSize = previewSize.inverse();
+                    }
+
+                    width = (int) (((float) height / (float) previewSize.getHeight()) * previewSize.getWidth());
                     widthMeasureSpec = MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY);
                 }
             } else if (layoutParams.height == WRAP_CONTENT) {
@@ -85,8 +88,13 @@ public class CameraView extends OrientationLayout implements Preview.SurfaceCall
                 if (cameraAspectRatio != null) {
                     height = (int) (((float) width / (float) cameraAspectRatio.getX()) * cameraAspectRatio.getY());
                     heightMeasureSpec = MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY);
-                } else if (mPreviewSize != null) {
-                    height = (int) (((float) width / (float) mPreviewSize.getWidth()) * mPreviewSize.getHeight());
+                } else if (getPreviewSize() != null) {
+                    CameraSize previewSize = getPreviewSize();
+                    if (getLastKnownDisplayOrientation() % 180 == 0) {
+                        previewSize = previewSize.inverse();
+                    }
+
+                    height = (int) (((float) width / (float) previewSize.getWidth()) * previewSize.getHeight());
                     heightMeasureSpec = MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY);
                 }
             }
@@ -97,7 +105,7 @@ public class CameraView extends OrientationLayout implements Preview.SurfaceCall
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        if (mPreviewSize == null || getChildCount() == 0) {
+        if (getPreviewSize() == null || getChildCount() == 0) {
             super.onLayout(changed, left, top, right, bottom);
             return;
         }
@@ -107,7 +115,7 @@ public class CameraView extends OrientationLayout implements Preview.SurfaceCall
 
         final View child = getChildAt(0);
 
-        CameraSize previewSize = mPreviewSize;
+        CameraSize previewSize = getPreviewSize();
         if (getLastKnownDisplayOrientation() % 180 == 0) {
             previewSize = previewSize.inverse();
         }
@@ -124,6 +132,14 @@ public class CameraView extends OrientationLayout implements Preview.SurfaceCall
         }
     }
 
+    private CameraSize getPreviewSize() {
+        if (mCameraApi == null) return null;
+        if (mCameraApi.previewAttributes() == null) return null;
+        if (mCameraApi.previewAttributes().supportedSizes() == null) return null;
+
+        return mCameraApi.previewAttributes().supportedSizes().get(0);
+    }
+
     @Override
     void onOrientationChanged(int displayOrientation, int deviceOrientation) {
         mCameraApi.previewApi()
@@ -136,8 +152,8 @@ public class CameraView extends OrientationLayout implements Preview.SurfaceCall
             mCameraApi.previewApi()
                     .stop()
                     .then(() -> {
-                        mPreviewSize = mCameraApi.previewAttributes().supportedSizes().get(0);
-                        mCameraApi.previewApi().setSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
+                        CameraSize previewSize = getPreviewSize();
+                        mCameraApi.previewApi().setSize(previewSize.getWidth(), previewSize.getHeight());
                         invalidate();
                     })
                     .then(() -> mCameraApi.previewApi().setSurface(surfaceHolder))
@@ -221,6 +237,7 @@ public class CameraView extends OrientationLayout implements Preview.SurfaceCall
         }
 
         mCameraFacing = cameraFacing;
+
         stop();
         start();
 

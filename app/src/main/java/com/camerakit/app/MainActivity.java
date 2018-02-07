@@ -12,7 +12,6 @@ import android.text.Html;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.camerakit.CameraPhotographer;
 import com.camerakit.CameraView;
@@ -102,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         Photo photo = photographer.capture();
         photo.toGalleryFile()
                 .whenReady(photoFile -> {
-                    Toast.makeText(this, "Saved Photo to Gallery!", Toast.LENGTH_SHORT).show();
+                    photoFile.getFile();
                 })
                 .catchError(error -> {
 
