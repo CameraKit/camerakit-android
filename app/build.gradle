@@ -20,5 +20,4 @@ dependencies {
     implementation project(':camerakit')
     implementation 'com.android.support:appcompat-v7:27.0.2'
     implementation 'com.android.support:design:27.0.2'
-    implementation 'com.github.rubensousa:floatingtoolbar:1.5.1'
 }

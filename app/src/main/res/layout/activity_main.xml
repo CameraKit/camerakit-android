@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/activityMain"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimaryReallyDark"
-    android:fitsSystemWindows="true">
+    android:background="@color/colorPrimaryReallyDark">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -32,50 +31,58 @@
 
     </LinearLayout>
 
-    <View
-        android:id="@+id/fabAnchor"
-        android:layout_width="56dp"
-        android:layout_height="122dp"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="7dp" />
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fabSettings"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="160dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="top|center_horizontal"
-        android:elevation="4dp"
-        android:src="@drawable/ic_settings"
-        app:layout_anchor="@+id/fabAnchor"
-        app:layout_anchorGravity="bottom|center_horizontal" />
+        android:layout_gravity="bottom|start"
+        android:layout_margin="12dp"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/previewSettingsButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/colorPrimaryDark"
+            android:drawableLeft="@drawable/ic_preview"
+            android:padding="14dp"
+            android:text=" Preview\nSettings" />
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/photoSettingsButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/colorPrimaryDark"
+            android:drawableLeft="@drawable/ic_photo"
+            android:padding="14dp"
+            android:text=" Photo\nSettings" />
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/flashlightButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/colorPrimaryDark"
+            android:drawableLeft="@drawable/ic_flash"
+            android:padding="14dp"
+            android:text=" Toggle\nFlashlight" />
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/facingButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/colorPrimaryDark"
+            android:drawableLeft="@drawable/ic_facing"
+            android:padding="14dp"
+            android:text=" Toggle\nFacing" />
+
+    </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fabPhoto"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center_horizontal"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="12dp"
         android:elevation="4dp"
-        android:src="@drawable/ic_camera"
-        android:tint="@color/colorPrimaryDark"
-        app:backgroundTint="#FFFFFF"
-        app:layout_anchor="@+id/fabAnchor"
-        app:layout_anchorGravity="top|center_horizontal"
-        app:rippleColor="#44131B1F" />
+        android:src="@drawable/ic_camera" />
 
-    <View
-        android:id="@+id/toolbarAnchor"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:layout_gravity="bottom" />
-
-    <com.github.rubensousa.floatingtoolbar.FloatingToolbar
-        android:id="@+id/toolbarSettings"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:layout_gravity="center"
-        app:floatingAutoHide="false"
-        app:floatingMenu="@menu/camera_settings"
-        app:layout_anchor="@+id/toolbarAnchor"
-        app:layout_anchorGravity="center" />
-
-</android.support.design.widget.CoordinatorLayout>
+</FrameLayout>

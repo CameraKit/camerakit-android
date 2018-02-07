@@ -11,22 +11,23 @@ import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
-import com.camerakit.CameraFacing;
 import com.camerakit.CameraPhotographer;
 import com.camerakit.CameraView;
 import com.camerakit.Photo;
-import com.github.rubensousa.floatingtoolbar.FloatingToolbar;
-import com.github.rubensousa.floatingtoolbar.FloatingToolbarMenuBuilder;
 
-public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuItemClickListener, FloatingToolbar.ItemClickListener {
+public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuItemClickListener {
 
     private CameraView cameraView;
     private Toolbar toolbar;
     private FloatingActionButton photoButton;
-    private FloatingToolbar settingsToolbar;
-    private FloatingActionButton settingsButton;
+
+    private Button previewSettingsButton;
+    private Button photoSettingsButton;
+    private Button flashlightButton;
+    private Button facingButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,17 +43,17 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         photoButton = findViewById(R.id.fabPhoto);
         photoButton.setOnClickListener(photoOnClickListener);
 
-        settingsToolbar = findViewById(R.id.toolbarSettings);
-        settingsToolbar.setClickListener(this);
-        settingsToolbar.setMenu(new FloatingToolbarMenuBuilder(this)
-                .addItem(R.id.action_addons, R.drawable.logomark_white)
-                .addItem(R.id.action_facing, R.drawable.ic_facing)
-                .addItem(R.id.action_dimens, R.drawable.ic_dimens)
-                .addItem(R.id.action_close, R.drawable.ic_close)
-                .build());
+        previewSettingsButton = findViewById(R.id.previewSettingsButton);
+        previewSettingsButton.setOnClickListener(previewSettingsOnClickListener);
 
-        settingsButton = findViewById(R.id.fabSettings);
-        settingsToolbar.attachFab(settingsButton);
+        photoSettingsButton = findViewById(R.id.photoSettingsButton);
+        photoSettingsButton.setOnClickListener(photoSettingsOnClickListener);
+
+        flashlightButton = findViewById(R.id.flashlightButton);
+        flashlightButton.setOnClickListener(flashlightOnClickListener);
+
+        facingButton = findViewById(R.id.facingButton);
+        facingButton.setOnClickListener(facingOnClickListener);
     }
 
     @Override
@@ -94,42 +95,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         return false;
     }
 
-    @Override
-    public void onItemClick(MenuItem item) {
-        switch(item.getItemId()) {
-            case R.id.action_addons: {
-                break;
-            }
-
-            case R.id.action_facing: {
-                CameraFacing cameraFacing = cameraView.toggleFacing();
-                if (cameraFacing == CameraFacing.BACK) {
-                    Toast.makeText(this, "Switched cameraFacing to back.", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(this, "Switched cameraFacing to front.", Toast.LENGTH_SHORT).show();
-                }
-                break;
-            }
-
-            case R.id.action_dimens: {
-                break;
-            }
-
-            case R.id.action_close: {
-                settingsToolbar.hide();
-                break;
-            }
-        }
-    }
-
-    @Override
-    public void onItemLongClick(MenuItem item) {
-
-    }
-
     private View.OnClickListener photoOnClickListener = v -> {
-        settingsToolbar.hide();
-
         CameraPhotographer photographer = new CameraPhotographer();
         cameraView.use(photographer);
 
@@ -141,6 +107,23 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
                 .catchError(error -> {
 
                 });
+    };
+
+
+    private View.OnClickListener previewSettingsOnClickListener = v -> {
+
+    };
+
+    private View.OnClickListener photoSettingsOnClickListener = v -> {
+
+    };
+
+    private View.OnClickListener flashlightOnClickListener = v -> {
+
+    };
+
+    private View.OnClickListener facingOnClickListener = v -> {
+        cameraView.toggleFacing();
     };
 
 }
