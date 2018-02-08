@@ -1,5 +1,6 @@
 package com.camerakit;
 
+import android.content.Context;
 import android.hardware.Camera;
 
 import java.util.ArrayList;
@@ -9,6 +10,8 @@ import static android.hardware.Camera.CameraInfo.CAMERA_FACING_BACK;
 import static android.hardware.Camera.CameraInfo.CAMERA_FACING_FRONT;
 
 class Camera1 implements CameraApi {
+
+    private Context mContext;
 
     private int mCameraId;
     private Camera mCamera;
@@ -24,7 +27,8 @@ class Camera1 implements CameraApi {
     private Camera1() {
     }
 
-    Camera1(CameraFacing facing, CameraExecutor cameraExecutor) {
+    Camera1(Context context, CameraExecutor cameraExecutor, CameraFacing facing) {
+        mContext = context;
         mCameraExecutor = cameraExecutor;
 
         if (facing == CameraFacing.BACK) {
@@ -42,8 +46,8 @@ class Camera1 implements CameraApi {
     }
 
     @Override
-    public CameraFuture connect() {
-        return new CameraFuture(mCameraExecutor, () -> {
+    public CameraFuture<PreviewView> connect() {
+        return new CameraFuture<>(mCameraExecutor, cameraFuture -> {
             mCamera = Camera.open(mCameraId);
 
             Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
@@ -56,6 +60,9 @@ class Camera1 implements CameraApi {
             mFlash.onCameraConnected(mCamera, cameraInfo, cameraParameters);
             mPhoto.onCameraConnected(mCamera, cameraInfo, cameraParameters);
             mVideo.onCameraConnected(mCamera, cameraInfo, cameraParameters);
+
+            SurfaceViewPreview preview = new SurfaceViewPreview(mContext);
+            cameraFuture.complete(preview);
         });
     }
 

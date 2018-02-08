@@ -4,7 +4,7 @@ import android.view.SurfaceHolder;
 
 public interface CameraApi extends CameraAttributes {
 
-    CameraFuture connect();
+    CameraFuture<PreviewView> connect();
     CameraFuture disconnect();
 
     PreviewApi previewApi();

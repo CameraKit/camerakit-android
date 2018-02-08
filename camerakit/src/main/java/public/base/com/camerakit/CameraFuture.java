@@ -70,7 +70,7 @@ public class CameraFuture<T> {
         return this;
     }
 
-    public CameraFuture<T> data(Data<T> callback) {
+    public CameraFuture<T> result(Data<T> callback) {
         if (mData != null) {
             callback.data(mData);
             return this;

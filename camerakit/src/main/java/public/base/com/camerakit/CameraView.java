@@ -12,7 +12,7 @@ import java.util.List;
 
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
-public class CameraView extends OrientationLayout implements Preview.SurfaceCallback {
+public class CameraView extends OrientationLayout implements PreviewView.SurfaceCallback {
 
     private static final int CK_FACING_BACK = 0;
     private static final int CK_FACING_FRONT = 1;
@@ -24,8 +24,7 @@ public class CameraView extends OrientationLayout implements Preview.SurfaceCall
 
     private CameraApi mCameraApi;
     private CameraExecutor mCameraExecutor;
-
-    private Preview mPreview;
+    private PreviewView mPreviewView;
 
     private List<CameraModule> mModules;
 
@@ -44,6 +43,7 @@ public class CameraView extends OrientationLayout implements Preview.SurfaceCall
         mAdjustViewBounds = array.getBoolean(R.styleable.CameraView_android_adjustViewBounds, false);
         mAspectRatio = array.getString(R.styleable.CameraView_camera_aspectRatio);
 
+        mCameraExecutor = new CameraExecutor();
         mModules = new ArrayList<>();
     }
 
@@ -105,7 +105,7 @@ public class CameraView extends OrientationLayout implements Preview.SurfaceCall
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        if (getPreviewSize() == null || getChildCount() == 0) {
+        if (getPreviewSize() == null || mPreviewView == null) {
             super.onLayout(changed, left, top, right, bottom);
             return;
         }
@@ -113,7 +113,7 @@ public class CameraView extends OrientationLayout implements Preview.SurfaceCall
         int width = right - left;
         int height = bottom - top;
 
-        final View child = getChildAt(0);
+        final View child = mPreviewView;
 
         CameraSize previewSize = getPreviewSize();
         if (getLastKnownDisplayOrientation() % 180 == 0) {
@@ -142,8 +142,10 @@ public class CameraView extends OrientationLayout implements Preview.SurfaceCall
 
     @Override
     void onOrientationChanged(int displayOrientation, int deviceOrientation) {
-        mCameraApi.previewApi()
-                .setDisplayOrientation(displayOrientation);
+        if (mCameraApi != null) {
+            mCameraApi.previewApi()
+                    .setDisplayOrientation(displayOrientation);
+        }
     }
 
     @Override
@@ -170,36 +172,32 @@ public class CameraView extends OrientationLayout implements Preview.SurfaceCall
     }
 
     public void start() {
-        if (mCameraApi != null || mCameraExecutor != null) {
+        if (mCameraApi != null) {
             return;
         }
 
-        mCameraExecutor = new CameraExecutor();
-        mCameraExecutor.start();
+        if (mPreviewView != null && indexOfChild(mPreviewView) >= 0) {
+            removeView(mPreviewView);
+            mPreviewView = null;
+        }
 
-        mCameraApi = new Camera1(mCameraFacing, mCameraExecutor);
+        mCameraExecutor.start();
+        mCameraApi = new Camera1(getContext(), mCameraExecutor, mCameraFacing);
 
         mCameraApi.connect()
-                .success(() -> {
+                .result(previewView -> {
+                    mPreviewView = previewView;
                     for (CameraModule module : mModules) {
                         module.setApi(mCameraApi);
                     }
 
                     post(() -> {
-                        if (mPreview == null) {
-                            mPreview = new PreviewSurfaceView(getContext());
-                        }
-
-                        mPreview.setSurfaceCallback(this);
-
-                        if (indexOfChild(mPreview.getView()) == -1) {
-                            addView(mPreview.getView(), 0);
-                        }
-
+                        addView(mPreviewView);
+                        mPreviewView.setSurfaceCallback(this);
                         enableOrientationDetection();
                     });
                 })
-                .error((error) -> {
+                .error(error -> {
                     throw new CameraException("Failed to connect to Camera API.", error);
                 });
     }
@@ -212,15 +210,11 @@ public class CameraView extends OrientationLayout implements Preview.SurfaceCall
             mCameraApi = null;
         }
 
-        if (mPreview != null) {
-            mPreview.setSurfaceCallback(null);
-            mPreview.setGestureCallback(null);
+        if (mPreviewView != null) {
+            mPreviewView.setSurfaceCallback(null);
         }
 
-        if (mCameraExecutor != null) {
-            mCameraExecutor.stop();
-            mCameraExecutor = null;
-        }
+        mCameraExecutor.stop();
 
         for (CameraModule module : mModules) {
             module.setApi(null);

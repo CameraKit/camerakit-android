@@ -21,7 +21,7 @@ public class CameraPhotographer extends CameraModule {
                 .then(() -> photoApi.setSize(size.getWidth(), size.getHeight()))
                 .success(() -> {
                     photoApi.captureStandard()
-                            .data(photo::set)
+                            .result(photo::set)
                             .error(photo::set)
                             .then(previewApi::start);
                 })
