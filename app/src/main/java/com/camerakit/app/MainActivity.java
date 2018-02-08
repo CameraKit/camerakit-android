@@ -1,9 +1,13 @@
 package com.camerakit.app;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.media.MediaScannerConnection;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -11,11 +15,14 @@ import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import com.camerakit.CameraPhotographer;
 import com.camerakit.CameraView;
 import com.camerakit.Photo;
+import com.camerakit.PhotoFile;
 
 public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuItemClickListener {
 
@@ -27,6 +34,11 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     private Button photoSettingsButton;
     private Button flashlightButton;
     private Button facingButton;
+
+    private ImageView newPhotoImageView;
+    private ImageView photoImageView;
+
+    private PhotoFile mPhoto;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +65,23 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
 
         facingButton = findViewById(R.id.facingButton);
         facingButton.setOnClickListener(facingOnClickListener);
+
+        newPhotoImageView = findViewById(R.id.newImageView);
+        newPhotoImageView.setVisibility(View.GONE);
+
+        photoImageView = findViewById(R.id.photoImageView);
+        photoImageView.setAlpha(0f);
+        photoImageView.setOnClickListener((v -> {
+            if (mPhoto != null) {
+                MediaScannerConnection.scanFile(this, new String[]{mPhoto.getFile().getAbsolutePath()}, null,
+                        (path, uri) -> {
+                            Intent intent = new Intent();
+                            intent.setAction(Intent.ACTION_VIEW);
+                            intent.setDataAndType(uri, "image/*");
+                            startActivity(intent);
+                        });
+            }
+        }));
     }
 
     @Override
@@ -83,10 +112,8 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         }
 
         if (item.getItemId() == R.id.main_menu_gallery) {
-            Intent intent = new Intent();
-            intent.setAction(android.content.Intent.ACTION_VIEW);
-            intent.setType("image/*");
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
             startActivity(intent);
             return true;
         }
@@ -99,13 +126,44 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         cameraView.use(photographer);
 
         Photo photo = photographer.capture();
-        photo.toGalleryFile()
-                .whenReady(photoFile -> {
-                    photoFile.getFile();
-                })
-                .catchError(error -> {
+        photo.toBytes()
+                .whenReady(photoBytes ->
+                        photoBytes.toGalleryFile()
+                                .whenReady(photoFile -> {
+                                    mPhoto = photoFile;
+                                    photoFile.toThumbnail()
+                                            .whenReady(thumbnailBytes ->
+                                                    thumbnailBytes.toBitmap()
+                                                            .whenReady(thumbnailBitmap -> {
+                                                                runOnUiThread(() -> {
+                                                                    newPhotoImageView.setImageBitmap(thumbnailBitmap.getBitmap());
+                                                                    newPhotoImageView.setAlpha(0f);
+                                                                    newPhotoImageView.setScaleX(1f);
+                                                                    newPhotoImageView.setScaleY(1f);
+                                                                    newPhotoImageView.setVisibility(View.VISIBLE);
 
-                });
+                                                                    newPhotoImageView.animate()
+                                                                            .alpha(1f)
+                                                                            .scaleX(0.1f)
+                                                                            .scaleY(0.1f)
+                                                                            .setDuration(450)
+                                                                            .setInterpolator(new DecelerateInterpolator())
+                                                                            .setListener(new AnimatorListenerAdapter() {
+                                                                                @Override
+                                                                                public void onAnimationEnd(Animator animation) {
+                                                                                    super.onAnimationEnd(animation);
+                                                                                    photoImageView.setAlpha(1f);
+                                                                                    photoImageView.setImageBitmap(thumbnailBitmap.getBitmap());
+
+                                                                                    newPhotoImageView.setVisibility(View.GONE);
+                                                                                }
+                                                                            })
+                                                                            .start();
+                                                                });
+                                                            })
+                                            );
+                                })
+                );
     };
 
 

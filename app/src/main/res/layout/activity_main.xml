@@ -34,6 +34,28 @@
                 android:adjustViewBounds="true"
                 app:camera_facing="back" />
 
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/photoImageView"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="bottom|end"
+                android:layout_marginBottom="80dp"
+                android:layout_marginEnd="15dp"
+                android:layout_marginRight="15dp"
+                android:elevation="4dp" />
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/newImageView"
+                android:layout_width="500dp"
+                android:layout_height="500dp"
+                android:layout_gravity="bottom|end"
+                android:layout_marginBottom="80dp"
+                android:layout_marginEnd="15dp"
+                android:layout_marginRight="15dp"
+                android:elevation="4dp"
+                android:transformPivotX="500dp"
+                android:transformPivotY="500dp" />
+
         </FrameLayout>
 
     </LinearLayout>
