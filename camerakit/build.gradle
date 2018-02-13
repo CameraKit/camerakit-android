@@ -14,7 +14,7 @@ android {
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_7
     }
     sourceSets {
         main {
@@ -85,6 +85,7 @@ task deploySnapshot {
     finalizedBy bintrayUpload
 
     doLast {
+        version = version + '-Snapshot'
         bintrayUpload.setVersionName(bintrayUpload.getVersionName() + '-Snapshot')
         bintrayUpload.setUserOrg('camerakit')
         bintrayUpload.setRepoName('camerakit-android-snapshots')
