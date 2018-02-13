@@ -1,9 +1,14 @@
 plugins {
+    id 'me.tatarka.retrolambda' version '3.7.0'
     id 'com.jfrog.bintray' version '1.7.3'
     id 'com.github.dcendents.android-maven' version '1.5'
 }
 
 apply plugin: 'com.android.library'
+
+retrolambda {
+    javaVersion JavaVersion.VERSION_1_7
+}
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -14,7 +19,7 @@ android {
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_8
     }
     sourceSets {
         main {
