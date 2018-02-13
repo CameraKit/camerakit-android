@@ -1,5 +1,5 @@
 #!/bin/bash
 
-./gradlew deploySnapshot
+./gradlew camerakit:deploySnapshot
 
 exit 0
