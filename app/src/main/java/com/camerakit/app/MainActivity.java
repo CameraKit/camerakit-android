@@ -18,15 +18,15 @@ import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
-import com.camerakit.CameraPhotographer;
-import com.camerakit.CameraView;
-import com.camerakit.Photo;
-import com.camerakit.PhotoFile;
+import com.camerakit.CameraKitView;
+
+import java.io.File;
 
 public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuItemClickListener {
 
-    private CameraView cameraView;
+    private CameraKitView cameraView;
     private Toolbar toolbar;
     private FloatingActionButton photoButton;
 
@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     private ImageView newPhotoImageView;
     private ImageView photoImageView;
 
-    private PhotoFile mPhoto;
+    private File mPhoto;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         photoImageView.setAlpha(0f);
         photoImageView.setOnClickListener((v -> {
             if (mPhoto != null) {
-                MediaScannerConnection.scanFile(this, new String[]{mPhoto.getFile().getAbsolutePath()}, null,
+                MediaScannerConnection.scanFile(this, new String[]{mPhoto.getAbsolutePath()}, null,
                         (path, uri) -> {
                             Intent intent = new Intent();
                             intent.setAction(Intent.ACTION_VIEW);
@@ -122,48 +122,41 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     }
 
     private View.OnClickListener photoOnClickListener = v -> {
-        CameraPhotographer photographer = new CameraPhotographer();
-        cameraView.use(photographer);
+        cameraView.capturePhoto(((view, photo) -> {
+            photo.getGalleryFile((galleryFile -> {
+                mPhoto = galleryFile;
+            }));
 
-        Photo photo = photographer.capture();
-        photo.toBytes()
-                .whenReady(photoBytes ->
-                        photoBytes.toGalleryFile()
-                                .whenReady(photoFile -> {
-                                    mPhoto = photoFile;
-                                    photoFile.toThumbnail()
-                                            .whenReady(thumbnailBytes ->
-                                                    thumbnailBytes.toBitmap()
-                                                            .whenReady(thumbnailBitmap -> {
-                                                                runOnUiThread(() -> {
-                                                                    newPhotoImageView.setImageBitmap(thumbnailBitmap.getBitmap());
-                                                                    newPhotoImageView.setAlpha(0f);
-                                                                    newPhotoImageView.setScaleX(1f);
-                                                                    newPhotoImageView.setScaleY(1f);
-                                                                    newPhotoImageView.setVisibility(View.VISIBLE);
+            photo.getThumbnail((thumbnail -> {
+                thumbnail.getBitmap((thumbnailBitmap -> {
+                    runOnUiThread(() -> {
+                        newPhotoImageView.setImageBitmap(thumbnailBitmap);
+                        newPhotoImageView.setAlpha(0f);
+                        newPhotoImageView.setScaleX(1f);
+                        newPhotoImageView.setScaleY(1f);
+                        newPhotoImageView.setVisibility(View.VISIBLE);
 
-                                                                    newPhotoImageView.animate()
-                                                                            .alpha(1f)
-                                                                            .scaleX(0.1f)
-                                                                            .scaleY(0.1f)
-                                                                            .setDuration(450)
-                                                                            .setInterpolator(new DecelerateInterpolator())
-                                                                            .setListener(new AnimatorListenerAdapter() {
-                                                                                @Override
-                                                                                public void onAnimationEnd(Animator animation) {
-                                                                                    super.onAnimationEnd(animation);
-                                                                                    photoImageView.setAlpha(1f);
-                                                                                    photoImageView.setImageBitmap(thumbnailBitmap.getBitmap());
+                        newPhotoImageView.animate()
+                                .alpha(1f)
+                                .scaleX(0.1f)
+                                .scaleY(0.1f)
+                                .setDuration(450)
+                                .setInterpolator(new DecelerateInterpolator())
+                                .setListener(new AnimatorListenerAdapter() {
+                                    @Override
+                                    public void onAnimationEnd(Animator animation) {
+                                        super.onAnimationEnd(animation);
+                                        photoImageView.setAlpha(1f);
+                                        photoImageView.setImageBitmap(thumbnailBitmap);
 
-                                                                                    newPhotoImageView.setVisibility(View.GONE);
-                                                                                }
-                                                                            })
-                                                                            .start();
-                                                                });
-                                                            })
-                                            );
+                                        newPhotoImageView.setVisibility(View.GONE);
+                                    }
                                 })
-                );
+                                .start();
+                    });
+                }));
+            }));
+        }));
     };
 
 

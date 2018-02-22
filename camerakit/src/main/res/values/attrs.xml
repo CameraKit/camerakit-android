@@ -1,13 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <declare-styleable name="CameraView">
+    <!-- Declarable attributes for a CameraKitView defined in XML. -->
+    <declare-styleable name="CameraKitView">
+
+        <!-- Should the view handle layout_width or layout_height set as wrap_content. -->
         <attr name="android:adjustViewBounds" />
-        <attr name="camera_aspectRatio" format="string" />
+
+        <!-- Aspect ratio to force the view to measure to. Depends on a adjustViewBounds and
+             having one dimension set as wrap_content. -->
+        <attr name="camera_aspectRatio" format="float" />
+
+        <!-- Default camera orientation to use. -->
         <attr name="camera_facing" format="enum">
             <enum name="back" value="0" />
             <enum name="front" value="1" />
         </attr>
+
+        <!-- Default camera flash mode to use. -->
+        <attr name="camera_flash" format="enum">
+            <enum name="off" value="0" />
+            <enum name="on" value="1" />
+            <enum name="torch" value="2" />
+            <enum name="auto" value="3" />
+        </attr>
+
+        <!-- How should the lens continuously focus. -->
+        <attr name="camera_activeFocusMode" format="enum">
+            <enum name="off" value="0" />
+            <enum name="fast" value="1" />
+            <enum name="smooth" value="2" />
+        </attr>
+
+        <!-- Default zoom. Accepts a float representing the factor to zoom by. -->
+        <attr name="camera_zoomFactor" format="float" />
+
+        <!-- Will the view be used to capture photos. -->
+        <attr name="camera_photoHint" format="boolean" />
+
+        <!-- Will the view be used to capture videos. -->
+        <attr name="camera_videoHint" format="boolean" />
+
     </declare-styleable>
 
 </resources>

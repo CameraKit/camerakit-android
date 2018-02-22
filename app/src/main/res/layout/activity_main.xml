@@ -26,7 +26,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <com.camerakit.CameraView
+            <com.camerakit.CameraKitView
                 android:id="@+id/camera"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
