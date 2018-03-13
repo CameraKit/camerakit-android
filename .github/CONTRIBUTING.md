@@ -7,13 +7,13 @@ agree to abide by the CameraKit [code of conduct].
 
 Fork, then clone the repo:
 
-    git clone https://github.com/wonderkiln/CameraKit-Android
+    git clone https://github.com/CameraKit/camerakit-android
 
 Make your change. Add tests for your change. Make the tests pass.
 
 Push to your fork and [submit a pull request][pr].
 
-[pr]: https://github.com/wonderkiln/CameraKit-Android/pulls
+[pr]: https://github.com/CameraKit/camerakit-android/pulls
 
 At this point you're waiting on us. We like to at least comment on pull requests
 within three business days (and, typically, one business day). We may suggest

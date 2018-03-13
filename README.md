@@ -9,7 +9,7 @@
         <img alt='WonderKiln Promo' src='.repo/gh-readme-wk.png'/>
     </a>
     <a href="https://play.google.com/store/apps/details?id=com.camerakit.demo&hl=en" target="_blank">
-        <img alt='CameraKit Demo' src='.repo/gh-readme-app.png'/>
+        <img alt='CameraKit Header' src='.repo/gh-readme-app.png'/>
     </a>
 </p>
 
