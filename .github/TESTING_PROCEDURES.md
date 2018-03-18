@@ -3,25 +3,35 @@
 For each release we plan to run all code changes through a specific flow and test regiment, on varying devicews. THe report of these tests will be reported via a comment or in the PR Header ahead of any and all merges.
 
 ## Tests
-### Test Single Photo (Portrait)
+### Test Photo Capture (Portrait)
 
 - Open CameraKit
   - Take single photo
     - Verify photo is created and saved as Portrait Photo
     - Verify photo is in-focus, and error free
 
-### Test Single Photo (Landscape)
+### Test Photo Capture (Landscape)
 
 - Open CameraKit
   - Take single photo
     - Verify photo is created and saved as Landscape Photo
     - Verify photo is in-focus, and error free
 
+### Test Orientation Capture
+
+- Change Orientation to 90, 180, 270, 0 (with orientation lock OFF)
+  - Confirm Preview Updates properly for each orietantation
+  - Capture Photo for each orientation, confirm result matches preview
+
+### Test Orientation Capture w/ Orientation Lock ON
+
+- Change Orientation to 90, 180, 270, 0 (with orientation lock ON)
+  - Confirm Preview Updates properly for each orietantation
+  - Capture Photo for each orientation, confirm result matches preview
+
 ### Engage Camera Controls and Take Photo (Portrait)
 
 - Open CameraKit
-  - Change Orientation to 90, 180, 270, 0
-    - Confirm Preview Updates properly for each orietantation
   - Tap to Focus and Take Photo
     - Confirm preview focuses correctly
     - COnfirm saved photo matches preview
