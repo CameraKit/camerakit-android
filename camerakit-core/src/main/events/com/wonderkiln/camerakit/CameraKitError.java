@@ -4,8 +4,6 @@ import android.support.annotation.Nullable;
 
 public class CameraKitError extends CameraKitEvent {
 
-    private String type;
-    private String message;
     private Exception exception;
 
     CameraKitError() {
