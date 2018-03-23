@@ -535,6 +535,10 @@ public class CameraView extends CameraViewLayout {
         mEventDispatcher.addListener(CameraKitEventListener);
     }
 
+    public void removeCameraKitListener(CameraKitEventListener CameraKitEventListener) {
+        mEventDispatcher.removeListener(CameraKitEventListener);
+    }
+
     public void bindCameraKitListener(Object object) {
         mEventDispatcher.addBinding(object);
     }
