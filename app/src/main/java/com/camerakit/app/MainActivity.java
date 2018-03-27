@@ -1,46 +1,34 @@
 package com.camerakit.app;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.media.MediaScannerConnection;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.camerakit.CameraKitView;
-import com.jpegkit.JpegFile;
+import com.jpegkit.Jpeg;
 import com.jpegkit.JpegImageView;
-
-import java.io.File;
 
 public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuItemClickListener {
 
     private CameraKitView cameraView;
     private Toolbar toolbar;
-    private FloatingActionButton photoButton;
 
-    private Button previewSettingsButton;
-    private Button photoSettingsButton;
-    private Button flashlightButton;
+    private Button photoButton;
+    private Button flashButton;
     private Button facingButton;
 
-    private JpegImageView newPhotoImageView;
-    private JpegImageView photoImageView;
+    private Button permissionsButton;
 
-    private File mPhoto;
+    private JpegImageView imageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,37 +41,33 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         toolbar.inflateMenu(R.menu.main);
         toolbar.setOnMenuItemClickListener(this);
 
-        photoButton = findViewById(R.id.fabPhoto);
+        photoButton = findViewById(R.id.photoButton);
         photoButton.setOnClickListener(photoOnClickListener);
 
-        previewSettingsButton = findViewById(R.id.previewSettingsButton);
-        previewSettingsButton.setOnClickListener(previewSettingsOnClickListener);
-
-        photoSettingsButton = findViewById(R.id.photoSettingsButton);
-        photoSettingsButton.setOnClickListener(photoSettingsOnClickListener);
-
-        flashlightButton = findViewById(R.id.flashlightButton);
-        flashlightButton.setOnClickListener(flashlightOnClickListener);
+        flashButton = findViewById(R.id.flashButton);
+        flashButton.setOnClickListener(flashOnClickListener);
 
         facingButton = findViewById(R.id.facingButton);
         facingButton.setOnClickListener(facingOnClickListener);
 
-        newPhotoImageView = findViewById(R.id.newImageView);
-        newPhotoImageView.setVisibility(View.GONE);
+        permissionsButton = findViewById(R.id.permissionsButton);
+        permissionsButton.setOnClickListener((v) -> {
+            cameraView.requestPermissions(this);
+        });
 
-        photoImageView = findViewById(R.id.photoImageView);
-        photoImageView.setAlpha(0f);
-        photoImageView.setOnClickListener((v -> {
-            if (mPhoto != null) {
-                MediaScannerConnection.scanFile(this, new String[]{mPhoto.getAbsolutePath()}, null,
-                        (path, uri) -> {
-                            Intent intent = new Intent();
-                            intent.setAction(Intent.ACTION_VIEW);
-                            intent.setDataAndType(uri, "image/*");
-                            startActivity(intent);
-                        });
+        imageView = findViewById(R.id.imageView);
+
+        cameraView.setPermissionsListener(new CameraKitView.PermissionsListener() {
+            @Override
+            public void onPermissionsSuccess() {
+                permissionsButton.setVisibility(View.GONE);
             }
-        }));
+
+            @Override
+            public void onPermissionsFailure() {
+                permissionsButton.setVisibility(View.VISIBLE);
+            }
+        });
     }
 
     @Override
@@ -124,63 +108,23 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     }
 
     private View.OnClickListener photoOnClickListener = v -> {
-        cameraView.capturePhoto(((view, photo) -> {
-            photo.saveToGallery(view.getContext(), "test.jpg", new CameraKitView.Photo.JpegFileCallback() {
-                @Override
-                public void onJpegFile(JpegFile jpegFile) {
-                    mPhoto = jpegFile.getFile();
-                }
-
-                @Override
-                public void onError(CameraKitView.CameraException error) {
-                    Log.e("CameraKit", error.toString());
-                }
-            });
-
+        cameraView.captureImage(((view, photo) -> {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(MainActivity.this, photo.getJpeg().getWidth() + "x" + photo.getJpeg().getHeight(), Toast.LENGTH_SHORT).show();
-
-                    newPhotoImageView.setJpeg(photo.getJpeg());
-                    newPhotoImageView.setAlpha(0f);
-                    newPhotoImageView.setScaleX(1f);
-                    newPhotoImageView.setScaleY(1f);
-                    newPhotoImageView.setVisibility(View.VISIBLE);
-
-                    newPhotoImageView.animate()
-                            .alpha(1f)
-                            .scaleX(0.1f)
-                            .scaleY(0.1f)
-                            .setDuration(450)
-                            .setInterpolator(new DecelerateInterpolator())
-                            .setListener(new AnimatorListenerAdapter() {
-                                @Override
-                                public void onAnimationEnd(Animator animation) {
-                                    super.onAnimationEnd(animation);
-                                    photoImageView.setAlpha(1f);
-                                    photoImageView.setJpeg(photo.getJpeg());
-
-                                    newPhotoImageView.setVisibility(View.GONE);
-                                }
-                            })
-                            .start();
+                    Jpeg jpeg = new Jpeg(photo);
+                    imageView.setJpeg(jpeg);
                 }
             });
         }));
     };
 
-
-    private View.OnClickListener previewSettingsOnClickListener = v -> {
-
-    };
-
-    private View.OnClickListener photoSettingsOnClickListener = v -> {
-
-    };
-
-    private View.OnClickListener flashlightOnClickListener = v -> {
-
+    private View.OnClickListener flashOnClickListener = v -> {
+        if (cameraView.getFlash() == CameraKitView.FLASH_OFF) {
+            cameraView.setFlash(CameraKitView.FLASH_ON);
+        } else {
+            cameraView.setFlash(CameraKitView.FLASH_OFF);
+        }
     };
 
     private View.OnClickListener facingOnClickListener = v -> {

@@ -4,8 +4,10 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
@@ -15,8 +17,6 @@ import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
-import android.media.MediaScannerConnection;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -35,10 +35,8 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 
 import com.jpegkit.Jpeg;
-import com.jpegkit.JpegFile;
-import com.jpegkit.JpegKit;
 
-import java.io.File;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -66,7 +64,7 @@ public class CameraKitView extends GestureLayout {
     /**
      * Request code for a runtime permissions intent.
      */
-    private static final int PERMISSIONS_REQUEST_CODE = 99107;
+    private static final int PERMISSION_REQUEST_CODE = 99107;
 
     /**
      * The device points away from the screen.
@@ -113,7 +111,7 @@ public class CameraKitView extends GestureLayout {
     public static final int FLASH_OFF = 0;
 
     /**
-     * Flash will activate during a photo capture's shutter.
+     * Flash will activate during a image capture's shutter.
      * <p>
      * Related low-level constants:
      * Camera1: {@link android.hardware.Camera.Parameters#FLASH_MODE_ON}
@@ -125,7 +123,7 @@ public class CameraKitView extends GestureLayout {
     public static final int FLASH_ON = 1;
 
     /**
-     * Flash will activate during a photo capture's shutter, if needed.
+     * Flash will activate during a image capture's shutter, if needed.
      * <p>
      * Related low-level constants:
      * Camera1: {@link android.hardware.Camera.Parameters#FLASH_MODE_AUTO}
@@ -522,11 +520,18 @@ public class CameraKitView extends GestureLayout {
     public static final int PERMISSION_STORAGE = 1 << 2;
 
     /**
+     * Flag for handling requesting the {@link android.Manifest.permission#ACCESS_FINE_LOCATION}
+     * permission.
+     */
+    public static final int PERMISSION_LOCATION = 1 << 3;
+
+    /**
      * Represents manifest runtime-permissions that may be used.
      */
     @RestrictTo(Scope.LIBRARY_GROUP)
     @Retention(RetentionPolicy.SOURCE)
-    @IntDef(flag = true, value = {PERMISSION_CAMERA, PERMISSION_MICROPHONE, PERMISSION_STORAGE})
+    @IntDef(flag = true,
+            value = {PERMISSION_CAMERA, PERMISSION_MICROPHONE, PERMISSION_STORAGE, PERMISSION_LOCATION})
     @interface Permission {}
 
     /**
@@ -581,26 +586,24 @@ public class CameraKitView extends GestureLayout {
     /**
      *
      */
-    public interface PermissionsRequestCallback {
+    public interface PermissionsListener {
 
-        /**
-         * @param approvedPermissions
-         * @param deniedPermissions
-         */
-        void onRequestComplete(@Permission int approvedPermissions, @Permission int deniedPermissions);
+        void onPermissionsSuccess();
+
+        void onPermissionsFailure();
 
     }
 
     /**
      *
      */
-    public interface PhotoCallback {
+    public interface ImageCallback {
 
         /**
          * @param view
-         * @param photo
+         * @param jpeg
          */
-        void onPhoto(CameraKitView view, Photo photo);
+        void onImage(CameraKitView view, byte[] jpeg);
 
     }
 
@@ -613,7 +616,7 @@ public class CameraKitView extends GestureLayout {
          * @param view
          * @param video
          */
-        void onVideo(CameraKitView view, Video video);
+        void onVideo(CameraKitView view, Object video);
 
     }
 
@@ -621,9 +624,9 @@ public class CameraKitView extends GestureLayout {
 
         /**
          * @param view
-         * @param frame
+         * @param jpeg
          */
-        void onFrame(CameraKitView view, Frame frame);
+        void onFrame(CameraKitView view, byte[] jpeg);
 
     }
 
@@ -636,11 +639,12 @@ public class CameraKitView extends GestureLayout {
     private int mSensorPreset;
     private int mPreviewEffect;
     private int mPermissions;
-    private float mPhotoMegaPixels;
+    private float mImageMegaPixels;
+    private int mImageJpegQuality;
     private GestureListener mGestureListener;
     private ErrorListener mErrorListener;
 
-    private PermissionsRequestCallback mPendingPermissionsRequestCallback;
+    private PermissionsListener mPermissionsListener;
 
     private CameraPreview mCameraPreview;
 
@@ -669,7 +673,8 @@ public class CameraKitView extends GestureLayout {
         mFocus = a.getInteger(R.styleable.CameraKitView_camera_focus, FOCUS_AUTO);
         mZoomFactor = a.getFloat(R.styleable.CameraKitView_camera_zoomFactor, 1.0f);
         mPermissions = a.getInteger(R.styleable.CameraKitView_camera_permissions, PERMISSION_CAMERA);
-        mPhotoMegaPixels = a.getFloat(R.styleable.CameraKitView_camera_photoMegaPixels, 2f);
+        mImageMegaPixels = a.getFloat(R.styleable.CameraKitView_camera_imageMegaPixels, 2f);
+        mImageJpegQuality = a.getInteger(R.styleable.CameraKitView_camera_imageJpegQuality, 100);
 
         a.recycle();
     }
@@ -745,12 +750,50 @@ public class CameraKitView extends GestureLayout {
             return;
         }
 
+        List<String> missingPermissions = getMissingPermissions();
+        if (Build.VERSION.SDK_INT >= 23 && missingPermissions.size() > 0) {
+            Activity activity = null;
+            Context context = getContext();
+            while (context instanceof ContextWrapper) {
+                if (context instanceof Activity) {
+                    activity = (Activity) context;
+                }
+                context = ((ContextWrapper) context).getBaseContext();
+            }
+
+            if (activity != null) {
+                List<String> requestPermissions = new ArrayList<>();
+                List<String> rationalePermissions = new ArrayList<>();
+                for (String permission : missingPermissions) {
+                    if (!activity.shouldShowRequestPermissionRationale(permission)) {
+                        requestPermissions.add(permission);
+                    } else {
+                        rationalePermissions.add(permission);
+                    }
+                }
+
+                if (requestPermissions.size() > 0) {
+                    activity.requestPermissions(requestPermissions.toArray(new String[requestPermissions.size()]), PERMISSION_REQUEST_CODE);
+                }
+
+                if (rationalePermissions.size() > 0 && mPermissionsListener != null) {
+                    mPermissionsListener.onPermissionsFailure();
+                }
+            }
+
+            return;
+        }
+
+        if (mPermissionsListener != null) {
+            mPermissionsListener.onPermissionsSuccess();
+        }
+
         removeAllViews();
 
         if (Build.VERSION.SDK_INT < 21) {
-            mCameraPreview = new Camera2(getContext(), mFacing);
-        } else {
             mCameraPreview = new Camera1(getContext(), mFacing);
+        } else {
+            mCameraPreview = new Camera2(getContext(), mFacing);
         }
 
         addView(mCameraPreview);
@@ -765,7 +808,7 @@ public class CameraKitView extends GestureLayout {
         }
 
         if (mCameraPreview != null) {
-            removeView(mCameraPreview);
+            mCameraPreview.stop();
             mCameraPreview = null;
         }
     }
@@ -773,12 +816,15 @@ public class CameraKitView extends GestureLayout {
     /**
      * @param callback
      */
-    public void capturePhoto(final PhotoCallback callback) {
+    public void captureImage(final ImageCallback callback) {
         if (mCameraPreview != null) {
-            mCameraPreview.capturePhoto(new JpegCallback() {
+            mCameraPreview.captureImage(new JpegCallback() {
                 @Override
                 public void onJpeg(Jpeg jpeg) {
-                    callback.onPhoto(CameraKitView.this, new Photo(jpeg));
+                    byte[] jpegBytes = jpeg.getJpegBytes();
+                    jpeg.release();
+
+                    callback.onImage(CameraKitView.this, jpegBytes);
                 }
             });
         }
@@ -820,153 +866,58 @@ public class CameraKitView extends GestureLayout {
     }
 
     /**
-     * @param activity
      * @return
      */
-    @Permission
-    public int getPendingPermissions(Activity activity) {
-        int permissions = mPermissions;
-        if (Build.VERSION.SDK_INT >= 23) {
-            if ((permissions | PERMISSION_CAMERA) == permissions) {
-                String manifestPermission = Manifest.permission.CAMERA;
-                if (!activity.shouldShowRequestPermissionRationale(manifestPermission)) {
-                    permissions = permissions ^ PERMISSION_CAMERA;
-                }
-            }
+    private List<String> getMissingPermissions() {
+        List<String> manifestPermissions = new ArrayList<>();
 
-            if ((permissions | PERMISSION_MICROPHONE) == permissions) {
-                String manifestPermission = Manifest.permission.RECORD_AUDIO;
-                if (!activity.shouldShowRequestPermissionRationale(manifestPermission)) {
-                    permissions = permissions ^ PERMISSION_MICROPHONE;
-                }
-            }
-
-            if ((permissions | PERMISSION_STORAGE) == permissions) {
-                String manifestPermission = Manifest.permission.WRITE_EXTERNAL_STORAGE;
-                if (!activity.shouldShowRequestPermissionRationale(manifestPermission)) {
-                    permissions = permissions ^ PERMISSION_STORAGE;
-                }
-            }
-
-            return permissions;
-        } else {
-            return 0;
+        if (Build.VERSION.SDK_INT < 23) {
+            return manifestPermissions;
         }
+
+        if ((mPermissions | PERMISSION_CAMERA) == mPermissions) {
+            String manifestPermission = Manifest.permission.CAMERA;
+            if (getContext().checkSelfPermission(manifestPermission) == PackageManager.PERMISSION_DENIED) {
+                manifestPermissions.add(manifestPermission);
+            }
+        }
+
+        if ((mPermissions | PERMISSION_MICROPHONE) == mPermissions) {
+            String manifestPermission = Manifest.permission.RECORD_AUDIO;
+            if (getContext().checkSelfPermission(manifestPermission) == PackageManager.PERMISSION_DENIED) {
+                manifestPermissions.add(manifestPermission);
+            }
+        }
+
+        if ((mPermissions | PERMISSION_STORAGE) == mPermissions) {
+            String manifestPermission = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+            if (getContext().checkSelfPermission(manifestPermission) == PackageManager.PERMISSION_DENIED) {
+                manifestPermissions.add(manifestPermission);
+            }
+        }
+
+        if ((mPermissions | PERMISSION_LOCATION) == mPermissions) {
+            String manifestPermission = Manifest.permission.ACCESS_FINE_LOCATION;
+            if (getContext().checkSelfPermission(manifestPermission) == PackageManager.PERMISSION_DENIED) {
+                manifestPermissions.add(manifestPermission);
+            }
+        }
+
+        return manifestPermissions;
+    }
+
+    public void setPermissionsListener(PermissionsListener permissionsListener) {
+        mPermissionsListener = permissionsListener;
     }
 
     /**
-     * @param activity
-     * @return
      */
-    @Permission
-    public int getApprovedPermissions(Activity activity) {
-        int permissions = mPermissions;
+    public void requestPermissions(Activity activity) {
         if (Build.VERSION.SDK_INT >= 23) {
-            if ((permissions | PERMISSION_CAMERA) == permissions) {
-                String manifestPermission = Manifest.permission.CAMERA;
-                if (activity.checkSelfPermission(manifestPermission) == PackageManager.PERMISSION_DENIED) {
-                    permissions = permissions ^ PERMISSION_CAMERA;
-                }
-            }
-
-            if ((permissions | PERMISSION_MICROPHONE) == permissions) {
-                String manifestPermission = Manifest.permission.RECORD_AUDIO;
-                if (activity.checkSelfPermission(manifestPermission) == PackageManager.PERMISSION_DENIED) {
-                    permissions = permissions ^ PERMISSION_MICROPHONE;
-                }
-            }
-
-            if ((permissions | PERMISSION_STORAGE) == permissions) {
-                String manifestPermission = Manifest.permission.WRITE_EXTERNAL_STORAGE;
-                if (activity.checkSelfPermission(manifestPermission) == PackageManager.PERMISSION_DENIED) {
-                    permissions = permissions ^ PERMISSION_STORAGE;
-                }
-            }
-
-            return permissions;
-        } else {
-            return permissions;
-        }
-    }
-
-    /**
-     * @param activity
-     * @return
-     */
-    @Permission
-    public int getDeniedPermissions(Activity activity) {
-        int permissions = mPermissions;
-        if (Build.VERSION.SDK_INT >= 23) {
-            if ((permissions | PERMISSION_CAMERA) == permissions) {
-                String manifestPermission = Manifest.permission.CAMERA;
-                if (activity.checkSelfPermission(manifestPermission) == PackageManager.PERMISSION_GRANTED
-                        || activity.shouldShowRequestPermissionRationale(manifestPermission)) {
-                    permissions = permissions ^ PERMISSION_CAMERA;
-                }
-            }
-
-            if ((permissions | PERMISSION_MICROPHONE) == permissions) {
-                String manifestPermission = Manifest.permission.RECORD_AUDIO;
-                if (activity.checkSelfPermission(manifestPermission) == PackageManager.PERMISSION_GRANTED
-                        || activity.shouldShowRequestPermissionRationale(manifestPermission)) {
-                    permissions = permissions ^ PERMISSION_MICROPHONE;
-                }
-            }
-
-            if ((permissions | PERMISSION_STORAGE) == permissions) {
-                String manifestPermission = Manifest.permission.WRITE_EXTERNAL_STORAGE;
-                if (activity.checkSelfPermission(manifestPermission) == PackageManager.PERMISSION_GRANTED
-                        || activity.shouldShowRequestPermissionRationale(manifestPermission)) {
-                    permissions = permissions ^ PERMISSION_STORAGE;
-                }
-            }
-
-            return permissions;
-        } else {
-            return 0;
-        }
-    }
-
-    /**
-     * @param activity
-     * @param callback
-     */
-    public void requestPermissions(Activity activity, @Permission int permissions, @Nullable PermissionsRequestCallback callback) {
-        if (Build.VERSION.SDK_INT >= 23) {
-            List<String> manifestPermissions = new ArrayList<>();
-
-            if ((permissions | PERMISSION_CAMERA) == permissions) {
-                String manifestPermission = Manifest.permission.CAMERA;
-                if (activity.checkSelfPermission(manifestPermission) == PackageManager.PERMISSION_DENIED) {
-                    manifestPermissions.add(manifestPermission);
-                }
-            }
-
-            if ((permissions | PERMISSION_MICROPHONE) == permissions) {
-                String manifestPermission = Manifest.permission.RECORD_AUDIO;
-                if (activity.checkSelfPermission(manifestPermission) == PackageManager.PERMISSION_DENIED) {
-                    manifestPermissions.add(manifestPermission);
-                }
-            }
-
-            if ((permissions | PERMISSION_STORAGE) == permissions) {
-                String manifestPermission = Manifest.permission.WRITE_EXTERNAL_STORAGE;
-                if (activity.checkSelfPermission(manifestPermission) == PackageManager.PERMISSION_DENIED) {
-                    manifestPermissions.add(manifestPermission);
-                }
-            }
+            List<String> manifestPermissions = getMissingPermissions();
 
             if (manifestPermissions.size() > 0) {
-                mPendingPermissionsRequestCallback = callback;
-                activity.requestPermissions(manifestPermissions.toArray(new String[manifestPermissions.size()]), PERMISSIONS_REQUEST_CODE);
-            } else {
-                if (callback != null) {
-                    callback.onRequestComplete(permissions, 0);
-                }
-            }
-        } else {
-            if (callback != null) {
-                callback.onRequestComplete(permissions, 0);
+                activity.requestPermissions(manifestPermissions.toArray(new String[manifestPermissions.size()]), PERMISSION_REQUEST_CODE);
             }
         }
     }
@@ -977,7 +928,7 @@ public class CameraKitView extends GestureLayout {
      * @param grantResults
      */
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == PERMISSIONS_REQUEST_CODE) {
+        if (requestCode == PERMISSION_REQUEST_CODE) {
             int approvedPermissions = 0;
             int deniedPermissions = 0;
 
@@ -1005,11 +956,6 @@ public class CameraKitView extends GestureLayout {
                 } else {
                     deniedPermissions = deniedPermissions | flag;
                 }
-            }
-
-            if (mPendingPermissionsRequestCallback != null) {
-                mPendingPermissionsRequestCallback.onRequestComplete(approvedPermissions, deniedPermissions);
-                mPendingPermissionsRequestCallback = null;
             }
         }
     }
@@ -1082,11 +1028,15 @@ public class CameraKitView extends GestureLayout {
      * @param flash one of {@link Flash}'s constants.
      * @see #FLASH_OFF
      * @see #FLASH_ON
-     * @see #FLASH_TORCH
      * @see #FLASH_AUTO
+     * @see #FLASH_TORCH
      */
     public void setFlash(@Flash int flash) {
         mFlash = flash;
+
+        if (mCameraPreview != null) {
+            mCameraPreview.reconfigure();
+        }
     }
 
     /**
@@ -1274,115 +1224,17 @@ public class CameraKitView extends GestureLayout {
     /**
      *
      */
-    public static class Photo {
-
-        private Jpeg mJpeg;
-
-        public Photo(Jpeg jpeg) {
-            mJpeg = jpeg;
-        }
-
-        public Jpeg getJpeg() {
-            return mJpeg;
-        }
-
-        public void saveToInternalStorage(final Context context, @Nullable String fileName, @Nullable final JpegFileCallback callback) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        JpegFile jpegFile = JpegKit.writeToInternalFilesDirectory(context, null, null, mJpeg);
-                        if (callback != null) {
-                            callback.onJpegFile(jpegFile);
-                        }
-                    } catch (Exception e) {
-                        if (callback != null) {
-                            callback.onError(new CameraException("CameraKitPhoto.saveToGallery failed.", e));
-                        }
-                    }
-                }
-            }).start();
-        }
-
-        public void saveToExternalStorage(final Context context, @Nullable String fileName, @Nullable final JpegFileCallback callback) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        JpegFile jpegFile = JpegKit.writeToExternalPrivateDirectory(context, null, null, mJpeg);
-                        if (callback != null) {
-                            callback.onJpegFile(jpegFile);
-                        }
-                    } catch (Exception e) {
-                        if (callback != null) {
-                            callback.onError(new CameraException("CameraKitPhoto.saveToGallery failed.", e));
-                        }
-                    }
-                }
-            }).start();
-        }
-
-        public void saveToGallery(final Context context, @Nullable String fileName, @Nullable final JpegFileCallback callback) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        final JpegFile jpegFile = JpegKit.writeToExternalPublicDirectory(context, null, System.currentTimeMillis() + ".jpg", mJpeg);
-                        final File imageFile = jpegFile.getFile();
-
-                        MediaScannerConnection.scanFile(context, new String[]{imageFile.getAbsolutePath()}, null, new MediaScannerConnection.OnScanCompletedListener() {
-                            @Override
-                            public void onScanCompleted(String path, Uri uri) {
-                                if (callback != null) {
-                                    callback.onJpegFile(jpegFile);
-                                }
-                            }
-                        });
-                    } catch (Exception e) {
-                        if (callback != null) {
-                            callback.onError(new CameraException("CameraKitPhoto.saveToGallery failed.", e));
-                        }
-                    }
-                }
-            }).start();
-        }
-
-        public interface JpegFileCallback {
-
-            void onJpegFile(JpegFile jpegFile);
-
-            void onError(CameraException error);
-
-        }
-
-    }
-
-    /**
-     *
-     */
-    public static class Frame {
-
-    }
-
-    /**
-     *
-     */
-    public static class Video {
-
-    }
-
-    /**
-     *
-     */
     public static class Attributes {
 
         public int facing;
 
         public int sensorOrientation;
 
-        public List<CameraKitView.Size> previewSupportedSizes;
+        public List<Integer> supportedFocuses;
 
-        public List<CameraKitView.Size> photoSupportedSizes;
+        public List<CameraKitView.Size> supportedPreviewSizes;
+
+        public List<CameraKitView.Size> supportedImageSizes;
 
     }
 
@@ -1433,15 +1285,11 @@ public class CameraKitView extends GestureLayout {
         static final int EVENT_PREVIEW_STOPPED = 8;
         static final int EVENT_PREVIEW_ERROR = 9;
 
-        static final int STATUS_IDLE = 0;
-        static final int STATUS_READY = 1;
-        static final int STATUS_PREVIEW = 2;
-
-        private HandlerThread mHandlerThread;
-        private Handler mHandler;
-
+        protected final CameraApi mApi;
         protected int mFacing;
-        protected int mStatus;
+
+        private Handler mHandler;
+        private HandlerThread mHandlerThread;
 
         private int mDisplayRotation;
         private OrientationEventListener mOrientationEventListener;
@@ -1457,6 +1305,7 @@ public class CameraKitView extends GestureLayout {
             super(context);
 
             mFacing = facing;
+            mApi = getApi();
 
             mHandlerThread = new HandlerThread("CameraPreview@" + System.currentTimeMillis());
             mHandlerThread.start();
@@ -1487,9 +1336,7 @@ public class CameraKitView extends GestureLayout {
                         }
                     }
 
-                    if (mStatus == STATUS_PREVIEW) {
-                        getApi().setDisplayRotation(mDisplayRotation);
-                    }
+                    mApi.setDisplayRotation(mDisplayRotation);
                 }
             };
 
@@ -1498,6 +1345,15 @@ public class CameraKitView extends GestureLayout {
             if (windowManager != null) {
                 mOrientationEventListener.onOrientationChanged(windowManager.getDefaultDisplay().getRotation());
             }
+        }
+
+        public void stop() {
+            mApi.stopPreview();
+            mApi.closeCamera();
+        }
+
+        public void reconfigure() {
+
         }
 
         @Nullable
@@ -1514,7 +1370,7 @@ public class CameraKitView extends GestureLayout {
                 Size bestSize = null;
                 float bestRatio = Float.MAX_VALUE;
 
-                for (Size size : mAttributes.previewSupportedSizes) {
+                for (Size size : mAttributes.supportedPreviewSizes) {
                     if (bestSize == null) {
                         float widthRatio = (float) width / (float) size.getWidth();
                         float heightRatio = (float) height / (float) size.getHeight();
@@ -1553,8 +1409,8 @@ public class CameraKitView extends GestureLayout {
             return previewSize;
         }
 
-        public void capturePhoto(final JpegCallback callback) {
-            getApi().captureImage(new CameraApi.ImageCallback() {
+        public void captureImage(final JpegCallback callback) {
+            mApi.captureImage(new CameraApi.ImageCallback() {
                 @Override
                 public void onImage(byte[] data) {
                     Jpeg jpeg = new Jpeg(data);
@@ -1566,69 +1422,82 @@ public class CameraKitView extends GestureLayout {
                         captureRotation = (mAttributes.sensorOrientation - mDisplayRotation + 360) % 360;
                     }
 
-                    jpeg.rotate(captureRotation);
+                    if (mCameraPreview instanceof Camera1) {
+                        jpeg.rotate(captureRotation);
 
-                    if (mFacing == FACING_FRONT) {
-                        jpeg.flipHorizontal();
+                        if (mFacing == FACING_FRONT) {
+                            jpeg.flipHorizontal();
+                        }
                     }
+
 
                     callback.onJpeg(jpeg);
                 }
             });
         }
 
-        protected synchronized void dispatchEvent(int event) {
-            switch (event) {
-                case EVENT_CAMERA_OPENED: {
-                    mAttributes = getApi().getAttributes();
-                    getApi().startPreview();
-                    break;
-                }
+        protected synchronized void dispatchEvent(final int event) {
+            post(new Runnable() {
+                @Override
+                public void run() {
+                    switch (event) {
+                        case EVENT_CAMERA_OPENED: {
+                            mAttributes = mApi.getAttributes();
+                            mApi.startPreview();
+                            break;
+                        }
 
-                case EVENT_CAMERA_CLOSED: {
-                    break;
-                }
+                        case EVENT_CAMERA_CLOSED: {
+                            break;
+                        }
 
-                case EVENT_CAMERA_ERROR: {
-                    getApi().closeCamera();
-                    break;
-                }
+                        case EVENT_CAMERA_ERROR: {
+                            mApi.closeCamera();
+                            break;
+                        }
 
-                case EVENT_SURFACE_CREATED: {
-                    getApi().openCamera();
-                    break;
-                }
+                        case EVENT_SURFACE_CREATED: {
+                            mApi.openCamera();
+                            break;
+                        }
 
-                case EVENT_SURFACE_CHANGED: {
-                    getApi().stopPreview();
-                    getApi().startPreview();
-                    break;
-                }
+                        case EVENT_SURFACE_CHANGED: {
+                            mApi.stopPreview();
+                            mApi.startPreview();
+                            break;
+                        }
 
-                case EVENT_SURFACE_DESTROYED: {
-                    getApi().stopPreview();
-                    getApi().closeCamera();
-                    break;
-                }
+                        case EVENT_SURFACE_DESTROYED: {
+                            mApi.stopPreview();
+                            mApi.closeCamera();
+                            break;
+                        }
 
-                case EVENT_SURFACE_ERROR: {
-                    break;
-                }
+                        case EVENT_SURFACE_ERROR: {
+                            break;
+                        }
 
-                case EVENT_PREVIEW_STARTED: {
-                    getApi().setDisplayRotation(mDisplayRotation);
-                    requestLayout();
-                    break;
-                }
+                        case EVENT_PREVIEW_STARTED: {
+                            mApi.setDisplayRotation(mDisplayRotation);
+                            requestLayout();
+                            break;
+                        }
 
-                case EVENT_PREVIEW_STOPPED: {
-                    break;
-                }
+                        case EVENT_PREVIEW_STOPPED: {
+                            break;
+                        }
 
-                case EVENT_PREVIEW_ERROR: {
-                    break;
+                        case EVENT_PREVIEW_ERROR: {
+                            break;
+                        }
+                    }
                 }
-            }
+            });
+
+        }
+
+        protected void background(Runnable runnable) {
+            mHandler.post(runnable);
         }
 
         @Override
@@ -1727,162 +1596,213 @@ public class CameraKitView extends GestureLayout {
 
         @Override
         public CameraApi getApi() {
-            return mApi;
+            return new CameraApi() {
+                @Override
+                public Attributes getAttributes() {
+                    Attributes attributes = new Attributes();
+
+                    attributes.facing = mFacing;
+                    attributes.sensorOrientation = mCameraInfo.orientation;
+
+                    attributes.supportedPreviewSizes = new ArrayList<>();
+                    for (Camera.Size size : mCamera.getParameters().getSupportedPreviewSizes()) {
+                        attributes.supportedPreviewSizes.add(new Size(size.width, size.height));
+                    }
+
+                    attributes.supportedImageSizes = new ArrayList<>();
+                    for (Camera.Size size : mCamera.getParameters().getSupportedPictureSizes()) {
+                        attributes.supportedImageSizes.add(new Size(size.width, size.height));
+                    }
+
+                    return attributes;
+                }
+
+                @Override
+                public void openCamera() {
+                    background(new Runnable() {
+                        @Override
+                        public void run() {
+                            int cameraId = mFacing == FACING_BACK ? Camera.CameraInfo.CAMERA_FACING_BACK : Camera.CameraInfo.CAMERA_FACING_FRONT;
+                            mCamera = Camera.open(cameraId);
+                            mCameraInfo = new Camera.CameraInfo();
+                            Camera.getCameraInfo(cameraId, mCameraInfo);
+
+                            mCamera.setErrorCallback(new Camera.ErrorCallback() {
+                                @Override
+                                public void onError(int error, Camera camera) {
+                                    dispatchEvent(EVENT_CAMERA_ERROR);
+                                }
+                            });
+
+                            dispatchEvent(EVENT_CAMERA_OPENED);
+                        }
+                    });
+                }
+
+                @Override
+                public void closeCamera() {
+                    background(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (mCamera != null) {
+                                mCamera.release();
+                                mCamera = null;
+                            }
+
+                            dispatchEvent(EVENT_CAMERA_CLOSED);
+                        }
+                    });
+                }
+
+                @Override
+                public void startPreview() {
+                    background(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (mSurfaceHolder.getSurface() != null) {
+                                Size previewSize = getPreviewSize();
+                                if (previewSize != null) {
+                                    Camera.Parameters parameters = mCamera.getParameters();
+                                    parameters.setPreviewSize(previewSize.getWidth(), previewSize.getHeight());
+
+                                    if (parameters.getSupportedFlashModes().contains(FOCUS_MODE_CONTINUOUS_PICTURE)) {
+                                        parameters.setFocusMode(FOCUS_MODE_CONTINUOUS_PICTURE);
+                                    }
+
+                                    mCamera.setParameters(parameters);
+                                }
+
+                                try {
+                                    mCamera.setPreviewDisplay(mSurfaceHolder);
+                                } catch (IOException e) {
+                                    dispatchEvent(EVENT_PREVIEW_ERROR);
+                                    return;
+                                }
+
+                                mCamera.startPreview();
+
+                                dispatchEvent(EVENT_PREVIEW_STARTED);
+                            } else {
+                                dispatchEvent(EVENT_SURFACE_ERROR);
+                            }
+                        }
+                    });
+                }
+
+                @Override
+                public void stopPreview() {
+                    background(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (mCamera != null) {
+                                mCamera.stopPreview();
+                            }
+
+                            dispatchEvent(EVENT_PREVIEW_STOPPED);
+                        }
+                    });
+                }
+
+
+                @Override
+                public void setDisplayRotation(final int displayRotation) {
+                    background(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (mCamera != null) {
+                                final int previewRotation;
+                                if (mFacing == FACING_FRONT) {
+                                    previewRotation = (360 - ((mCameraInfo.orientation + displayRotation) % 360)) % 360;
+                                } else {
+                                    previewRotation = (mCameraInfo.orientation - displayRotation + 360) % 360;
+                                }
+                                mCamera.setDisplayOrientation(previewRotation);
+                            }
+                        }
+                    });
+                }
+
+                @Override
+                public void setFlash(final int flash) {
+                    background(new Runnable() {
+                        @Override
+                        public void run() {
+                            Camera.Parameters parameters = mCamera.getParameters();
+
+                            switch (flash) {
+                                case FLASH_OFF: {
+                                    parameters.setFlashMode(FLASH_MODE_OFF);
+                                    break;
+                                }
+
+                                case FLASH_ON: {
+                                    parameters.setFlashMode(FLASH_MODE_ON);
+                                    break;
+                                }
+
+                                case FLASH_AUTO: {
+                                    parameters.setFlashMode(FLASH_MODE_AUTO);
+                                    break;
+                                }
+
+                                case FLASH_TORCH: {
+                                    parameters.setFlashMode(FLASH_MODE_TORCH);
+                                    break;
+                                }
+                            }
+
+                            mCamera.setParameters(parameters);
+                        }
+                    });
+                }
+
+                @Override
+                public void setFocus(final int focus) {
+                    background(new Runnable() {
+                        @Override
+                        public void run() {
+                            Camera.Parameters parameters = mCamera.getParameters();
+
+                            switch (focus) {
+                                case FOCUS_OFF: {
+                                    break;
+                                }
+
+                                case FOCUS_AUTO: {
+                                    break;
+                                }
+
+                                case FOCUS_CONTINUOUS: {
+                                    if (parameters.getSupportedFlashModes().contains(FOCUS_MODE_CONTINUOUS_PICTURE)) {
+                                        parameters.setFocusMode(FOCUS_MODE_CONTINUOUS_PICTURE);
+                                    }
+
+                                    break;
+                                }
+                            }
+
+                            mCamera.setParameters(parameters);
+                        }
+                    });
+                }
+
+                @Override
+                public void captureImage(final ImageCallback callback) {
+                    background(new Runnable() {
+                        @Override
+                        public void run() {
+                            mCamera.takePicture(null, null, new Camera.PictureCallback() {
+                                @Override
+                                public void onPictureTaken(byte[] data, Camera camera) {
+                                    startPreview();
+                                    callback.onImage(data);
+                                }
+                            });
+                        }
+                    });
+                }
+            };
         }
-
-        private CameraApi mApi = new CameraApi() {
-
-            @Override
-            public Attributes getAttributes() {
-                Attributes attributes = new Attributes();
-
-                attributes.facing = mFacing;
-                attributes.sensorOrientation = mCameraInfo.orientation;
-
-                attributes.previewSupportedSizes = new ArrayList<>();
-                for (Camera.Size size : mCamera.getParameters().getSupportedPreviewSizes()) {
-                    attributes.previewSupportedSizes.add(new Size(size.width, size.height));
-                }
-
-                attributes.photoSupportedSizes = new ArrayList<>();
-                for (Camera.Size size : mCamera.getParameters().getSupportedPictureSizes()) {
-                    attributes.photoSupportedSizes.add(new Size(size.width, size.height));
-                }
-
-                return attributes;
-            }
-
-            @Override
-            public void openCamera() {
-                int cameraId = mFacing == FACING_BACK ? Camera.CameraInfo.CAMERA_FACING_BACK : Camera.CameraInfo.CAMERA_FACING_FRONT;
-                mCamera = Camera.open(cameraId);
-                mCameraInfo = new Camera.CameraInfo();
-                Camera.getCameraInfo(cameraId, mCameraInfo);
-
-                mCamera.setErrorCallback(new Camera.ErrorCallback() {
-                    @Override
-                    public void onError(int error, Camera camera) {
-                        dispatchEvent(EVENT_CAMERA_ERROR);
-                    }
-                });
-
-                dispatchEvent(EVENT_CAMERA_OPENED);
-            }
-
-            @Override
-            public void closeCamera() {
-                mCamera.release();
-
-                dispatchEvent(EVENT_CAMERA_CLOSED);
-            }
-
-            @Override
-            public void startPreview() {
-                if (mSurfaceHolder.getSurface() != null) {
-                    Size previewSize = getPreviewSize();
-                    if (previewSize != null) {
-                        Camera.Parameters parameters = mCamera.getParameters();
-                        parameters.setPreviewSize(previewSize.getWidth(), previewSize.getHeight());
-                        mCamera.setParameters(parameters);
-                    }
-
-                    try {
-                        mCamera.setPreviewDisplay(mSurfaceHolder);
-                    } catch (IOException e) {
-                        dispatchEvent(EVENT_PREVIEW_ERROR);
-                        return;
-                    }
-
-                    mCamera.startPreview();
-
-                    dispatchEvent(EVENT_PREVIEW_STARTED);
-                } else {
-                    dispatchEvent(EVENT_SURFACE_ERROR);
-                }
-            }
-
-            @Override
-            public void stopPreview() {
-                mCamera.stopPreview();
-
-                dispatchEvent(EVENT_PREVIEW_STOPPED);
-            }
-
-
-            @Override
-            public void setDisplayRotation(int displayRotation) {
-                final int previewRotation;
-                if (mFacing == FACING_FRONT) {
-                    previewRotation = (360 - ((mCameraInfo.orientation + displayRotation) % 360)) % 360;
-                } else {
-                    previewRotation = (mCameraInfo.orientation - displayRotation + 360) % 360;
-                }
-                mCamera.setDisplayOrientation(previewRotation);
-            }
-
-            @Override
-            public void setFlash(int flash) {
-                Camera.Parameters parameters = mCamera.getParameters();
-
-                switch (flash) {
-                    case FLASH_OFF: {
-                        parameters.setFlashMode(FLASH_MODE_OFF);
-                        break;
-                    }
-
-                    case FLASH_ON: {
-                        parameters.setFlashMode(FLASH_MODE_ON);
-                        break;
-                    }
-
-                    case FLASH_AUTO: {
-                        parameters.setFlashMode(FLASH_MODE_AUTO);
-                        break;
-                    }
-
-                    case FLASH_TORCH: {
-                        parameters.setFlashMode(FLASH_MODE_TORCH);
-                        break;
-                    }
-                }
-
-                mCamera.setParameters(parameters);
-            }
-
-            @Override
-            public void setFocus(int focus) {
-                Camera.Parameters parameters = mCamera.getParameters();
-
-                switch (focus) {
-                    case FOCUS_OFF: {
-                        break;
-                    }
-
-                    case FOCUS_AUTO: {
-                        break;
-                    }
-
-                    case FOCUS_CONTINUOUS: {
-                        parameters.setFocusMode(FOCUS_MODE_CONTINUOUS_PICTURE);
-                        break;
-                    }
-                }
-
-                mCamera.setParameters(parameters);
-            }
-
-            @Override
-            public void captureImage(final ImageCallback callback) {
-                mCamera.takePicture(null, null, new Camera.PictureCallback() {
-                    @Override
-                    public void onPictureTaken(byte[] data, Camera camera) {
-                        startPreview();
-                        callback.onImage(data);
-                    }
-                });
-            }
-
-        };
 
     }
 
@@ -1984,169 +1904,238 @@ public class CameraKitView extends GestureLayout {
 
         @Override
         public CameraApi getApi() {
-            return mApi;
-        }
+            return new CameraApi() {
 
-        private CameraApi mApi = new CameraApi() {
-
-            @Override
-            public Attributes getAttributes() {
-                if (mCameraCharacteristics == null) {
-                    return null;
-                }
-
-                StreamConfigurationMap map = mCameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
-                if (map == null) {
-                    return null;
-                }
-
-                Attributes attributes = new Attributes();
-
-                Integer sensorOrientation = mCameraCharacteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
-                if (sensorOrientation != null) {
-                    attributes.sensorOrientation = sensorOrientation;
-                }
-
-                attributes.facing = mFacing;
-
-                attributes.previewSupportedSizes = new ArrayList<>();
-                for (android.util.Size size : map.getOutputSizes(SurfaceTexture.class)) {
-                    attributes.previewSupportedSizes.add(new Size(size.getWidth(), size.getHeight()));
-                }
-
-                return attributes;
-            }
-
-            @Override
-            @SuppressWarnings("MissingPermission")
-            public void openCamera() {
-                int facingTarget = mFacing == FACING_BACK ? LENS_FACING_BACK : LENS_FACING_FRONT;
-                mCameraManager = (CameraManager) getContext().getSystemService(Context.CAMERA_SERVICE);
-
-                if (mCameraManager == null) {
-
-                    return;
-                }
-
-                String[] cameraIdList;
-                try {
-                    cameraIdList = mCameraManager.getCameraIdList();
-                } catch (Exception e) {
-
-                    return;
-                }
-
-                for (String cameraId : cameraIdList) {
-                    try {
-                        CameraCharacteristics characteristics = mCameraManager.getCameraCharacteristics(cameraId);
-                        Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
-                        if (facing != null && facing != facingTarget) {
-                            continue;
-                        }
-
-                        StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
-                        if (map == null) {
-                            continue;
-                        }
-
-                        mCameraCharacteristics = characteristics;
-
-                        mCameraManager.openCamera(cameraId, new CameraDevice.StateCallback() {
-
-                            @Override
-                            public void onOpened(@NonNull CameraDevice camera) {
-                                mCameraDevice = camera;
-                                dispatchEvent(EVENT_CAMERA_OPENED);
-                            }
-
-                            @Override
-                            public void onDisconnected(@NonNull CameraDevice camera) {
-                                dispatchEvent(EVENT_CAMERA_CLOSED);
-                            }
-
-                            @Override
-                            public void onError(@NonNull CameraDevice camera, int error) {
-
-                            }
-
-                        }, null);
-                    } catch (Exception e) {
-                        continue;
+                @Override
+                public Attributes getAttributes() {
+                    if (mCameraCharacteristics == null) {
+                        return null;
                     }
+
+                    StreamConfigurationMap map = mCameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+                    if (map == null) {
+                        return null;
+                    }
+
+                    Attributes attributes = new Attributes();
+
+                    Integer sensorOrientation = mCameraCharacteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
+                    if (sensorOrientation != null) {
+                        attributes.sensorOrientation = sensorOrientation;
+                    }
+
+                    attributes.facing = mFacing;
+
+                    attributes.supportedPreviewSizes = new ArrayList<>();
+                    for (android.util.Size size : map.getOutputSizes(SurfaceTexture.class)) {
+                        attributes.supportedPreviewSizes.add(new Size(size.getWidth(), size.getHeight()));
+                    }
+
+                    return attributes;
                 }
-            }
 
-            @Override
-            public void closeCamera() {
-                if (mCameraDevice != null) {
-                    mCameraDevice.close();
-                    mCameraDevice = null;
-                }
-            }
-
-            @Override
-            public void startPreview() {
-                Surface surface = new Surface(mTextureView.getSurfaceTexture());
-
-                try {
-                    final CaptureRequest.Builder previewRequestBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-                    previewRequestBuilder.addTarget(surface);
-
-                    mCameraDevice.createCaptureSession(Arrays.asList(surface), new CameraCaptureSession.StateCallback() {
+                @Override
+                @SuppressWarnings("MissingPermission")
+                public void openCamera() {
+                    background(new Runnable() {
                         @Override
-                        public void onConfigured(@NonNull CameraCaptureSession session) {
-                            mCaptureSession = session;
-                            CaptureRequest previewRequest = previewRequestBuilder.build();
-                            try {
-                                session.setRepeatingRequest(previewRequest, null, null);
+                        public void run() {
+                            int facingTarget = mFacing == FACING_BACK ? LENS_FACING_BACK : LENS_FACING_FRONT;
+                            mCameraManager = (CameraManager) getContext().getSystemService(Context.CAMERA_SERVICE);
 
-                                dispatchEvent(EVENT_PREVIEW_STARTED);
+                            if (mCameraManager == null) {
+
+                                return;
+                            }
+
+                            String[] cameraIdList;
+                            try {
+                                cameraIdList = mCameraManager.getCameraIdList();
                             } catch (Exception e) {
+
+                                return;
+                            }
+
+                            for (String cameraId : cameraIdList) {
+                                try {
+                                    CameraCharacteristics characteristics = mCameraManager.getCameraCharacteristics(cameraId);
+                                    Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
+                                    if (facing != null && facing != facingTarget) {
+                                        continue;
+                                    }
+
+                                    StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+                                    if (map == null) {
+                                        continue;
+                                    }
+
+                                    mCameraCharacteristics = characteristics;
+
+                                    mCameraManager.openCamera(cameraId, new CameraDevice.StateCallback() {
+
+                                        @Override
+                                        public void onOpened(final @NonNull CameraDevice camera) {
+                                            background(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    mCameraDevice = camera;
+                                                    dispatchEvent(EVENT_CAMERA_OPENED);
+                                                }
+                                            });
+                                        }
+
+                                        @Override
+                                        public void onDisconnected(final @NonNull CameraDevice camera) {
+                                            background(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    camera.close();
+                                                    mCameraDevice = null;
+
+                                                    dispatchEvent(EVENT_CAMERA_CLOSED);
+                                                }
+                                            });
+                                        }
+
+                                        @Override
+                                        public void onError(final @NonNull CameraDevice camera, int error) {
+                                            background(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    camera.close();
+                                                    mCameraDevice = null;
+                                                }
+                                            });
+                                        }
+
+                                    }, null);
+                                } catch (Exception e) {
+                                    continue;
+                                }
                             }
                         }
+                    });
+                }
 
+                @Override
+                public void closeCamera() {
+                    background(new Runnable() {
                         @Override
-                        public void onConfigureFailed(@NonNull CameraCaptureSession session) {
+                        public void run() {
+                            if (mCameraDevice != null) {
+                                mCameraDevice.close();
+                                mCameraDevice = null;
+                            }
+                        }
+                    });
+                }
+
+                @Override
+                public void startPreview() {
+                    background(new Runnable() {
+                        @Override
+                        public void run() {
+                            Size previewSize = getPreviewSize();
+
+                            SurfaceTexture surfaceTexture = mTextureView.getSurfaceTexture();
+                            surfaceTexture.setDefaultBufferSize(previewSize.getWidth(), previewSize.getHeight());
+
+                            Surface surface = new Surface(surfaceTexture);
+
+                            try {
+                                final CaptureRequest.Builder previewRequestBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+                                previewRequestBuilder.addTarget(surface);
+
+                                mCameraDevice.createCaptureSession(Arrays.asList(surface), new CameraCaptureSession.StateCallback() {
+                                    @Override
+                                    public void onConfigured(final @NonNull CameraCaptureSession session) {
+                                        background(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                mCaptureSession = session;
+                                                CaptureRequest previewRequest = previewRequestBuilder.build();
+                                                try {
+                                                    previewRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
+                                                    session.setRepeatingRequest(previewRequest, null, null);
+
+                                                    dispatchEvent(EVENT_PREVIEW_STARTED);
+                                                } catch (Exception e) {
+                                                }
+                                            }
+                                        });
+                                    }
+
+                                    @Override
+                                    public void onConfigureFailed(final @NonNull CameraCaptureSession session) {
+                                        background(new Runnable() {
+                                            @Override
+                                            public void run() {
+
+                                            }
+                                        });
+                                    }
+                                }, null);
+                            } catch (Exception e) {
+
+                                return;
+                            }
+                        }
+                    });
+                }
+
+                @Override
+                public void stopPreview() {
+                    background(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (mCaptureSession != null) {
+                                mCaptureSession.close();
+                                mCaptureSession = null;
+
+                                dispatchEvent(EVENT_PREVIEW_STOPPED);
+                            }
+                        }
+                    });
+                }
+
+                @Override
+                public void setDisplayRotation(int displayRotation) {
+
+                }
+
+                @Override
+                public void setFlash(int flash) {
+
+                }
+
+                @Override
+                public void setFocus(int focus) {
+                    background(new Runnable() {
+                        @Override
+                        public void run() {
 
                         }
-                    }, null);
-                } catch (Exception e) {
-
-                    return;
+                    });
                 }
-            }
 
-            @Override
-            public void stopPreview() {
-                if (mCaptureSession != null) {
-                    mCaptureSession.close();
-                    mCaptureSession = null;
+                @Override
+                public void captureImage(final ImageCallback callback) {
+                    background(new Runnable() {
+                        @Override
+                        public void run() {
+                            Bitmap bitmap = mTextureView.getBitmap();
 
-                    dispatchEvent(EVENT_PREVIEW_STOPPED);
+                            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                            byte[] byteArray = stream.toByteArray();
+
+                            callback.onImage(byteArray);
+                        }
+                    });
                 }
-            }
 
-            @Override
-            public void setDisplayRotation(int displayRotation) {
-
-            }
-
-            @Override
-            public void setFlash(int flash) {
-
-            }
-
-            @Override
-            public void setFocus(int focus) {
-
-            }
-
-            @Override
-            public void captureImage(ImageCallback callback) {
-
-            }
-
-        };
+            };
+        }
 
     }
 

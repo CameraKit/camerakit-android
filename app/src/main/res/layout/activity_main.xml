@@ -30,88 +30,71 @@
                 android:id="@+id/camera"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_gravity="center"
                 android:adjustViewBounds="true"
-                app:camera_facing="back" />
+                app:camera_facing="back"
+                app:camera_focus="continuous"
+                app:camera_imageJpegQuality="100"
+                app:camera_imageMegaPixels="2.0"
+                app:camera_permissions="camera" />
+
+            <Button
+                android:id="@+id/permissionsButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Approve Permissions"
+                android:visibility="gone" />
 
             <com.jpegkit.JpegImageView
-                android:id="@+id/photoImageView"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_gravity="bottom|end"
-                android:layout_marginBottom="80dp"
-                android:layout_marginEnd="15dp"
-                android:layout_marginRight="15dp"
-                android:elevation="4dp" />
-
-            <com.jpegkit.JpegImageView
-                android:id="@+id/newImageView"
-                android:layout_width="500dp"
-                android:layout_height="500dp"
-                android:layout_gravity="bottom|end"
-                android:layout_marginBottom="80dp"
-                android:layout_marginEnd="15dp"
-                android:layout_marginRight="15dp"
-                android:elevation="4dp"
-                android:transformPivotX="500dp"
-                android:transformPivotY="500dp" />
+                android:id="@+id/imageView"
+                android:layout_width="108dp"
+                android:layout_height="192dp"
+                android:layout_gravity="top|right"
+                android:layout_margin="12dp"
+                android:alpha="0.8"
+                android:scaleType="centerInside" />
 
         </FrameLayout>
 
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="160dp"
+    <FrameLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|left"
+        android:layout_gravity="bottom|center_horizontal"
         android:layout_margin="12dp"
         android:orientation="vertical">
 
         <android.support.v7.widget.AppCompatButton
-            android:id="@+id/previewSettingsButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/colorPrimaryDark"
-            android:drawableLeft="@drawable/ic_preview"
-            android:padding="14dp"
-            android:text=" Preview\nSettings" />
-
-        <android.support.v7.widget.AppCompatButton
-            android:id="@+id/photoSettingsButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/colorPrimaryDark"
-            android:drawableLeft="@drawable/ic_photo"
-            android:padding="14dp"
-            android:text=" Photo\nSettings" />
-
-        <android.support.v7.widget.AppCompatButton
-            android:id="@+id/flashlightButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/colorPrimaryDark"
-            android:drawableLeft="@drawable/ic_flash"
-            android:padding="14dp"
-            android:text=" Toggle\nFlashlight" />
-
-        <android.support.v7.widget.AppCompatButton
             android:id="@+id/facingButton"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="left"
             android:backgroundTint="@color/colorPrimaryDark"
             android:drawableLeft="@drawable/ic_facing"
             android:padding="14dp"
             android:text=" Toggle\nFacing" />
 
-    </LinearLayout>
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/photoButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:backgroundTint="@color/colorPrimaryDark"
+            android:drawableLeft="@drawable/ic_photo"
+            android:padding="14dp"
+            android:text=" Capture\nImage" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fabPhoto"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="12dp"
-        android:elevation="4dp"
-        android:src="@drawable/ic_camera" />
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/flashButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:backgroundTint="@color/colorPrimaryDark"
+            android:drawableLeft="@drawable/ic_flash"
+            android:padding="14dp"
+            android:text=" Toggle\nFlash" />
+
+    </FrameLayout>
 
 </FrameLayout>

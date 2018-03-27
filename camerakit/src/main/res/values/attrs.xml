@@ -37,13 +37,16 @@
 
         <attr name="camera_permissions">
             <flag name="none" value="0" />
-            <flag name="photo" value="1" />
+            <flag name="camera" value="1" />
             <flag name="audio" value="2" />
             <flag name="storage" value="4" />
-            <flag name="all" value="7" />
+            <flag name="location" value="8" />
+            <flag name="all" value="15" />
         </attr>
 
-        <attr name="camera_photoMegaPixels" format="float" />
+        <attr name="camera_imageMegaPixels" format="float" />
+
+        <attr name="camera_imageJpegQuality" format="integer" />
 
     </declare-styleable>
 
