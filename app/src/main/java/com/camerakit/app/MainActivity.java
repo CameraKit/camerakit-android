@@ -13,14 +13,16 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.camerakit.CameraKitView;
+import com.jpegkit.JpegFile;
+import com.jpegkit.JpegImageView;
 
 import java.io.File;
 
@@ -35,8 +37,8 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     private Button flashlightButton;
     private Button facingButton;
 
-    private ImageView newPhotoImageView;
-    private ImageView photoImageView;
+    private JpegImageView newPhotoImageView;
+    private JpegImageView photoImageView;
 
     private File mPhoto;
 
@@ -87,12 +89,12 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     @Override
     public void onResume() {
         super.onResume();
-        cameraView.start();
+        cameraView.onResume();
     }
 
     @Override
     public void onPause() {
-        cameraView.stop();
+        cameraView.onPause();
         super.onPause();
     }
 
@@ -123,39 +125,48 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
 
     private View.OnClickListener photoOnClickListener = v -> {
         cameraView.capturePhoto(((view, photo) -> {
-            photo.getGalleryFile((galleryFile -> {
-                mPhoto = galleryFile;
-            }));
+            photo.saveToGallery(view.getContext(), "test.jpg", new CameraKitView.Photo.JpegFileCallback() {
+                @Override
+                public void onJpegFile(JpegFile jpegFile) {
+                    mPhoto = jpegFile.getFile();
+                }
 
-            photo.getThumbnail((thumbnail -> {
-                thumbnail.getBitmap((thumbnailBitmap -> {
-                    runOnUiThread(() -> {
-                        newPhotoImageView.setImageBitmap(thumbnailBitmap);
-                        newPhotoImageView.setAlpha(0f);
-                        newPhotoImageView.setScaleX(1f);
-                        newPhotoImageView.setScaleY(1f);
-                        newPhotoImageView.setVisibility(View.VISIBLE);
+                @Override
+                public void onError(CameraKitView.CameraException error) {
+                    Log.e("CameraKit", error.toString());
+                }
+            });
 
-                        newPhotoImageView.animate()
-                                .alpha(1f)
-                                .scaleX(0.1f)
-                                .scaleY(0.1f)
-                                .setDuration(450)
-                                .setInterpolator(new DecelerateInterpolator())
-                                .setListener(new AnimatorListenerAdapter() {
-                                    @Override
-                                    public void onAnimationEnd(Animator animation) {
-                                        super.onAnimationEnd(animation);
-                                        photoImageView.setAlpha(1f);
-                                        photoImageView.setImageBitmap(thumbnailBitmap);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(MainActivity.this, photo.getJpeg().getWidth() + "x" + photo.getJpeg().getHeight(), Toast.LENGTH_SHORT).show();
 
-                                        newPhotoImageView.setVisibility(View.GONE);
-                                    }
-                                })
-                                .start();
-                    });
-                }));
-            }));
+                    newPhotoImageView.setJpeg(photo.getJpeg());
+                    newPhotoImageView.setAlpha(0f);
+                    newPhotoImageView.setScaleX(1f);
+                    newPhotoImageView.setScaleY(1f);
+                    newPhotoImageView.setVisibility(View.VISIBLE);
+
+                    newPhotoImageView.animate()
+                            .alpha(1f)
+                            .scaleX(0.1f)
+                            .scaleY(0.1f)
+                            .setDuration(450)
+                            .setInterpolator(new DecelerateInterpolator())
+                            .setListener(new AnimatorListenerAdapter() {
+                                @Override
+                                public void onAnimationEnd(Animator animation) {
+                                    super.onAnimationEnd(animation);
+                                    photoImageView.setAlpha(1f);
+                                    photoImageView.setJpeg(photo.getJpeg());
+
+                                    newPhotoImageView.setVisibility(View.GONE);
+                                }
+                            })
+                            .start();
+                }
+            });
         }));
     };
 

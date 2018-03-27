@@ -34,7 +34,7 @@
                 android:adjustViewBounds="true"
                 app:camera_facing="back" />
 
-            <de.hdodenhof.circleimageview.CircleImageView
+            <com.jpegkit.JpegImageView
                 android:id="@+id/photoImageView"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
@@ -44,7 +44,7 @@
                 android:layout_marginRight="15dp"
                 android:elevation="4dp" />
 
-            <de.hdodenhof.circleimageview.CircleImageView
+            <com.jpegkit.JpegImageView
                 android:id="@+id/newImageView"
                 android:layout_width="500dp"
                 android:layout_height="500dp"
@@ -63,7 +63,7 @@
     <LinearLayout
         android:layout_width="160dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|start"
+        android:layout_gravity="bottom|left"
         android:layout_margin="12dp"
         android:orientation="vertical">
 

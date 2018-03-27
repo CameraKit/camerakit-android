@@ -21,25 +21,29 @@
         <attr name="camera_flash" format="enum">
             <enum name="off" value="0" />
             <enum name="on" value="1" />
-            <enum name="torch" value="2" />
-            <enum name="auto" value="3" />
+            <enum name="auto" value="2" />
+            <enum name="torch" value="3" />
         </attr>
 
         <!-- How should the lens continuously focus. -->
-        <attr name="camera_activeFocusMode" format="enum">
+        <attr name="camera_focus" format="enum">
             <enum name="off" value="0" />
-            <enum name="fast" value="1" />
-            <enum name="smooth" value="2" />
+            <enum name="auto" value="1" />
+            <enum name="continuous" value="2" />
         </attr>
 
         <!-- Default zoom. Accepts a float representing the factor to zoom by. -->
         <attr name="camera_zoomFactor" format="float" />
 
-        <!-- Will the view be used to capture photos. -->
-        <attr name="camera_photoHint" format="boolean" />
+        <attr name="camera_permissions">
+            <flag name="none" value="0" />
+            <flag name="photo" value="1" />
+            <flag name="audio" value="2" />
+            <flag name="storage" value="4" />
+            <flag name="all" value="7" />
+        </attr>
 
-        <!-- Will the view be used to capture videos. -->
-        <attr name="camera_videoHint" format="boolean" />
+        <attr name="camera_photoMegaPixels" format="float" />
 
     </declare-styleable>
 

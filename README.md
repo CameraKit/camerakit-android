@@ -36,27 +36,27 @@ implementation 'com.camerakit:camerakit:1.0.0'
 
 ## Usage
 
-To use CameraKit, simply add a `CameraView` to your layout:
+To use CameraKit, simply add a `CameraKitView` to your layout:
 
 ```xml
-<com.camerakit.CameraView
+<com.camerakit.CameraKitView
     android:id="@+id/camera"
     android:layout_width="match_parent"
     android:layout_height="match_parent" />
 ```
 
-Make sure you override `onResume` and `onPause` in your activity, and make calls respectively to `CameraView.start()` and `CameraView.stop()`.
+Make sure you override `onResume` and `onPause` in your activity, and make pass-through calls CameraKit with `CameraKitView.onResume()` and `CameraKitView.onPause()`.
 
 ```java
 @Override
 protected void onResume() {
     super.onResume();
-    cameraView.start();
+    cameraView.onResume();
 }
 
 @Override
 protected void onPause() {
-    cameraView.stop();
+    cameraView.onPause();
     super.onPause();
 }
 ```

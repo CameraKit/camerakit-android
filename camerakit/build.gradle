@@ -1,14 +1,9 @@
 plugins {
-    id 'me.tatarka.retrolambda' version '3.7.0'
     id 'com.jfrog.bintray' version '1.7.3'
     id 'com.github.dcendents.android-maven' version '1.5'
 }
 
 apply plugin: 'com.android.library'
-
-retrolambda {
-    javaVersion JavaVersion.VERSION_1_7
-}
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -17,29 +12,12 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
     }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-    sourceSets {
-        main {
-            java {
-                setSrcDirs([])
-                srcDir 'src/main/java/public/base'
-                srcDir 'src/main/java/public/types'
-                srcDir 'src/main/java/public/modules'
-                srcDir 'src/main/java/public/products'
-                srcDir 'src/main/java/core/base'
-                srcDir 'src/main/java/core/v1'
-            }
-        }
-    }
 }
 
 dependencies {
-    implementation 'com.camerakit:jpegkit:0.0.1'
-    implementation 'com.android.support:support-annotations:27.0.2'
-    testImplementation 'junit:junit:4.12'
+    compile 'com.camerakit:jpegkit:0.1.0'
+    compile 'com.android.support:support-annotations:27.1.0'
+    testCompile 'junit:junit:4.12'
 }
 
 ext.getBintrayUser = { ->
