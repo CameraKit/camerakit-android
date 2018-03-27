@@ -1510,7 +1510,7 @@ public class CameraKitView extends GestureLayout {
     /**
      *
      */
-    class Camera1 extends CameraPreview implements SurfaceHolder.Callback {
+    private class Camera1 extends CameraPreview implements SurfaceHolder.Callback {
 
         private final SurfaceView mSurfaceView;
         private final SurfaceHolder mSurfaceHolder;
@@ -1810,7 +1810,7 @@ public class CameraKitView extends GestureLayout {
      *
      */
     @TargetApi(21)
-    class Camera2 extends CameraPreview implements TextureView.SurfaceTextureListener {
+    private class Camera2 extends CameraPreview implements TextureView.SurfaceTextureListener {
 
         private TextureView mTextureView;
 
