@@ -19,12 +19,14 @@ public class CameraKitEvent {
     public static final String TYPE_FOCUS_MOVED = "CKFocusMovedEvent";
 
     public static final String TYPE_TEXT_DETECTED = "CKTextDetectedEvent";
+    public static final String TYPE_BARCODE_DETECTED = "CKBarCodeDetectedEvent";
 
     private String type;
     private String message;
 
     private Bundle data;
 
+    //This should not be necessary.
     private CameraKitEvent() {
     }
 

@@ -31,6 +31,7 @@ import android.view.WindowManager;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.vision.barcode.BarcodeDetector;
 import com.google.android.gms.vision.text.TextRecognizer;
 import com.wonderkiln.camerakit.core.R;
 
@@ -456,6 +457,25 @@ public class CameraView extends CameraViewLayout {
             return false;
         }
     }
+
+    public boolean setBarCodeDetectionListener(int barCodeFormats, final CameraKitEventCallback<CameraKitBarCodeDetect> callback) throws GooglePlayServicesUnavailableException {
+        BarcodeDetector barCodeDetector = new BarcodeDetector.Builder(getContext())
+                .setBarcodeFormats(barCodeFormats).build();
+        barCodeDetector.setProcessor(new BarcodeProcessor(mEventDispatcher, callback));
+        int code = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(getContext().getApplicationContext());
+        if (code != ConnectionResult.SUCCESS) {
+            throw new GooglePlayServicesUnavailableException();
+        }
+
+        if (barCodeDetector.isOperational()) {
+            mCameraImpl.setBarCodeDetector(barCodeDetector);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
 
     public void captureImage(final CameraKitEventCallback<CameraKitImage> callback) {
         mCameraImpl.captureImage(new CameraImpl.ImageCapturedCallback() {

@@ -14,6 +14,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.android.gms.vision.Detector;
+import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.text.TextBlock;
 
 import java.io.ByteArrayOutputStream;
@@ -75,6 +76,7 @@ public class Camera1 extends CameraImpl {
     private int mVideoQuality;
 
     private Detector<TextBlock> mTextDetector;
+    private Detector<Barcode> mBarCodeDetector;
 
     private int mVideoBitRate;
 
@@ -89,6 +91,7 @@ public class Camera1 extends CameraImpl {
     private VideoCapturedCallback mVideoCallback;
 
     private final Object mCameraLock = new Object();
+
 
     Camera1(EventDispatcher eventDispatcher, PreviewImpl preview) {
         super(eventDispatcher, preview);
@@ -145,10 +148,12 @@ public class Camera1 extends CameraImpl {
         releaseMediaRecorder();
         releaseCamera();
         if (mFrameProcessor != null) {
+            //This method breaks the entire program. LOL I spent so much time looking for this
             mFrameProcessor.cleanup();
         }
     }
 
+    //TODO: This gets called three times at a time!
     void setDisplayAndDeviceOrientation() {
         setDisplayAndDeviceOrientation(this.mDisplayOrientation, this.mDeviceOrientation);
     }
@@ -268,6 +273,9 @@ public class Camera1 extends CameraImpl {
     void setTextDetector(Detector<TextBlock> detector) {
         this.mTextDetector = detector;
     }
+
+    @Override
+    void setBarCodeDetector(Detector<Barcode> detector) {this.mBarCodeDetector = detector;}
 
     @Override
     void setVideoQuality(int videoQuality) {
@@ -685,6 +693,10 @@ public class Camera1 extends CameraImpl {
 
             if (mTextDetector != null) {
                 mFrameProcessor = new FrameProcessingRunnable(mTextDetector, mPreviewSize, mCamera);
+                mFrameProcessor.start();
+            }
+            if (mBarCodeDetector != null) {
+                mFrameProcessor = new FrameProcessingRunnable(mBarCodeDetector, mPreviewSize, mCamera);
                 mFrameProcessor.start();
             }
         }

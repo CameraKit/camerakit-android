@@ -26,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wonderkiln.camerakit.CameraKit;
+import com.wonderkiln.camerakit.CameraKitBarCodeDetect;
 import com.wonderkiln.camerakit.CameraKitEventCallback;
 import com.wonderkiln.camerakit.CameraKitTextDetect;
 import com.wonderkiln.camerakit.CameraView;
@@ -65,6 +66,18 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+
+        try {
+            camera.setBarCodeDetectionListener(CameraKit.Constants.BARCODE_QR, new CameraKitEventCallback<CameraKitBarCodeDetect>() {
+                @Override
+                public void callback(CameraKitBarCodeDetect event) {
+                    Log.i(TAG,"Detected something!");
+                }
+            });
+        } catch (GooglePlayServicesUnavailableException e) {
+            e.printStackTrace();
+        }
 
         setupDrawerAndToolbar();
 

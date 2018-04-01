@@ -1,5 +1,6 @@
 package com.wonderkiln.camerakit;
 
+import android.annotation.SuppressLint;
 import android.graphics.ImageFormat;
 import android.hardware.Camera;
 import android.util.Log;
@@ -50,8 +51,10 @@ public class FrameProcessingRunnable implements Runnable {
     private Size mPreviewSize;
     private Camera mCamera;
 
+    @SuppressLint("Assert")
     public FrameProcessingRunnable(Detector<?> detector, Size mPreviewSize, Camera mCamera) {
         mDetector = detector;
+        assert mDetector.isOperational();
         this.mPreviewSize = mPreviewSize;
         this.mCamera = mCamera;
 
@@ -93,8 +96,10 @@ public class FrameProcessingRunnable implements Runnable {
                     try {
                         // Wait for the next frame to be received from the camera, since we
                         // don't have it yet.
+                        Log.i(TAG,"Waiting on frame!");
                         mLock.wait();
                     } catch (InterruptedException e) {
+                        Log.i(TAG,"Interrupted " + e.getLocalizedMessage());
                         return;
                     }
                 }
@@ -113,6 +118,7 @@ public class FrameProcessingRunnable implements Runnable {
                     continue;
                 }
 
+                //Build the frame.
                 outputFrame = new Frame.Builder()
                         .setImageData(mPendingFrameData, mPreviewSize.getWidth(),
                                 mPreviewSize.getHeight(), android.graphics.ImageFormat.NV21)
@@ -128,7 +134,7 @@ public class FrameProcessingRunnable implements Runnable {
                 mPendingFrameData = null;
             }
 
-            // The code below needs to run outside of synchronization, because this will allow
+
             // The code below needs to run outside of synchronization, because this will allow
             // the camera to add pending frame(s) while we are running detection on the current
             // frame.
@@ -150,7 +156,7 @@ public class FrameProcessingRunnable implements Runnable {
                 // Wait for the thread to complete to ensure that we can't have multiple threads
                 // executing at the same time (i.e., which would happen if we called start too
                 // quickly after stop).
-                mProcessingThread.join();
+                mProcessingThread.join(1000);
             } catch (InterruptedException e) {
                 Log.d(TAG, "Frame processing thread interrupted on release.");
             }
@@ -162,9 +168,11 @@ public class FrameProcessingRunnable implements Runnable {
     }
 
     public void start() {
-        mProcessingThread = new Thread(this);
-        setActive(true);
-        mProcessingThread.start();
+
+        mCamera.addCallbackBuffer(createPreviewBuffer(mPreviewSize));
+        mCamera.addCallbackBuffer(createPreviewBuffer(mPreviewSize));
+        mCamera.addCallbackBuffer(createPreviewBuffer(mPreviewSize));
+        mCamera.addCallbackBuffer(createPreviewBuffer(mPreviewSize));
 
         mCamera.setPreviewCallbackWithBuffer(new Camera.PreviewCallback() {
             @Override
@@ -172,10 +180,14 @@ public class FrameProcessingRunnable implements Runnable {
                 setNextFrame(bytes, camera);
             }
         });
-        mCamera.addCallbackBuffer(createPreviewBuffer(mPreviewSize));
-        mCamera.addCallbackBuffer(createPreviewBuffer(mPreviewSize));
-        mCamera.addCallbackBuffer(createPreviewBuffer(mPreviewSize));
-        mCamera.addCallbackBuffer(createPreviewBuffer(mPreviewSize));
+
+        mProcessingThread = new Thread(this);
+        setActive(true);
+        mProcessingThread.start();
+
+
+
+
     }
 
     /**
