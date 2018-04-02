@@ -34,9 +34,12 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:27.0.2'
-    compile 'com.android.support:exifinterface:27.0.2'
-    implementation 'com.google.android.gms:play-services-vision:11.6.2'
+    //noinspection GradleCompatible
+    compile 'com.android.support:appcompat-v7:27.1.0'
+    compile 'com.android.support:exifinterface:27.1.0'
+    testCompile 'org.mockito:mockito-core:2.17.0'
+    testCompile 'junit:junit:4.12'
+    implementation 'com.google.android.gms:play-services-vision:12.0.0'
 }
 
 group = 'com.wonderkiln'

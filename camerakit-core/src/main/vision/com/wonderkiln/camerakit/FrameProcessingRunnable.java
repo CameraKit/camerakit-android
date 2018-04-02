@@ -150,20 +150,25 @@ public class FrameProcessingRunnable implements Runnable {
     }
 
     public void cleanup() {
-        // stop text dectection thread
+        // stop detectioncycle
+
+        //Leave this here, BEFORE we join. Else the loop never terminates!
+        setActive(false);
+
+
         if (mProcessingThread != null) {
             try {
                 // Wait for the thread to complete to ensure that we can't have multiple threads
                 // executing at the same time (i.e., which would happen if we called start too
                 // quickly after stop).
-                mProcessingThread.join(1000);
+                mProcessingThread.join();
             } catch (InterruptedException e) {
                 Log.d(TAG, "Frame processing thread interrupted on release.");
             }
             mProcessingThread = null;
         }
 
-        setActive(false);
+
         mBytesToByteBuffer.clear();
     }
 
