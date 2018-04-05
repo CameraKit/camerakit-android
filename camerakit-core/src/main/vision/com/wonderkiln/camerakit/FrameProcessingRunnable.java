@@ -68,7 +68,12 @@ public class FrameProcessingRunnable implements Runnable {
     @android.annotation.SuppressLint("Assert")
     public void release() {
         assert (mProcessingThread.getState() == Thread.State.TERMINATED);
-        mDetector.release();
+
+        /*  This call has been removed as this releases the underlying processor as well, breaking the detector
+         *  mDetector.release();
+         *  this should only be called once the program is finished, or provide an option to not release every-time
+         *  The only other way around this would be to also pass a copy of the processor to the FPR constructor, so that it can reattach it!
+        */
     }
 
     /**
