@@ -2,11 +2,6 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
     defaultConfig {
         applicationId 'com.camerakit.app'
         minSdkVersion 16
@@ -14,6 +9,7 @@ android {
         versionName '1.0.0'
         versionCode 1
     }
+    buildToolsVersion '27.0.3'
 }
 
 dependencies {

@@ -51,8 +51,11 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         facingButton.setOnClickListener(facingOnClickListener);
 
         permissionsButton = findViewById(R.id.permissionsButton);
-        permissionsButton.setOnClickListener((v) -> {
-            cameraView.requestPermissions(this);
+        permissionsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cameraView.requestPermissions(MainActivity.this);
+            }
         });
 
         imageView = findViewById(R.id.imageView);
@@ -66,6 +69,13 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
             @Override
             public void onPermissionsFailure() {
                 permissionsButton.setVisibility(View.VISIBLE);
+            }
+        });
+
+        cameraView.captureImage(new CameraKitView.ImageCallback() {
+            @Override
+            public void onImage(CameraKitView view, byte[] jpeg) {
+
             }
         });
     }
@@ -107,28 +117,40 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         return false;
     }
 
-    private View.OnClickListener photoOnClickListener = v -> {
-        cameraView.captureImage(((view, photo) -> {
-            runOnUiThread(new Runnable() {
+    private View.OnClickListener photoOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            cameraView.captureImage(new CameraKitView.ImageCallback() {
                 @Override
-                public void run() {
-                    Jpeg jpeg = new Jpeg(photo);
-                    imageView.setJpeg(jpeg);
+                public void onImage(CameraKitView vew, final byte[] photo) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Jpeg jpeg = new Jpeg(photo);
+                            imageView.setJpeg(jpeg);
+                        }
+                    });
                 }
             });
-        }));
-    };
-
-    private View.OnClickListener flashOnClickListener = v -> {
-        if (cameraView.getFlash() == CameraKitView.FLASH_OFF) {
-            cameraView.setFlash(CameraKitView.FLASH_ON);
-        } else {
-            cameraView.setFlash(CameraKitView.FLASH_OFF);
         }
     };
 
-    private View.OnClickListener facingOnClickListener = v -> {
-        cameraView.toggleFacing();
+    private View.OnClickListener flashOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (cameraView.getFlash() == CameraKitView.FLASH_OFF) {
+                cameraView.setFlash(CameraKitView.FLASH_ON);
+            } else {
+                cameraView.setFlash(CameraKitView.FLASH_OFF);
+            }
+        }
+    };
+
+    private View.OnClickListener facingOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            cameraView.toggleFacing();
+        }
     };
 
 }
