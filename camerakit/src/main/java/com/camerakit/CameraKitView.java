@@ -26,6 +26,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.OrientationEventListener;
 import android.view.Surface;
 import android.view.SurfaceHolder;
@@ -987,7 +988,6 @@ public class CameraKitView extends GestureLayout {
         }
 
         public void reconfigure() {
-
         }
 
         @Nullable
@@ -1044,6 +1044,8 @@ public class CameraKitView extends GestureLayout {
         }
 
         public void captureImage(final JpegCallback callback) {
+            mApi.setFlash(mFlash);
+
             mApi.captureImage(new CameraApi.ImageCallback() {
                 @Override
                 public void onImage(byte[] data) {
@@ -1471,6 +1473,8 @@ public class CameraKitView extends GestureLayout {
 
         private CameraCaptureSession mCaptureSession;
 
+        private CaptureRequest.Builder mPreviewRequestBuilder;
+
         public Camera2(Context context) {
             this(context, CameraKit.FACING_BACK);
         }
@@ -1556,6 +1560,9 @@ public class CameraKitView extends GestureLayout {
         public CameraApi getApi() {
             return new CameraApi() {
 
+                String mCameraId = null;
+                boolean mFlashing = false;
+
                 @Override
                 public Attributes getAttributes() {
                     if (mCameraCharacteristics == null) {
@@ -1606,7 +1613,7 @@ public class CameraKitView extends GestureLayout {
                                 return;
                             }
 
-                            for (String cameraId : cameraIdList) {
+                            for (final String cameraId : cameraIdList) {
                                 try {
                                     CameraCharacteristics characteristics = mCameraManager.getCameraCharacteristics(cameraId);
                                     Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
@@ -1628,6 +1635,7 @@ public class CameraKitView extends GestureLayout {
                                             background(new Runnable() {
                                                 @Override
                                                 public void run() {
+                                                    mCameraId = cameraId;
                                                     mCameraDevice = camera;
                                                     dispatchEvent(EVENT_CAMERA_OPENED);
                                                 }
@@ -1641,6 +1649,7 @@ public class CameraKitView extends GestureLayout {
                                                 public void run() {
                                                     camera.close();
                                                     mCameraDevice = null;
+                                                    mCameraId = null;
 
                                                     dispatchEvent(EVENT_CAMERA_CLOSED);
                                                 }
@@ -1695,8 +1704,8 @@ public class CameraKitView extends GestureLayout {
                             Surface surface = new Surface(surfaceTexture);
 
                             try {
-                                final CaptureRequest.Builder previewRequestBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-                                previewRequestBuilder.addTarget(surface);
+                                mPreviewRequestBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+                                mPreviewRequestBuilder.addTarget(surface);
 
                                 mCameraDevice.createCaptureSession(Arrays.asList(surface), new CameraCaptureSession.StateCallback() {
                                     @Override
@@ -1705,9 +1714,9 @@ public class CameraKitView extends GestureLayout {
                                             @Override
                                             public void run() {
                                                 mCaptureSession = session;
-                                                CaptureRequest previewRequest = previewRequestBuilder.build();
+                                                CaptureRequest previewRequest = mPreviewRequestBuilder.build();
                                                 try {
-                                                    previewRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
+                                                    mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
                                                     session.setRepeatingRequest(previewRequest, null, null);
 
                                                     dispatchEvent(EVENT_PREVIEW_STARTED);
@@ -1772,6 +1781,25 @@ public class CameraKitView extends GestureLayout {
 
                 @Override
                 public void captureImage(final ImageCallback callback) {
+                    Log.v("WonderKiln", "flashing: " + mFlashing + "  flash: " + mFlash);
+                    if (mFlash == CameraKit.FLASH_ON && !mFlashing) {
+                        try {
+                            mPreviewRequestBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_TORCH);
+                            mCaptureSession.setRepeatingRequest(mPreviewRequestBuilder.build(), null, null);
+                            mFlashing = true;
+
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    captureImage(callback);
+                                }
+                            }, 1000);
+                            return;
+                        } catch (Exception e) {
+                            Log.v("WonderKiln, ", e.toString());
+                        }
+                    }
+
                     background(new Runnable() {
                         @Override
                         public void run() {
@@ -1782,6 +1810,15 @@ public class CameraKitView extends GestureLayout {
                             byte[] byteArray = stream.toByteArray();
 
                             callback.onImage(byteArray);
+
+                            if (mFlashing) {
+                                try {
+                                    mPreviewRequestBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_OFF);
+                                    mCaptureSession.setRepeatingRequest(mPreviewRequestBuilder.build(), null, null);
+                                    mFlashing = false;
+                                } catch (Exception e) {
+                                }
+                            }
                         }
                     });
                 }
