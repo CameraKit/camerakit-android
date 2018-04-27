@@ -102,6 +102,40 @@ public class CameraKitView extends GestureLayout {
     /**
      *
      */
+    public interface CameraListener {
+
+        /**
+         *
+         */
+        void onOpened();
+
+        /**
+         *
+         */
+        void onClosed();
+
+    }
+
+    /**
+     *
+     */
+    public interface PreviewListener {
+
+        /**
+         *
+         */
+        void onStart();
+
+        /**
+         *
+         */
+        void onStop();
+
+    }
+
+    /**
+     *
+     */
     public interface ErrorListener {
 
         /**
@@ -207,6 +241,8 @@ public class CameraKitView extends GestureLayout {
     private float mImageMegaPixels;
     private int mImageJpegQuality;
     private GestureListener mGestureListener;
+    private CameraListener mCameraListener;
+    private PreviewListener mPreviewListener;
     private ErrorListener mErrorListener;
 
     private PermissionsListener mPermissionsListener;
@@ -606,7 +642,7 @@ public class CameraKitView extends GestureLayout {
     }
 
     /**
-     * @return one of {@link com.camerakit.CameraKit.Flash}'s constants.
+     * @return one of {@link CameraKit.Flash}'s constants.
      * @see #setFlash(int)
      */
     @CameraKit.Flash
@@ -770,6 +806,38 @@ public class CameraKitView extends GestureLayout {
         public void onPinch(CameraKitView view, float ds, float dsx, float dsy) {
         }
 
+    }
+
+    /**
+     *
+     * @param cameraListener
+     */
+    public void setCameraListener(CameraListener cameraListener) {
+        mCameraListener = cameraListener;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public CameraListener getCameraListener() {
+        return mCameraListener;
+    }
+
+    /**
+     *
+     * @param previewListener
+     */
+    public void setPreviewListener(PreviewListener previewListener) {
+        mPreviewListener = previewListener;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public PreviewListener getPreviewListener() {
+        return mPreviewListener;
     }
 
     /**
@@ -1009,11 +1077,20 @@ public class CameraKitView extends GestureLayout {
                     switch (event) {
                         case EVENT_CAMERA_OPENED: {
                             mAttributes = mApi.getAttributes();
+
+                            if (mCameraListener != null) {
+                                mCameraListener.onOpened();
+                            }
+
                             mApi.startPreview();
                             break;
                         }
 
                         case EVENT_CAMERA_CLOSED: {
+                            if (mCameraListener != null) {
+                                mCameraListener.onClosed();
+                            }
+
                             break;
                         }
 
@@ -1046,10 +1123,17 @@ public class CameraKitView extends GestureLayout {
                         case EVENT_PREVIEW_STARTED: {
                             mApi.setDisplayRotation(mDisplayRotation);
                             requestLayout();
+
+                            if (mPreviewListener != null) {
+                                mPreviewListener.onStart();
+                            }
                             break;
                         }
 
                         case EVENT_PREVIEW_STOPPED: {
+                            if (mPreviewListener != null) {
+                                mPreviewListener.onStop();
+                            }
                             break;
                         }
 
@@ -1592,6 +1676,8 @@ public class CameraKitView extends GestureLayout {
                                 mCameraDevice.close();
                                 mCameraDevice = null;
                             }
+
+                            dispatchEvent(EVENT_CAMERA_CLOSED);
                         }
                     });
                 }
