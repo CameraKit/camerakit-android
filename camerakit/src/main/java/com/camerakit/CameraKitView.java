@@ -67,441 +67,6 @@ public class CameraKitView extends GestureLayout {
     private static final int PERMISSION_REQUEST_CODE = 99107;
 
     /**
-     * The device points away from the screen.
-     * <p>
-     * Related low-level constants:
-     * Camera1: {@link android.hardware.Camera.CameraInfo#CAMERA_FACING_BACK}
-     * Camera2: {@link android.hardware.camera2.CameraCharacteristics#LENS_FACING_BACK}
-     *
-     * @see #setFacing(int)
-     * @see #getFacing()
-     */
-    public static final int FACING_BACK = 0;
-
-    /**
-     * The device points in the same direction as the screen.
-     * <p>
-     * Related low-level constants:
-     * Camera1: {@link android.hardware.Camera.CameraInfo#CAMERA_FACING_FRONT}
-     * Camera2: {@link android.hardware.camera2.CameraCharacteristics#LENS_FACING_FRONT}
-     *
-     * @see #setFacing(int)
-     * @see #getFacing()
-     */
-    public static final int FACING_FRONT = 1;
-
-    /**
-     * Describes the orientation of the camera lens relative to the screen.
-     */
-    @RestrictTo(Scope.LIBRARY_GROUP)
-    @Retention(RetentionPolicy.SOURCE)
-    @IntDef({FACING_BACK, FACING_FRONT})
-    @interface Facing {}
-
-    /**
-     * Flash will never activate.
-     * <p>
-     * Related low-level constants:
-     * Camera1: {@link android.hardware.Camera.Parameters#FLASH_MODE_OFF}
-     * Camera2: {@link android.hardware.camera2.CameraCharacteristics#FLASH_MODE_OFF}
-     *
-     * @see #setFlash(int)
-     * @see #getFlash()
-     */
-    public static final int FLASH_OFF = 0;
-
-    /**
-     * Flash will activate during a image capture's shutter.
-     * <p>
-     * Related low-level constants:
-     * Camera1: {@link android.hardware.Camera.Parameters#FLASH_MODE_ON}
-     * Camera2: {@link android.hardware.camera2.CameraCharacteristics#FLASH_MODE_SINGLE}
-     *
-     * @see #setFlash(int)
-     * @see #getFlash()
-     */
-    public static final int FLASH_ON = 1;
-
-    /**
-     * Flash will activate during a image capture's shutter, if needed.
-     * <p>
-     * Related low-level constants:
-     * Camera1: {@link android.hardware.Camera.Parameters#FLASH_MODE_AUTO}
-     * Camera2: {@link android.hardware.camera2.CaptureRequest#CONTROL_AE_MODE_ON_AUTO_FLASH}
-     *
-     * @see #setFlash(int)
-     * @see #getFlash()
-     */
-    public static final int FLASH_AUTO = 2;
-
-
-    /**
-     * Flash is constantly activated when the preview is showing.
-     * <p>
-     * Related low-level constants:
-     * Camera1: {@link android.hardware.Camera.Parameters#FLASH_MODE_TORCH}
-     * Camera2: {@link android.hardware.camera2.CameraCharacteristics#FLASH_MODE_TORCH}
-     *
-     * @see #setFlash(int)
-     * @see #getFlash()
-     */
-    public static final int FLASH_TORCH = 3;
-
-    /**
-     * Describes how the camera's flash should behave.
-     * <p>
-     * Use declared constants with {@link #setFlash(int)}.
-     */
-    @RestrictTo(Scope.LIBRARY_GROUP)
-    @Retention(RetentionPolicy.SOURCE)
-    @IntDef({FLASH_OFF, FLASH_ON, FLASH_AUTO, FLASH_TORCH})
-    @interface Flash {}
-
-    /**
-     * <p>
-     * Related low-level constants:
-     * Camera1: {@link android.hardware.Camera.Parameters#FOCUS_MODE_FIXED}
-     * Camera2: {@link android.hardware.camera2.CaptureRequest#CONTROL_AF_MODE_OFF}
-     *
-     * @see #setFocus(int)
-     * @see #getFocus()
-     */
-    public static final int FOCUS_OFF = 0;
-
-    /**
-     * <p>
-     * Related low-level constants:
-     * Camera1: {@link android.hardware.Camera.Parameters#FOCUS_MODE_AUTO}
-     * Camera2: {@link android.hardware.camera2.CaptureRequest#CONTROL_AF_MODE_AUTO}
-     *
-     * @see #setFocus(int)
-     * @see #getFocus()
-     */
-    public static final int FOCUS_AUTO = 1;
-
-    /**
-     * <p>
-     * Related low-level constants:
-     * Camera1: {@link android.hardware.Camera.Parameters#FOCUS_MODE_CONTINUOUS_PICTURE}
-     * Camera2: {@link android.hardware.camera2.CaptureRequest#CONTROL_AF_MODE_CONTINUOUS_PICTURE}
-     *
-     * @see #setFocus(int)
-     * @see #getFocus()
-     */
-    public static final int FOCUS_CONTINUOUS = 2;
-
-    /**
-     * Describes the constant in-the-background focus strategy for when autoFocus isn't manually
-     * triggered.
-     */
-    @RestrictTo(Scope.LIBRARY_GROUP)
-    @Retention(RetentionPolicy.SOURCE)
-    @IntDef({FOCUS_OFF, FOCUS_AUTO, FOCUS_CONTINUOUS})
-    @interface Focus {}
-
-    /**
-     * <p>
-     * Related low-level constants:
-     * Camera1: {@link android.hardware.Camera.Parameters#SCENE_MODE_BARCODE}
-     * Camera2: {@link android.hardware.camera2.CameraMetadata#CONTROL_SCENE_MODE_BARCODE}
-     *
-     * @see #setSensorPreset(int)
-     * @see #getSensorPreset()
-     */
-    public static final int SENSOR_PRESET_NONE = 0;
-
-    /**
-     * <p>
-     * Related low-level constants:
-     * Camera1: {@link android.hardware.Camera.Parameters#SCENE_MODE_BARCODE}
-     * Camera2: {@link android.hardware.camera2.CameraMetadata#CONTROL_SCENE_MODE_BARCODE}
-     *
-     * @see #setSensorPreset(int)
-     * @see #getSensorPreset()
-     */
-    public static final int SENSOR_PRESET_ACTION = 1;
-
-    /**
-     * <p>
-     * Related low-level constants:
-     * Camera1: {@link android.hardware.Camera.Parameters#SCENE_MODE_BARCODE}
-     * Camera2: {@link android.hardware.camera2.CameraMetadata#CONTROL_SCENE_MODE_BARCODE}
-     *
-     * @see #setSensorPreset(int)
-     * @see #getSensorPreset()
-     */
-    public static final int SENSOR_PRESET_PORTRAIT = 2;
-
-    /**
-     * <p>
-     * Related low-level constants:
-     * Camera1: {@link android.hardware.Camera.Parameters#SCENE_MODE_LANDSCAPE}
-     * Camera2: {@link android.hardware.camera2.CameraMetadata#CONTROL_SCENE_MODE_LANDSCAPE}
-     *
-     * @see #setSensorPreset(int)
-     * @see #getSensorPreset()
-     */
-    public static final int SENSOR_PRESET_LANDSCAPE = 3;
-
-    /**
-     * <p>
-     * Related low-level constants:
-     * Camera1: {@link android.hardware.Camera.Parameters#SCENE_MODE_NIGHT}
-     * Camera2: {@link android.hardware.camera2.CameraMetadata#CONTROL_SCENE_MODE_NIGHT}
-     *
-     * @see #setSensorPreset(int)
-     * @see #getSensorPreset()
-     */
-    public static final int SENSOR_PRESET_NIGHT = 4;
-
-    /**
-     * <p>
-     * Related low-level constants:
-     * Camera1: {@link android.hardware.Camera.Parameters#SCENE_MODE_NIGHT_PORTRAIT}
-     * Camera2: {@link android.hardware.camera2.CameraMetadata#CONTROL_SCENE_MODE_NIGHT_PORTRAIT}
-     *
-     * @see #setSensorPreset(int)
-     * @see #getSensorPreset()
-     */
-    public static final int SENSOR_PRESET_NIGHT_PORTRAIT = 5;
-
-    /**
-     * <p>
-     * Related low-level constants:
-     * Camera1: {@link android.hardware.Camera.Parameters#SCENE_MODE_THEATRE}
-     * Camera2: {@link android.hardware.camera2.CameraMetadata#CONTROL_SCENE_MODE_THEATRE}
-     *
-     * @see #setSensorPreset(int)
-     * @see #getSensorPreset()
-     */
-    public static final int SENSOR_PRESET_THEATRE = 6;
-
-    /**
-     * <p>
-     * Related low-level constants:
-     * Camera1: {@link android.hardware.Camera.Parameters#SCENE_MODE_BEACH}
-     * Camera2: {@link android.hardware.camera2.CameraMetadata#CONTROL_SCENE_MODE_BEACH}
-     *
-     * @see #setSensorPreset(int)
-     * @see #getSensorPreset()
-     */
-    public static final int SENSOR_PRESET_BEACH = 7;
-
-    /**
-     * <p>
-     * Related low-level constants:
-     * Camera1: {@link android.hardware.Camera.Parameters#SCENE_MODE_SNOW}
-     * Camera2: {@link android.hardware.camera2.CameraMetadata#CONTROL_SCENE_MODE_SNOW}
-     *
-     * @see #setSensorPreset(int)
-     * @see #getSensorPreset()
-     */
-    public static final int SENSOR_PRESET_SNOW = 8;
-
-    /**
-     * <p>
-     * Related low-level constants:
-     * Camera1: {@link android.hardware.Camera.Parameters#SCENE_MODE_SUNSET}
-     * Camera2: {@link android.hardware.camera2.CameraMetadata#CONTROL_SCENE_MODE_SUNSET}
-     *
-     * @see #setSensorPreset(int)
-     * @see #getSensorPreset()
-     */
-    public static final int SENSOR_PRESET_SUNSET = 9;
-
-    /**
-     * <p>
-     * Related low-level constants:
-     * Camera1: {@link android.hardware.Camera.Parameters#SCENE_MODE_STEADYPHOTO}
-     * Camera2: {@link android.hardware.camera2.CameraMetadata#CONTROL_SCENE_MODE_STEADYPHOTO}
-     *
-     * @see #setSensorPreset(int)
-     * @see #getSensorPreset()
-     */
-    public static final int SENSOR_PRESET_STEADYPHOTO = 10;
-
-    /**
-     * <p>
-     * Related low-level constants:
-     * Camera1: {@link android.hardware.Camera.Parameters#SCENE_MODE_FIREWORKS}
-     * Camera2: {@link android.hardware.camera2.CameraMetadata#CONTROL_SCENE_MODE_FIREWORKS}
-     *
-     * @see #setSensorPreset(int)
-     * @see #getSensorPreset()
-     */
-    public static final int SENSOR_PRESET_FIREWORKS = 11;
-
-    /**
-     * <p>
-     * Related low-level constants:
-     * Camera1: {@link android.hardware.Camera.Parameters#SCENE_MODE_SPORTS}
-     * Camera2: {@link android.hardware.camera2.CameraMetadata#CONTROL_SCENE_MODE_SPORTS}
-     *
-     * @see #setSensorPreset(int)
-     * @see #getSensorPreset()
-     */
-    public static final int SENSOR_PRESET_SPORTS = 12;
-
-    /**
-     * <p>
-     * Related low-level constants:
-     * Camera1: {@link android.hardware.Camera.Parameters#SCENE_MODE_PARTY}
-     * Camera2: {@link android.hardware.camera2.CameraMetadata#CONTROL_SCENE_MODE_PARTY}
-     *
-     * @see #setSensorPreset(int)
-     * @see #getSensorPreset()
-     */
-    public static final int SENSOR_PRESET_PARTY = 13;
-
-    /**
-     * <p>
-     * Related low-level constants:
-     * Camera1: {@link android.hardware.Camera.Parameters#SCENE_MODE_CANDLELIGHT}
-     * Camera2: {@link android.hardware.camera2.CameraMetadata#CONTROL_SCENE_MODE_CANDLELIGHT}
-     *
-     * @see #setSensorPreset(int)
-     * @see #getSensorPreset()
-     */
-    public static final int SENSOR_PRESET_CANDLELIGHT = 14;
-
-    /**
-     * <p>
-     * Related low-level constants:
-     * Camera1: {@link android.hardware.Camera.Parameters#SCENE_MODE_BARCODE}
-     * Camera2: {@link android.hardware.camera2.CameraMetadata#CONTROL_SCENE_MODE_BARCODE}
-     *
-     * @see #setSensorPreset(int)
-     * @see #getSensorPreset()
-     */
-    public static final int SENSOR_PRESET_BARCODE = 15;
-
-    /**
-     * Describes the constant in-the-background focus strategy for when autoFocus isn't manually
-     * triggered.
-     * <p>
-     * Use declared constants with {@link #setSensorPreset(int)}.
-     */
-    @RestrictTo(Scope.LIBRARY_GROUP)
-    @Retention(RetentionPolicy.SOURCE)
-    @IntDef({SENSOR_PRESET_NONE, SENSOR_PRESET_ACTION, SENSOR_PRESET_PORTRAIT,
-            SENSOR_PRESET_LANDSCAPE, SENSOR_PRESET_NIGHT, SENSOR_PRESET_NIGHT_PORTRAIT,
-            SENSOR_PRESET_THEATRE, SENSOR_PRESET_BEACH, SENSOR_PRESET_SNOW, SENSOR_PRESET_SUNSET,
-            SENSOR_PRESET_STEADYPHOTO, SENSOR_PRESET_FIREWORKS, SENSOR_PRESET_SPORTS,
-            SENSOR_PRESET_PARTY, SENSOR_PRESET_CANDLELIGHT, SENSOR_PRESET_BARCODE})
-    @interface SensorPreset {}
-
-    /**
-     * No effect will be applied to the preview.
-     * <p>
-     * Related low-level constants:
-     * Camera1: {@link android.hardware.Camera.Parameters#EFFECT_NONE}
-     * Camera2: {@link android.hardware.camera2.CameraMetadata#CONTROL_EFFECT_MODE_OFF}
-     *
-     * @see #setPreviewEffect(int)
-     * @see #getPreviewEffect()
-     */
-    public static final int PREVIEW_EFFECT_NONE = 0;
-
-    /**
-     * <p>
-     * Related low-level constants:
-     * Camera1: {@link android.hardware.Camera.Parameters#EFFECT_MONO}
-     * Camera2: {@link android.hardware.camera2.CameraMetadata#CONTROL_EFFECT_MODE_MONO}
-     *
-     * @see #setPreviewEffect(int)
-     * @see #getPreviewEffect()
-     */
-    public static final int PREVIEW_EFFECT_MONO = 1;
-
-    /**
-     * <p>
-     * Related low-level constants:
-     * Camera1: {@link android.hardware.Camera.Parameters#EFFECT_NEGATIVE}
-     * Camera2: {@link android.hardware.camera2.CameraMetadata#CONTROL_EFFECT_MODE_NEGATIVE}
-     *
-     * @see #setPreviewEffect(int)
-     * @see #getPreviewEffect()
-     */
-    public static final int PREVIEW_EFFECT_NEGATIVE = 2;
-
-    /**
-     * <p>
-     * Related low-level constants:
-     * Camera1: {@link android.hardware.Camera.Parameters#EFFECT_SOLARIZE}
-     * Camera2: {@link android.hardware.camera2.CameraMetadata#CONTROL_EFFECT_MODE_SOLARIZE}
-     *
-     * @see #setPreviewEffect(int)
-     * @see #getPreviewEffect()
-     */
-    public static final int PREVIEW_EFFECT_SOLARIZE = 3;
-
-    /**
-     * <p>
-     * Related low-level constants:
-     * Camera1: {@link android.hardware.Camera.Parameters#EFFECT_SEPIA}
-     * Camera2: {@link android.hardware.camera2.CameraMetadata#CONTROL_EFFECT_MODE_SEPIA}
-     *
-     * @see #setPreviewEffect(int)
-     * @see #getPreviewEffect()
-     */
-    public static final int PREVIEW_EFFECT_SEPIA = 4;
-
-    /**
-     * <p>
-     * Related low-level constants:
-     * Camera1: {@link android.hardware.Camera.Parameters#EFFECT_POSTERIZE}
-     * Camera2: {@link android.hardware.camera2.CameraMetadata#CONTROL_EFFECT_MODE_POSTERIZE}
-     *
-     * @see #setPreviewEffect(int)
-     * @see #getPreviewEffect()
-     */
-    public static final int PREVIEW_EFFECT_POSTERIZE = 5;
-
-    /**
-     * <p>
-     * Related low-level constants:
-     * Camera1: {@link android.hardware.Camera.Parameters#EFFECT_WHITEBOARD}
-     * Camera2: {@link android.hardware.camera2.CameraMetadata#CONTROL_EFFECT_MODE_WHITEBOARD}
-     *
-     * @see #setPreviewEffect(int)
-     * @see #getPreviewEffect()
-     */
-    public static final int PREVIEW_EFFECT_WHITEBOARD = 6;
-
-    /**
-     * <p>
-     * Related low-level constants:
-     * Camera1: {@link android.hardware.Camera.Parameters#EFFECT_BLACKBOARD}
-     * Camera2: {@link android.hardware.camera2.CameraMetadata#CONTROL_EFFECT_MODE_BLACKBOARD}
-     *
-     * @see #setPreviewEffect(int)
-     * @see #getPreviewEffect()
-     */
-    public static final int PREVIEW_EFFECT_BLACKBOARD = 7;
-
-    /**
-     * <p>
-     * Related low-level constants:
-     * Camera1: {@link android.hardware.Camera.Parameters#EFFECT_AQUA}
-     * Camera2: {@link android.hardware.camera2.CameraMetadata#CONTROL_EFFECT_MODE_AQUA}
-     *
-     * @see #setPreviewEffect(int)
-     * @see #getPreviewEffect()
-     */
-    public static final int PREVIEW_EFFECT_AQUA = 8;
-
-    /**
-     * Describes the constant in-the-background focus strategy for when auto focus isn't manually
-     * triggered.
-     */
-    @RestrictTo(Scope.LIBRARY_GROUP)
-    @Retention(RetentionPolicy.SOURCE)
-    @IntDef({PREVIEW_EFFECT_NONE, PREVIEW_EFFECT_MONO, PREVIEW_EFFECT_NEGATIVE,
-            PREVIEW_EFFECT_SOLARIZE, PREVIEW_EFFECT_SEPIA, PREVIEW_EFFECT_POSTERIZE,
-            PREVIEW_EFFECT_WHITEBOARD, PREVIEW_EFFECT_BLACKBOARD, PREVIEW_EFFECT_AQUA})
-    @interface PreviewEffect {}
-
-    /**
      * Flag for handling requesting the {@link android.Manifest.permission#CAMERA}
      * permission.
      */
@@ -668,9 +233,9 @@ public class CameraKitView extends GestureLayout {
 
         mAdjustViewBounds = a.getBoolean(R.styleable.CameraKitView_android_adjustViewBounds, false);
         mAspectRatio = a.getFloat(R.styleable.CameraKitView_camera_aspectRatio, -1f);
-        mFacing = a.getInteger(R.styleable.CameraKitView_camera_facing, FACING_BACK);
-        mFlash = a.getInteger(R.styleable.CameraKitView_camera_flash, FLASH_OFF);
-        mFocus = a.getInteger(R.styleable.CameraKitView_camera_focus, FOCUS_AUTO);
+        mFacing = a.getInteger(R.styleable.CameraKitView_camera_facing, CameraKit.FACING_BACK);
+        mFlash = a.getInteger(R.styleable.CameraKitView_camera_flash, CameraKit.FLASH_OFF);
+        mFocus = a.getInteger(R.styleable.CameraKitView_camera_focus, CameraKit.FOCUS_AUTO);
         mZoomFactor = a.getFloat(R.styleable.CameraKitView_camera_zoomFactor, 1.0f);
         mPermissions = a.getInteger(R.styleable.CameraKitView_camera_permissions, PERMISSION_CAMERA);
         mImageMegaPixels = a.getFloat(R.styleable.CameraKitView_camera_imageMegaPixels, 2f);
@@ -833,14 +398,14 @@ public class CameraKitView extends GestureLayout {
     /**
      *
      */
-    public void startRecording() {
+    public void startVideo() {
 
     }
 
     /**
      *
      */
-    public void stopRecording() {
+    public void stopVideo() {
 
     }
 
@@ -991,11 +556,12 @@ public class CameraKitView extends GestureLayout {
     }
 
     /**
-     * @param facing one of {@link Facing}'s constants.
-     * @see #FACING_BACK
-     * @see #FACING_FRONT
+     * @param facing one of {@link CameraKit.Facing}'s constants.
+     * @see CameraKit#FACING_BACK
+     * @see CameraKit#FACING_FRONT
+     *
      */
-    public void setFacing(@Facing int facing) {
+    public void setFacing(@CameraKit.Facing int facing) {
         mFacing = facing;
 
         if (mCameraPreview != null) {
@@ -1005,10 +571,10 @@ public class CameraKitView extends GestureLayout {
     }
 
     /**
-     * @return one of {@link Facing}'s constants.
+     * @return one of {@link CameraKit.Facing}'s constants.
      * @see #setFacing(int)
      */
-    @Facing
+    @CameraKit.Facing
     public int getFacing() {
         return mFacing;
     }
@@ -1017,21 +583,21 @@ public class CameraKitView extends GestureLayout {
      *
      */
     public void toggleFacing() {
-        if (getFacing() == FACING_BACK) {
-            setFacing(FACING_FRONT);
+        if (getFacing() == CameraKit.FACING_BACK) {
+            setFacing(CameraKit.FACING_FRONT);
         } else {
-            setFacing(FACING_BACK);
+            setFacing(CameraKit.FACING_BACK);
         }
     }
 
     /**
-     * @param flash one of {@link Flash}'s constants.
-     * @see #FLASH_OFF
-     * @see #FLASH_ON
-     * @see #FLASH_AUTO
-     * @see #FLASH_TORCH
+     * @param flash one of {@link CameraKit.Flash}'s constants.
+     * @see CameraKit#FLASH_OFF
+     * @see CameraKit#FLASH_ON
+     * @see CameraKit#FLASH_AUTO
+     * @see CameraKit#FLASH_TORCH
      */
-    public void setFlash(@Flash int flash) {
+    public void setFlash(@CameraKit.Flash int flash) {
         mFlash = flash;
 
         if (mCameraPreview != null) {
@@ -1040,29 +606,29 @@ public class CameraKitView extends GestureLayout {
     }
 
     /**
-     * @return one of {@link Flash}'s constants.
+     * @return one of {@link com.camerakit.CameraKit.Flash}'s constants.
      * @see #setFlash(int)
      */
-    @Flash
+    @CameraKit.Flash
     public int getFlash() {
         return mFlash;
     }
 
     /**
-     * @param focus one of {@link Focus}'s constants.
-     * @see #FOCUS_OFF
-     * @see #FOCUS_AUTO
-     * @see #FOCUS_CONTINUOUS
+     * @param focus one of {@link CameraKit.Focus}'s constants.
+     * @see CameraKit#FOCUS_OFF
+     * @see CameraKit#FOCUS_AUTO
+     * @see CameraKit#FOCUS_CONTINUOUS
      */
-    public void setFocus(@Focus int focus) {
+    public void setFocus(@CameraKit.Focus int focus) {
         mFocus = focus;
     }
 
     /**
-     * @return one of {@link Focus}'s constants.
+     * @return one of {@link CameraKit.Focus}'s constants.
      * @see #setFocus(int)
      */
-    @Focus
+    @CameraKit.Focus
     public int getFocus() {
         return mFocus;
     }
@@ -1083,57 +649,57 @@ public class CameraKitView extends GestureLayout {
     }
 
     /**
-     * @param sensorPreset one of {@link SensorPreset}'s constants.
-     * @see #SENSOR_PRESET_NONE
-     * @see #SENSOR_PRESET_ACTION
-     * @see #SENSOR_PRESET_PORTRAIT
-     * @see #SENSOR_PRESET_LANDSCAPE
-     * @see #SENSOR_PRESET_NIGHT
-     * @see #SENSOR_PRESET_NIGHT_PORTRAIT
-     * @see #SENSOR_PRESET_THEATRE
-     * @see #SENSOR_PRESET_BEACH
-     * @see #SENSOR_PRESET_SNOW
-     * @see #SENSOR_PRESET_SUNSET
-     * @see #SENSOR_PRESET_STEADYPHOTO
-     * @see #SENSOR_PRESET_FIREWORKS
-     * @see #SENSOR_PRESET_SPORTS
-     * @see #SENSOR_PRESET_PARTY
-     * @see #SENSOR_PRESET_CANDLELIGHT
-     * @see #SENSOR_PRESET_BARCODE
+     * @param sensorPreset one of {@link CameraKit.SensorPreset}'s constants.
+     * @see CameraKit#SENSOR_PRESET_NONE
+     * @see CameraKit#SENSOR_PRESET_ACTION
+     * @see CameraKit#SENSOR_PRESET_PORTRAIT
+     * @see CameraKit#SENSOR_PRESET_LANDSCAPE
+     * @see CameraKit#SENSOR_PRESET_NIGHT
+     * @see CameraKit#SENSOR_PRESET_NIGHT_PORTRAIT
+     * @see CameraKit#SENSOR_PRESET_THEATRE
+     * @see CameraKit#SENSOR_PRESET_BEACH
+     * @see CameraKit#SENSOR_PRESET_SNOW
+     * @see CameraKit#SENSOR_PRESET_SUNSET
+     * @see CameraKit#SENSOR_PRESET_STEADYPHOTO
+     * @see CameraKit#SENSOR_PRESET_FIREWORKS
+     * @see CameraKit#SENSOR_PRESET_SPORTS
+     * @see CameraKit#SENSOR_PRESET_PARTY
+     * @see CameraKit#SENSOR_PRESET_CANDLELIGHT
+     * @see CameraKit#SENSOR_PRESET_BARCODE
      */
-    public void setSensorPreset(@SensorPreset int sensorPreset) {
+    public void setSensorPreset(@CameraKit.SensorPreset int sensorPreset) {
         mSensorPreset = sensorPreset;
     }
 
     /**
-     * @return one of {@link SensorPreset}'s constants.
+     * @return one of {@link CameraKit.SensorPreset}'s constants.
      * @see #setSensorPreset(int)
      */
-    @SensorPreset
+    @CameraKit.SensorPreset
     public int getSensorPreset() {
         return mSensorPreset;
     }
 
     /**
-     * @param previewEffect one of {@link PreviewEffect}'s constants.
-     * @see #PREVIEW_EFFECT_NONE
-     * @see #PREVIEW_EFFECT_MONO
-     * @see #PREVIEW_EFFECT_SOLARIZE
-     * @see #PREVIEW_EFFECT_SEPIA
-     * @see #PREVIEW_EFFECT_POSTERIZE
-     * @see #PREVIEW_EFFECT_WHITEBOARD
-     * @see #PREVIEW_EFFECT_BLACKBOARD
-     * @see #PREVIEW_EFFECT_AQUA
+     * @param previewEffect one of {@link CameraKit.PreviewEffect}'s constants.
+     * @see CameraKit#PREVIEW_EFFECT_NONE
+     * @see CameraKit#PREVIEW_EFFECT_MONO
+     * @see CameraKit#PREVIEW_EFFECT_SOLARIZE
+     * @see CameraKit#PREVIEW_EFFECT_SEPIA
+     * @see CameraKit#PREVIEW_EFFECT_POSTERIZE
+     * @see CameraKit#PREVIEW_EFFECT_WHITEBOARD
+     * @see CameraKit#PREVIEW_EFFECT_BLACKBOARD
+     * @see CameraKit#PREVIEW_EFFECT_AQUA
      */
-    public void setPreviewEffect(@PreviewEffect int previewEffect) {
+    public void setPreviewEffect(@CameraKit.PreviewEffect int previewEffect) {
         mPreviewEffect = previewEffect;
     }
 
     /**
-     * @return one of {@link PreviewEffect}'s constants.
+     * @return one of {@link CameraKit.PreviewEffect}'s constants.
      * @see #setPreviewEffect(int)
      */
-    @PreviewEffect
+    @CameraKit.PreviewEffect
     public int getPreviewEffect() {
         return mPreviewEffect;
     }
@@ -1298,10 +864,10 @@ public class CameraKitView extends GestureLayout {
         private Size mPreviewSize;
 
         public CameraPreview(Context context) {
-            this(context, FACING_BACK);
+            this(context, CameraKit.FACING_BACK);
         }
 
-        public CameraPreview(Context context, @Facing int facing) {
+        public CameraPreview(Context context, @CameraKit.Facing int facing) {
             super(context);
 
             mFacing = facing;
@@ -1416,7 +982,7 @@ public class CameraKitView extends GestureLayout {
                     Jpeg jpeg = new Jpeg(data);
 
                     int captureRotation = 0;
-                    if (mFacing == FACING_FRONT) {
+                    if (mFacing == CameraKit.FACING_FRONT) {
                         captureRotation = (mAttributes.sensorOrientation + mDisplayRotation) % 360;
                     } else {
                         captureRotation = (mAttributes.sensorOrientation - mDisplayRotation + 360) % 360;
@@ -1425,7 +991,7 @@ public class CameraKitView extends GestureLayout {
                     if (mCameraPreview instanceof Camera1) {
                         jpeg.rotate(captureRotation);
 
-                        if (mFacing == FACING_FRONT) {
+                        if (mFacing == CameraKit.FACING_FRONT) {
                             jpeg.flipHorizontal();
                         }
                     }
@@ -1519,10 +1085,10 @@ public class CameraKitView extends GestureLayout {
         private Camera.CameraInfo mCameraInfo;
 
         public Camera1(Context context) {
-            this(context, FACING_BACK);
+            this(context, CameraKit.FACING_BACK);
         }
 
-        protected Camera1(Context context, @Facing int facing) {
+        protected Camera1(Context context, @CameraKit.Facing int facing) {
             super(context, facing);
 
             mSurfaceView = new SurfaceView(context);
@@ -1622,7 +1188,7 @@ public class CameraKitView extends GestureLayout {
                     background(new Runnable() {
                         @Override
                         public void run() {
-                            int cameraId = mFacing == FACING_BACK ? Camera.CameraInfo.CAMERA_FACING_BACK : Camera.CameraInfo.CAMERA_FACING_FRONT;
+                            int cameraId = mFacing == CameraKit.FACING_BACK ? Camera.CameraInfo.CAMERA_FACING_BACK : Camera.CameraInfo.CAMERA_FACING_FRONT;
                             mCamera = Camera.open(cameraId);
                             mCameraInfo = new Camera.CameraInfo();
                             Camera.getCameraInfo(cameraId, mCameraInfo);
@@ -1711,7 +1277,7 @@ public class CameraKitView extends GestureLayout {
                         public void run() {
                             if (mCamera != null) {
                                 final int previewRotation;
-                                if (mFacing == FACING_FRONT) {
+                                if (mFacing == CameraKit.FACING_FRONT) {
                                     previewRotation = (360 - ((mCameraInfo.orientation + displayRotation) % 360)) % 360;
                                 } else {
                                     previewRotation = (mCameraInfo.orientation - displayRotation + 360) % 360;
@@ -1730,22 +1296,22 @@ public class CameraKitView extends GestureLayout {
                             Camera.Parameters parameters = mCamera.getParameters();
 
                             switch (flash) {
-                                case FLASH_OFF: {
+                                case CameraKit.FLASH_OFF: {
                                     parameters.setFlashMode(FLASH_MODE_OFF);
                                     break;
                                 }
 
-                                case FLASH_ON: {
+                                case CameraKit.FLASH_ON: {
                                     parameters.setFlashMode(FLASH_MODE_ON);
                                     break;
                                 }
 
-                                case FLASH_AUTO: {
+                                case CameraKit.FLASH_AUTO: {
                                     parameters.setFlashMode(FLASH_MODE_AUTO);
                                     break;
                                 }
 
-                                case FLASH_TORCH: {
+                                case CameraKit.FLASH_TORCH: {
                                     parameters.setFlashMode(FLASH_MODE_TORCH);
                                     break;
                                 }
@@ -1764,15 +1330,15 @@ public class CameraKitView extends GestureLayout {
                             Camera.Parameters parameters = mCamera.getParameters();
 
                             switch (focus) {
-                                case FOCUS_OFF: {
+                                case CameraKit.FOCUS_OFF: {
                                     break;
                                 }
 
-                                case FOCUS_AUTO: {
+                                case CameraKit.FOCUS_AUTO: {
                                     break;
                                 }
 
-                                case FOCUS_CONTINUOUS: {
+                                case CameraKit.FOCUS_CONTINUOUS: {
                                     if (parameters.getSupportedFlashModes().contains(FOCUS_MODE_CONTINUOUS_PICTURE)) {
                                         parameters.setFocusMode(FOCUS_MODE_CONTINUOUS_PICTURE);
                                     }
@@ -1822,10 +1388,10 @@ public class CameraKitView extends GestureLayout {
         private CameraCaptureSession mCaptureSession;
 
         public Camera2(Context context) {
-            this(context, FACING_BACK);
+            this(context, CameraKit.FACING_BACK);
         }
 
-        protected Camera2(Context context, @Facing int facing) {
+        protected Camera2(Context context, @CameraKit.Facing int facing) {
             super(context, facing);
 
             mTextureView = new TextureView(context);
@@ -1940,7 +1506,7 @@ public class CameraKitView extends GestureLayout {
                     background(new Runnable() {
                         @Override
                         public void run() {
-                            int facingTarget = mFacing == FACING_BACK ? LENS_FACING_BACK : LENS_FACING_FRONT;
+                            int facingTarget = mFacing == CameraKit.FACING_BACK ? LENS_FACING_BACK : LENS_FACING_FRONT;
                             mCameraManager = (CameraManager) getContext().getSystemService(Context.CAMERA_SERVICE);
 
                             if (mCameraManager == null) {

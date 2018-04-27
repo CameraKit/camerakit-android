@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
+import com.camerakit.CameraKit;
 import com.camerakit.CameraKitView;
 import com.jpegkit.Jpeg;
 import com.jpegkit.JpegImageView;
@@ -69,13 +70,6 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
             @Override
             public void onPermissionsFailure() {
                 permissionsButton.setVisibility(View.VISIBLE);
-            }
-        });
-
-        cameraView.captureImage(new CameraKitView.ImageCallback() {
-            @Override
-            public void onImage(CameraKitView view, byte[] jpeg) {
-
             }
         });
     }
@@ -138,10 +132,10 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     private View.OnClickListener flashOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if (cameraView.getFlash() == CameraKitView.FLASH_OFF) {
-                cameraView.setFlash(CameraKitView.FLASH_ON);
+            if (cameraView.getFlash() == CameraKit.FLASH_OFF) {
+                cameraView.setFlash(CameraKit.FLASH_ON);
             } else {
-                cameraView.setFlash(CameraKitView.FLASH_OFF);
+                cameraView.setFlash(CameraKit.FLASH_OFF);
             }
         }
     };
