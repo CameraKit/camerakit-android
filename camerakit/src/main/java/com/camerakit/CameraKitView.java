@@ -26,7 +26,6 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.OrientationEventListener;
 import android.view.Surface;
 import android.view.SurfaceHolder;
@@ -1783,7 +1782,6 @@ public class CameraKitView extends GestureLayout {
 
                 @Override
                 public void captureImage(final ImageCallback callback) {
-                    Log.v("WonderKiln", "flashing: " + mFlashing + "  flash: " + mFlash);
                     if (mFlash == CameraKit.FLASH_ON && !mFlashing) {
                         try {
                             mPreviewRequestBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_TORCH);
@@ -1798,14 +1796,14 @@ public class CameraKitView extends GestureLayout {
                             }, 1000);
                             return;
                         } catch (Exception e) {
-                            Log.v("WonderKiln, ", e.toString());
                         }
                     }
 
                     background(new Runnable() {
                         @Override
                         public void run() {
-                            Bitmap bitmap = mTextureView.getBitmap();
+                            Size previewSize = getAdjustedPreviewSize();
+                            Bitmap bitmap = mTextureView.getBitmap(previewSize.getWidth(), previewSize.getHeight());
 
                             ByteArrayOutputStream stream = new ByteArrayOutputStream();
                             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
