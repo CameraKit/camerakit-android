@@ -1107,8 +1107,10 @@ public class CameraKitView extends GestureLayout {
                         }
 
                         case EVENT_SURFACE_CHANGED: {
-                            mApi.stopPreview();
-                            mApi.startPreview();
+                            if (mAttributes != null) {
+                                mApi.stopPreview();
+                                mApi.startPreview();
+                            }
                             break;
                         }
 
