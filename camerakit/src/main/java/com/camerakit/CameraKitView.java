@@ -1064,8 +1064,6 @@ public class CameraKitView extends GestureLayout {
                             jpeg.flipHorizontal();
                         }
                     }
-
-
                     callback.onJpeg(jpeg);
                 }
             });
@@ -1322,6 +1320,21 @@ public class CameraKitView extends GestureLayout {
                                         parameters.setFocusMode(FOCUS_MODE_CONTINUOUS_PICTURE);
                                     }
 
+                                    Camera.Size pictureSize = null;
+                                    for (Camera.Size size : parameters.getSupportedPictureSizes()) {
+                                        if (pictureSize == null) {
+                                            pictureSize = size;
+                                            continue;
+                                        }
+
+                                        if (size.width > previewSize.getWidth() && size.height > previewSize.getHeight()) {
+                                            if (size.width < pictureSize.width) {
+                                                pictureSize = size;
+                                            }
+                                        }
+                                    }
+
+                                    parameters.setPictureSize(pictureSize.width, pictureSize.height);
                                     mCamera.setParameters(parameters);
                                 }
 
@@ -1803,7 +1816,19 @@ public class CameraKitView extends GestureLayout {
                         @Override
                         public void run() {
                             Size previewSize = getAdjustedPreviewSize();
-                            Bitmap bitmap = mTextureView.getBitmap(previewSize.getWidth(), previewSize.getHeight());
+
+                            int width = getWidth();
+                            int height = getHeight();
+
+                            float widthRatio = (float) width / (float) previewSize.getWidth();
+                            float heightRatio = (float) height / (float) previewSize.getHeight();
+
+                            float ratio = Math.min(widthRatio, heightRatio);
+                            if (widthRatio > 1 || heightRatio > 1) {
+                                ratio = Math.max(widthRatio, heightRatio);
+                            }
+
+                            Bitmap bitmap = mTextureView.getBitmap((int) (previewSize.getWidth() * ratio), (int) (previewSize.getHeight() * ratio));
 
                             ByteArrayOutputStream stream = new ByteArrayOutputStream();
                             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
