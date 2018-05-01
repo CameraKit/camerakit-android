@@ -601,8 +601,29 @@ public class CameraKitView extends GestureLayout {
         mFacing = facing;
 
         if (mCameraPreview != null) {
+            final CameraListener cameraListener = getCameraListener();
+            setCameraListener(new CameraListener() {
+                @Override
+                public void onOpened() {
+                    if (cameraListener != null) {
+                        cameraListener.onOpened();
+                    }
+
+                    setCameraListener(cameraListener);
+                }
+
+                @Override
+                public void onClosed() {
+                    if (cameraListener != null) {
+                        cameraListener.onClosed();
+                    }
+
+                    setCameraListener(cameraListener);
+                    onResume();
+                }
+            });
+
             onPause();
-            onResume();
         }
     }
 
