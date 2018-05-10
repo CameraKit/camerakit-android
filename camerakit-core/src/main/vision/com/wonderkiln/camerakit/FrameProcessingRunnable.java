@@ -1,15 +1,12 @@
 package com.wonderkiln.camerakit;
 
-import android.graphics.ImageFormat;
+import android.graphics.*;
 import android.hardware.Camera;
-import android.util.Log;
+import android.util.*;
+import com.google.android.gms.vision.*;
 
-import com.google.android.gms.vision.Detector;
-import com.google.android.gms.vision.Frame;
-
-import java.nio.ByteBuffer;
-import java.util.HashMap;
-import java.util.Map;
+import java.nio.*;
+import java.util.*;
 /*
 Adapted/Copied from:
 https://github.com/googlesamples/android-vision/blob/master/visionSamples/ocr-codelab/ocr-reader-complete/app/src/main/java/com/google/android/gms/samples/vision/ocrreader/ui/camera/CameraSource.java#L1080
@@ -28,11 +25,11 @@ https://github.com/googlesamples/android-vision/blob/master/visionSamples/ocr-co
 public class FrameProcessingRunnable implements Runnable {
 
     private static final String TAG = FrameProcessingRunnable.class.getSimpleName();
-    private Detector<?> mDetector;
+    private final Detector<?> mDetector;
     private long mStartTimeMillis = android.os.SystemClock.elapsedRealtime();
+    private int mDeviceOrientation;
 
     // This lock guards all of the member variables below.
-    private final Object mLock = new Object();
     private boolean mActive = true;
 
     // These pending variables hold the state associated with the new frame awaiting processing.
@@ -50,10 +47,11 @@ public class FrameProcessingRunnable implements Runnable {
     private Size mPreviewSize;
     private Camera mCamera;
 
-    public FrameProcessingRunnable(Detector<?> detector, Size mPreviewSize, Camera mCamera) {
+    public FrameProcessingRunnable(Detector<?> detector, Size mPreviewSize, Camera mCamera, int mDeviceOrientation) {
         mDetector = detector;
         this.mPreviewSize = mPreviewSize;
         this.mCamera = mCamera;
+        this.mDeviceOrientation = mDeviceOrientation;
 
         mProcessingThread = new Thread(this);
     }
@@ -88,45 +86,65 @@ public class FrameProcessingRunnable implements Runnable {
         java.nio.ByteBuffer data;
 
         while (true) {
-            synchronized (mLock) {
-                while (mActive && (mPendingFrameData == null)) {
-                    try {
-                        // Wait for the next frame to be received from the camera, since we
-                        // don't have it yet.
-                        mLock.wait();
-                    } catch (InterruptedException e) {
-                        return;
-                    }
-                }
-
-                if (!mActive) {
-                    // Exit the loop once this camera source is stopped or released.  We check
-                    // this here, immediately after the wait() above, to handle the case where
-                    // setActive(false) had been called, triggering the termination of this
-                    // loop.
-                    return;
-                }
-
-                if (mPreviewSize == null) {
-                    // wait for this to be  set
-                    Log.d("WHAT", "waitin for preview size to not be null");
-                    continue;
-                }
-
-                outputFrame = new Frame.Builder()
-                        .setImageData(mPendingFrameData, mPreviewSize.getWidth(),
-                                mPreviewSize.getHeight(), android.graphics.ImageFormat.NV21)
-                        .setId(mPendingFrameId)
-                        .setTimestampMillis(mPendingTimeMillis)
-                        .setRotation(0)
-                        .build();
-
-                // Hold onto the frame data locally, so that we can use this for detection
-                // below.  We need to clear mPendingFrameData to ensure that this buffer isn't
-                // recycled back to the camera before we are done using that data.
-                data = mPendingFrameData;
-                mPendingFrameData = null;
+            // Lower the frequency
+            try {
+                Thread.sleep(300);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
+
+            if (mPendingFrameData == null) {
+                continue;
+            }
+
+            if (!mActive) {
+                // Exit the loop once this camera source is stopped or released.  We check
+                // this here, immediately after the wait() above, to handle the case where
+                // setActive(false) had been called, triggering the termination of this
+                // loop.
+                return;
+            }
+
+            if (mPreviewSize == null) {
+                // wait for this to be  set
+                Log.d("WHAT", "waitin for preview size to not be null");
+                continue;
+            }
+
+            int rotation = -1;
+
+            switch (mDeviceOrientation) {
+                case 0:
+                    rotation = Frame.ROTATION_90;
+                    break;
+                case 90:
+                    rotation = Frame.ROTATION_0;
+                    break;
+                case 180:
+                    rotation = Frame.ROTATION_270;
+                    break;
+                case 270:
+                    rotation = Frame.ROTATION_180;
+                    break;
+            }
+
+            if (rotation == -1) {
+                return;
+            }
+
+            outputFrame = new Frame.Builder()
+                    .setImageData(mPendingFrameData, mPreviewSize.getWidth(),
+                            mPreviewSize.getHeight(), android.graphics.ImageFormat.NV21)
+                    .setId(mPendingFrameId)
+                    .setTimestampMillis(mPendingTimeMillis)
+                    .setRotation(rotation)
+                    .build();
+
+            // Hold onto the frame data locally, so that we can use this for detection
+            // below.  We need to clear mPendingFrameData to ensure that this buffer isn't
+            // recycled back to the camera before we are done using that data.
+            data = mPendingFrameData;
+            mPendingFrameData = null;
 
             // The code below needs to run outside of synchronization, because this will allow
             // The code below needs to run outside of synchronization, because this will allow
@@ -179,13 +197,17 @@ public class FrameProcessingRunnable implements Runnable {
     }
 
     /**
+     * Current device orientation to prepare text detection bitmap
+     */
+    public void setDeviceOrientation(int deviceOrientation) {
+        this.mDeviceOrientation = deviceOrientation;
+    }
+
+    /**
      * Marks the runnable as active/not active.  Signals any blocked threads to continue.
      */
     private void setActive(boolean active) {
-        synchronized (mLock) {
-            mActive = active;
-            mLock.notifyAll();
-        }
+        mActive = active;
     }
 
     /**
@@ -194,28 +216,7 @@ public class FrameProcessingRunnable implements Runnable {
      * future use.
      */
     private void setNextFrame(byte[] data, Camera camera) {
-        synchronized (mLock) {
-            if (mPendingFrameData != null) {
-                camera.addCallbackBuffer(mPendingFrameData.array());
-                mPendingFrameData = null;
-            }
-
-            if (!mBytesToByteBuffer.containsKey(data)) {
-                Log.d(TAG,
-                        "Skipping frame.  Could not find ByteBuffer associated with the image " +
-                                "data from the camera.");
-                return;
-            }
-
-            // Timestamp and frame ID are maintained here, which will give downstream code some
-            // idea of the timing of frames received and when frames were dropped along the way.
-            mPendingTimeMillis = android.os.SystemClock.elapsedRealtime() - mStartTimeMillis;
-            mPendingFrameId++;
-            mPendingFrameData = mBytesToByteBuffer.get(data);
-
-            // Notify the processor thread if it is waiting on the next frame (see below).
-            mLock.notifyAll();
-        }
+        mPendingFrameData = mBytesToByteBuffer.get(data);
     }
 
     private void addBuffer(byte[] byteArray, ByteBuffer buffer) {

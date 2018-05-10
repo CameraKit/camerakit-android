@@ -158,6 +158,10 @@ public class Camera1 extends CameraImpl {
         this.mDisplayOrientation = displayOrientation;
         this.mDeviceOrientation = deviceOrientation;
 
+        if (mFrameProcessor != null) {
+            mFrameProcessor.setDeviceOrientation(this.mDeviceOrientation);
+        }
+
         synchronized (mCameraLock) {
             if (isCameraOpened()) {
                 try {
@@ -684,7 +688,7 @@ public class Camera1 extends CameraImpl {
             mEventDispatcher.dispatch(new CameraKitEvent(CameraKitEvent.TYPE_CAMERA_OPEN));
 
             if (mTextDetector != null) {
-                mFrameProcessor = new FrameProcessingRunnable(mTextDetector, mPreviewSize, mCamera);
+                mFrameProcessor = new FrameProcessingRunnable(mTextDetector, mPreviewSize, mCamera, mDisplayOrientation);
                 mFrameProcessor.start();
             }
         }
