@@ -109,7 +109,7 @@ task deployRelease {
 }
 
 group = 'com.camerakit'
-version = '1.0.0-alpha1'
+version = '1.0.0-beta1'
 
 install {
     repositories.mavenInstaller {
