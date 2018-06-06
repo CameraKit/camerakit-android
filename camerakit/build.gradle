@@ -19,10 +19,14 @@ android {
 }
 
 dependencies {
+    // `compile` and `implementation` behave slightly differently.
+    // Since we allow the end-developer to use classes from JpegKit,
+    // the package cannot be added using `implementation` for now.
     compile 'com.camerakit:jpegkit:0.1.0'
-    compile 'com.android.support:support-annotations:27.1.0'
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:1.10.19'
+
+    implementation 'com.android.support:support-annotations:27.1.1'
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.mockito:mockito-core:1.10.19'
 }
 
 ext.getBintrayUser = { ->
@@ -30,7 +34,7 @@ ext.getBintrayUser = { ->
         return System.getenv('BINTRAY_USER')
     }
 
-    if(rootProject.file('local.properties').exists()) {
+    if (rootProject.file('local.properties').exists()) {
         Properties properties = new Properties()
         properties.load(rootProject.file('local.properties').newDataInputStream())
         return properties.getProperty('bintray.user')
@@ -42,7 +46,7 @@ ext.getBintrayKey = { ->
         return System.getenv('BINTRAY_KEY')
     }
 
-    if(rootProject.file('local.properties').exists()) {
+    if (rootProject.file('local.properties').exists()) {
         Properties properties = new Properties()
         properties.load(rootProject.file('local.properties').newDataInputStream())
         return properties.getProperty('bintray.key')
