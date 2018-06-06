@@ -1,17 +1,16 @@
 package com.camerakit;
 
-import org.junit.Test;
-import org.junit.Before;
-import static junit.framework.Assert.assertEquals;
-
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import static org.mockito.Mockito.when;
-
-import android.content.res.TypedArray;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.util.AttributeSet;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import static junit.framework.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 
 public class CameraKitViewTest {
 
@@ -59,10 +58,12 @@ public class CameraKitViewTest {
 
         permissionsListener = new CameraKitView.PermissionsListener() {
             @Override
-            public void onPermissionsSuccess() { }
+            public void onPermissionsSuccess() {
+            }
 
             @Override
-            public void onPermissionsFailure() { }
+            public void onPermissionsFailure() {
+            }
         };
     }
 
@@ -178,7 +179,7 @@ public class CameraKitViewTest {
     }
 
     @Test
-    public void setPreviewListener(){
+    public void setPreviewListener() {
         cameraKitView.setPreviewListener(mockPreviewListener);
         assertEquals(cameraKitView.getPreviewListener(), mockPreviewListener);
     }
@@ -205,7 +206,7 @@ public class CameraKitViewTest {
     @Test
     public void equalsTest() {
         CameraKitView.Size size = new CameraKitView.Size(TEST_WIDTH, TEST_HEIGHT);
-        assert(testSize.equals(size));
+        assert (testSize.equals(size));
     }
 
     @Test
@@ -226,4 +227,5 @@ public class CameraKitViewTest {
         CameraKitView.Size size = new CameraKitView.Size(TEST_WIDTH, TEST_HEIGHT);
         assertEquals(testSize.compareTo(size), testCompareTo);
     }
+
 }
