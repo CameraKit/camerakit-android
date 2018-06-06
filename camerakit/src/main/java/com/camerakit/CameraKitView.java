@@ -765,7 +765,7 @@ public class CameraKitView extends GestureLayout {
      * @param permissions
      */
     public void setPermissions(@Permission int permissions) {
-
+        mPermissions = permissions;
     }
 
     /**
