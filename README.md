@@ -15,14 +15,16 @@
 
 <p align="center">
     <a href="https://join-slack.camerakit.website"><img src="https://join-slack.camerakit.website/badge.svg" alt="Build Status"></a>
-    <a href="https://circleci.com/gh/CameraKit/camerakit-android/tree/master"><img src="https://circleci.com/gh/CameraKit/camerakit-android/tree/master.svg?style=shield" alt="CircleCI"></a>
     <a href="https://codeclimate.com/github/wonderkiln/CameraKit-Android"><img src="https://codeclimate.com/github/wonderkiln/CameraKit-Android/badges/coverage.svg" alt="Code Climate"></a>
     <a href="https://codeclimate.com/github/wonderkiln/CameraKit-Android"><img src="https://codeclimate.com/github/wonderkiln/CameraKit-Android/badges/issue_count.svg" alt="Code Climate"></a>
 </p>
 
 CameraKit takes one of the hardest Android APIs and makes it into a high level and easy to use library that solves all of your problems.
 
-## Sponsored by
+## Supported by these Awesome Services
+[<figure><img src="https://buddy.works" /><figcaption>Automated by Buddy](https://assets.buddy.works/automated-white.svg)</figcaption></figure>
+
+## Sponsors
 <a href="https://www.expensify.com/"><img src=".repo/gh-readme-expensify.png"></a>
 <a href="https://www.buddy.works/"><img src=".repo/gh-readme-buddyworks.png"></a>
 
