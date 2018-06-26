@@ -22,7 +22,7 @@
 CameraKit takes one of the hardest Android APIs and makes it into a high level and easy to use library that solves all of your problems.
 
 ## Supported by these Awesome Services
-[<figure><img src="https://buddy.works" /><figcaption>Automated by Buddy](https://assets.buddy.works/automated-white.svg)</figcaption></figure>
+[![Buddy](https://assets.buddy.works/automated-dark.svg)](https://buddy.works/)
 
 ## Sponsors
 <a href="https://www.expensify.com/"><img src=".repo/gh-readme-expensify.png"></a>
