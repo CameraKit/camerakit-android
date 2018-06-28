@@ -1,30 +1,29 @@
 plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
     id 'com.jfrog.bintray' version '1.7.3'
     id 'com.github.dcendents.android-maven' version '1.5'
 }
 
-apply plugin: 'com.android.library'
-
 android {
-    compileSdkVersion rootProject.ext.compileSdkVersion
+    compileSdkVersion 28
     defaultConfig {
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
+        minSdkVersion 15
     }
-    buildToolsVersion '27.0.3'
-
     testOptions {
         unitTests.returnDefaultValues = true
     }
 }
 
-dependencies {
-    // `compile` and `implementation` behave slightly differently.
-    // Since we allow the end-developer to use classes from JpegKit,
-    // the package cannot be added using `implementation` for now.
-    compile 'com.camerakit:jpegkit:0.1.0'
+repositories {
+    google()
+    jcenter()
+}
 
+dependencies {
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.2.50'
     implementation 'com.android.support:support-annotations:27.1.1'
+    implementation 'com.camerakit:jpegkit:0.2.0-alpha1'
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.mockito:mockito-core:1.10.19'
 }
@@ -55,7 +54,7 @@ ext.getBintrayKey = { ->
 
 task cleanDeployment {
     doLast {
-        logger.lifecycle('CameraKit Deployment: Cleaning...')
+        logger.lifecycle('Deployment: Cleaning...')
         logger.lifecycle('Deleting: ' + project.buildDir)
         delete project.buildDir
     }
