@@ -16,6 +16,7 @@ android {
 
 dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.2.50'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:0.22.5'
     implementation 'com.android.support:support-annotations:27.1.1'
     implementation 'com.camerakit:jpegkit:0.2.0-alpha1'
     testImplementation 'junit:junit:4.12'

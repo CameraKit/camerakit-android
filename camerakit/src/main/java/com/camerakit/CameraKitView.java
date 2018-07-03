@@ -26,15 +26,18 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.OrientationEventListener;
 import android.view.Surface;
 import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.TextureView;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 
+import com.camerakit.surface.CameraSurfaceView;
 import com.jpegkit.Jpeg;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -97,7 +100,8 @@ public class CameraKitView extends GestureLayout {
     @Retention(RetentionPolicy.SOURCE)
     @IntDef(flag = true,
             value = {PERMISSION_CAMERA, PERMISSION_MICROPHONE, PERMISSION_STORAGE, PERMISSION_LOCATION})
-    @interface Permission {}
+    @interface Permission {
+    }
 
     /**
      *
@@ -240,11 +244,11 @@ public class CameraKitView extends GestureLayout {
     private int mPermissions;
     private float mImageMegaPixels;
     private int mImageJpegQuality;
+    private int mShader;
     private GestureListener mGestureListener;
     private CameraListener mCameraListener;
     private PreviewListener mPreviewListener;
     private ErrorListener mErrorListener;
-
     private PermissionsListener mPermissionsListener;
 
     private CameraPreview mCameraPreview;
@@ -276,6 +280,7 @@ public class CameraKitView extends GestureLayout {
         mPermissions = a.getInteger(R.styleable.CameraKitView_camera_permissions, PERMISSION_CAMERA);
         mImageMegaPixels = a.getFloat(R.styleable.CameraKitView_camera_imageMegaPixels, 2f);
         mImageJpegQuality = a.getInteger(R.styleable.CameraKitView_camera_imageJpegQuality, 100);
+        mShader = a.getInteger(R.styleable.CameraKitView_camera_shader, 0);
 
         a.recycle();
     }
@@ -394,7 +399,7 @@ public class CameraKitView extends GestureLayout {
         if (Build.VERSION.SDK_INT < 21) {
             mCameraPreview = new Camera1(getContext(), mFacing);
         } else {
-            mCameraPreview = new Camera2(getContext(), mFacing);
+            mCameraPreview = new Camera1(getContext(), mFacing);
         }
 
         addView(mCameraPreview);
@@ -413,6 +418,16 @@ public class CameraKitView extends GestureLayout {
             mCameraPreview = null;
         }
     }
+
+
+    public void setShader(int shader) {
+        mShader = shader;
+
+        if (mCameraPreview != null) {
+            mCameraPreview.setShader(shader);
+        }
+    }
+
 
     /**
      * @param callback
@@ -595,7 +610,6 @@ public class CameraKitView extends GestureLayout {
      * @param facing one of {@link CameraKit.Facing}'s constants.
      * @see CameraKit#FACING_BACK
      * @see CameraKit#FACING_FRONT
-     *
      */
     public void setFacing(@CameraKit.Facing int facing) {
         mFacing = facing;
@@ -830,7 +844,6 @@ public class CameraKitView extends GestureLayout {
     }
 
     /**
-     *
      * @param cameraListener
      */
     public void setCameraListener(CameraListener cameraListener) {
@@ -838,7 +851,6 @@ public class CameraKitView extends GestureLayout {
     }
 
     /**
-     *
      * @return
      */
     public CameraListener getCameraListener() {
@@ -846,7 +858,6 @@ public class CameraKitView extends GestureLayout {
     }
 
     /**
-     *
      * @param previewListener
      */
     public void setPreviewListener(PreviewListener previewListener) {
@@ -854,7 +865,6 @@ public class CameraKitView extends GestureLayout {
     }
 
     /**
-     *
      * @return
      */
     public PreviewListener getPreviewListener() {
@@ -1005,6 +1015,9 @@ public class CameraKitView extends GestureLayout {
         public void stop() {
             mApi.stopPreview();
             mApi.closeCamera();
+        }
+
+        public void setShader(int shader) {
         }
 
         public void reconfigure() {
@@ -1184,7 +1197,7 @@ public class CameraKitView extends GestureLayout {
      */
     private class Camera1 extends CameraPreview implements SurfaceHolder.Callback {
 
-        private final SurfaceView mSurfaceView;
+        private final CameraSurfaceView mSurfaceView;
         private final SurfaceHolder mSurfaceHolder;
 
         private Camera mCamera;
@@ -1197,11 +1210,11 @@ public class CameraKitView extends GestureLayout {
         protected Camera1(Context context, @CameraKit.Facing int facing) {
             super(context, facing);
 
-            mSurfaceView = new SurfaceView(context);
+            mSurfaceView = new CameraSurfaceView(context);
+            mSurfaceView.setShader(mShader);
 
             mSurfaceHolder = mSurfaceView.getHolder();
             mSurfaceHolder.addCallback(this);
-            mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
         }
 
         // CameraPreview:
@@ -1211,6 +1224,19 @@ public class CameraKitView extends GestureLayout {
         protected void onAttachedToWindow() {
             super.onAttachedToWindow();
             addView(mSurfaceView);
+            mSurfaceView.onResume();
+        }
+
+        @Override
+        public void stop() {
+            super.stop();
+            mSurfaceView.onPause();
+        }
+
+        @Override
+        public void setShader(int shader) {
+            super.setShader(shader);
+            mSurfaceView.setShader(shader);
         }
 
         // ViewGroup:
@@ -1337,7 +1363,8 @@ public class CameraKitView extends GestureLayout {
                                     Camera.Parameters parameters = mCamera.getParameters();
                                     parameters.setPreviewSize(previewSize.getWidth(), previewSize.getHeight());
 
-                                    if (parameters.getSupportedFlashModes().contains(FOCUS_MODE_CONTINUOUS_PICTURE)) {
+                                    List<String> supportedFlashModes = parameters.getSupportedFlashModes();
+                                    if (supportedFlashModes != null && supportedFlashModes.contains(FOCUS_MODE_CONTINUOUS_PICTURE)) {
                                         parameters.setFocusMode(FOCUS_MODE_CONTINUOUS_PICTURE);
                                     }
 
@@ -1359,16 +1386,27 @@ public class CameraKitView extends GestureLayout {
                                     mCamera.setParameters(parameters);
                                 }
 
-                                try {
-                                    mCamera.setPreviewDisplay(mSurfaceHolder);
-                                } catch (IOException e) {
-                                    dispatchEvent(EVENT_PREVIEW_ERROR);
-                                    return;
-                                }
+                                mSurfaceView.awaitSurface(new CameraSurfaceView.Callback() {
+                                    @Override
+                                    public void run(@NotNull SurfaceTexture surfaceTexture) {
+                                        surfaceTexture.setOnFrameAvailableListener(new SurfaceTexture.OnFrameAvailableListener() {
+                                            @Override
+                                            public void onFrameAvailable(SurfaceTexture surfaceTexture) {
+                                                mSurfaceView.requestRender();
+                                            }
+                                        });
 
-                                mCamera.startPreview();
+                                        try {
+                                            mCamera.setPreviewTexture(surfaceTexture);
+                                            mCamera.startPreview();
 
-                                dispatchEvent(EVENT_PREVIEW_STARTED);
+                                            dispatchEvent(EVENT_PREVIEW_STARTED);
+                                        } catch (IOException e) {
+                                            Log.e("CameraKiln", e.toString());
+                                            dispatchEvent(EVENT_PREVIEW_ERROR);
+                                        }
+                                    }
+                                });
                             } else {
                                 dispatchEvent(EVENT_SURFACE_ERROR);
                             }
@@ -1403,7 +1441,9 @@ public class CameraKitView extends GestureLayout {
                                 } else {
                                     previewRotation = (mCameraInfo.orientation - displayRotation + 360) % 360;
                                 }
+
                                 mCamera.setDisplayOrientation(previewRotation);
+                                mSurfaceView.setOrientation(displayRotation, mCameraInfo.orientation, mFacing);
                             }
                         }
                     });
@@ -1588,6 +1628,7 @@ public class CameraKitView extends GestureLayout {
         @Override
         public void onSurfaceTextureUpdated(SurfaceTexture surface) {
         }
+
 
         // CameraApi:
 
