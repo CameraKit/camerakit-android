@@ -22,16 +22,11 @@ import com.camerakit.type.CameraSize
 import com.jpegkit.Jpeg
 import java.util.*
 import kotlin.math.absoluteValue
-import android.R.attr.orientation
-import android.hardware.Camera.CameraInfo
-import android.hardware.Camera.CameraInfo.CAMERA_FACING_FRONT
-import android.R.attr.orientation
-
 
 class CameraPreview : FrameLayout, CameraEvents {
 
     companion object {
-        private const val FORCE_DEPRECATED_API = false
+        private const val FORCE_DEPRECATED_API = true
     }
 
     var listener: Listener? = null
@@ -42,7 +37,7 @@ class CameraPreview : FrameLayout, CameraEvents {
             cameraApi.setFlash(value)
         }
 
-    private val displayOrientation: Int
+    private var displayOrientation: Int = 0
 
     private val cameraApi: CameraApi
 
@@ -59,15 +54,20 @@ class CameraPreview : FrameLayout, CameraEvents {
     private var photoHeight: Int = 0
     private var imageMegaPixels: Float = 2f
 
+    private var isCameraOpen: Boolean = false
+    private var isPreviewStarted: Boolean = false
+    private var attachedToWindow: Boolean = false
+
+    private var startWaiting: Boolean = false
+    private var facing: CameraFacing = CameraFacing.BACK
+    private var resumeWaiting: Boolean = false
+
     constructor(context: Context) : super(context)
     constructor(context: Context, attributeSet: AttributeSet) : super(context, attributeSet)
 
     init {
         surfaceView = CameraSurfaceView(context)
         addView(surfaceView)
-
-        val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        displayOrientation = windowManager.defaultDisplay.rotation * 90
 
         @SuppressWarnings("NewApi")
         cameraApi = ManagedCameraApi(
@@ -77,14 +77,91 @@ class CameraPreview : FrameLayout, CameraEvents {
                 })
     }
 
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+
+        val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        displayOrientation = windowManager.defaultDisplay.rotation * 90
+
+        if ((width > 0 && height > 0) || Build.VERSION.SDK_INT < 19) {
+            attachedToWindow = true
+            if (startWaiting) {
+                start(facing)
+            }
+        }
+    }
+
+    override fun onDetachedFromWindow() {
+        attachedToWindow = false
+        super.onDetachedFromWindow()
+    }
+
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        if (Build.VERSION.SDK_INT >= 19 && !attachedToWindow && isAttachedToWindow && w > 0 && h > 0) {
+            attachedToWindow = true
+            if (startWaiting) {
+                start(facing)
+            }
+        }
+    }
+
     fun start(facing: CameraFacing) {
-        cameraApi.open(facing)
+        this.facing = facing
+
+        if (attachedToWindow) {
+            startWaiting = false
+            isCameraOpen = true
+            cameraApi.open(facing)
+        } else {
+            startWaiting = true
+        }
+    }
+
+    fun resume() {
+        isPreviewStarted = true
+        if (attachedToWindow) {
+            resumeWaiting = false
+            val cameraSurfaceTexture = cameraSurfaceTexture
+            if (cameraSurfaceTexture != null && isCameraOpen) {
+                cameraApi.startPreview(cameraSurfaceTexture)
+            }
+        } else {
+            resumeWaiting = true
+        }
+    }
+
+    fun pause() {
+        resumeWaiting = false
+        isPreviewStarted = false
+        if (attachedToWindow) {
+            cameraApi.stopPreview()
+        }
     }
 
     fun stop() {
-        cameraApi.stopPreview()
-        cameraApi.release()
+        cameraSurfaceTexture = null
+
+        startWaiting = false
+        resumeWaiting = false
+        isCameraOpen = false
+
         surfaceView.onPause()
+        surfaceView.stop()
+        cameraApi.release()
+    }
+
+    fun setFacing(facing: CameraFacing) {
+        this.facing = facing
+
+        if (attachedToWindow) {
+            surfaceView.onPause()
+
+            cameraApi.stopPreview()
+            cameraApi.release()
+            cameraApi.open(facing)
+            resume()
+        }
     }
 
     fun setImageMegaPixels(megaPixels: Float, photoSizes: Array<CameraSize>? = null) {
@@ -137,7 +214,7 @@ class CameraPreview : FrameLayout, CameraEvents {
             return null
         }
 
-        if (captureOrientation % 180 == 0) {
+        if (previewOrientation % 180 == 0) {
             return CameraSize(previewWidth, previewHeight)
         } else {
             return CameraSize(previewHeight, previewWidth)
@@ -162,25 +239,25 @@ class CameraPreview : FrameLayout, CameraEvents {
     // CameraEvents:
 
     override fun onCameraOpened(cameraAttributes: CameraAttributes) {
-        captureOrientation = (cameraAttributes.sensorOrientation - displayOrientation + 360) % 360
+        captureOrientation = when (facing) {
+            CameraFacing.BACK -> (cameraAttributes.sensorOrientation - displayOrientation + 360) % 360
+            CameraFacing.FRONT -> (cameraAttributes.sensorOrientation + displayOrientation + 360) % 360
+        }
+
         previewOrientation = (displayOrientation - cameraAttributes.sensorOrientation + 360) % 360
 
-        val previewSize = when (orientation % 180) {
+        val previewSize = when (previewOrientation % 180) {
             0 -> bestPreviewSize(cameraAttributes.previewSizes, width, height)
             else -> bestPreviewSize(cameraAttributes.previewSizes, height, width)
         }
 
-        if (previewOrientation % 180 == 0) {
-            previewWidth = previewSize.width
-            previewHeight = previewSize.height
-        } else {
-            previewWidth = previewSize.width
-            previewHeight = previewSize.height
-        }
-
+        previewWidth = previewSize.width
+        previewHeight = previewSize.height
 
         cameraApi.setPreviewSize(previewSize)
         setImageMegaPixels(imageMegaPixels, cameraAttributes.photoSizes)
+
+        listener?.onCameraOpened()
 
         surfaceView.onResume()
         surfaceView.awaitSurfaceTexture { surfaceTexture ->
@@ -188,10 +265,15 @@ class CameraPreview : FrameLayout, CameraEvents {
             surfaceTexture.facing = cameraAttributes.facing
             surfaceTexture.orientation = previewOrientation
             surfaceTexture.setDefaultBufferSize(previewSize.width, previewSize.height)
-            cameraApi.startPreview(surfaceTexture)
-        }
 
-        listener?.onCameraOpened()
+            if (isPreviewStarted) {
+                resume()
+            }
+
+            surfaceTexture.setOnFrameAvailableListener {
+                surfaceView.requestRender()
+            }
+        }
     }
 
     private fun bestPreviewSize(choices: Array<CameraSize>, viewWidth: Int, viewHeight: Int): CameraSize {

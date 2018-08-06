@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -127,6 +128,12 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        cameraView.onStart();
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         cameraView.onResume();
@@ -136,6 +143,18 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     public void onPause() {
         cameraView.onPause();
         super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        cameraView.onStop();
+        super.onStop();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        cameraView.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     @Override

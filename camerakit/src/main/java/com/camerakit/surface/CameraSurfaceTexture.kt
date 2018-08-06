@@ -11,7 +11,7 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
 
-class CameraSurfaceTexture(val inputTexture: Int, context: Context, val width: Int, val height: Int) : SurfaceTexture(inputTexture) {
+class CameraSurfaceTexture(val inputTexture: Int, context: Context, var width: Int, var height: Int) : SurfaceTexture(inputTexture) {
 
     var facing: CameraFacing = CameraFacing.BACK
         set(value) {
@@ -59,6 +59,10 @@ class CameraSurfaceTexture(val inputTexture: Int, context: Context, val width: I
         this.bufferWidth = bufferWidth
         this.bufferHeight = bufferHeight
 
+        updateScaleMatrix(bufferWidth, bufferHeight)
+    }
+
+    fun updateScaleMatrix(bufferWidth: Int, bufferHeight: Int) {
         val previewWidth: Int
         val previewHeight: Int
         if (orientation % 180 == 0) {
@@ -84,6 +88,15 @@ class CameraSurfaceTexture(val inputTexture: Int, context: Context, val width: I
 
         Matrix.setIdentityM(scaleMatrix, 0)
         Matrix.scaleM(scaleMatrix, 0, scaleX, scaleY, 1f)
+    }
+
+    fun setSurfaceSize(width: Int, height: Int) {
+        this.width = width
+        this.height = height
+
+        if (bufferWidth != 0 && bufferHeight != 0) {
+            updateScaleMatrix(bufferWidth, bufferHeight)
+        }
     }
 
     fun draw() {

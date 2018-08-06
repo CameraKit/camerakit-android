@@ -12,6 +12,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.ViewGroup;
 
 import com.camerakit.type.CameraFacing;
@@ -223,6 +224,7 @@ public class CameraKitView extends GestureLayout {
     private PermissionsListener mPermissionsListener;
 
     private CameraPreview mCameraPreview;
+    private boolean isStarted = false;
 
     public CameraKitView(Context context) {
         super(context);
@@ -253,6 +255,58 @@ public class CameraKitView extends GestureLayout {
         mImageJpegQuality = a.getInteger(R.styleable.CameraKitView_camera_imageJpegQuality, 100);
 
         a.recycle();
+
+        mCameraPreview = new CameraPreview(getContext());
+        addView(mCameraPreview);
+        mCameraPreview.setListener(new CameraPreview.Listener() {
+            @Override
+            public void onCameraOpened() {
+                if (mCameraListener != null) {
+                    post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mCameraListener.onOpened();
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onCameraClosed() {
+                if (mCameraListener != null) {
+                    post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mCameraListener.onClosed();
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onPreviewStarted() {
+                if (mPreviewListener != null) {
+                    post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mPreviewListener.onStart();
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onPreviewStopped() {
+                if (mPreviewListener != null) {
+                    post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mPreviewListener.onStop();
+                        }
+                    });
+                }
+            }
+        });
     }
 
     @Override
@@ -321,7 +375,7 @@ public class CameraKitView extends GestureLayout {
         }
     }
 
-    public void onResume() {
+    public void onStart() {
         if (isInEditMode()) {
             return;
         }
@@ -340,7 +394,7 @@ public class CameraKitView extends GestureLayout {
             if (activity != null) {
                 List<String> requestPermissions = new ArrayList<>();
                 List<String> rationalePermissions = new ArrayList<>();
-                for (String permission: missingPermissions) {
+                for (String permission : missingPermissions) {
                     if (!activity.shouldShowRequestPermissionRationale(permission)) {
                         requestPermissions.add(permission);
                     } else {
@@ -364,73 +418,37 @@ public class CameraKitView extends GestureLayout {
             mPermissionsListener.onPermissionsSuccess();
         }
 
-        removeAllViews();
-        mCameraPreview = new CameraPreview(getContext());
-        mCameraPreview.setListener(new CameraPreview.Listener() {
-            @Override
-            public void onCameraOpened() {
-                if (mCameraListener != null) {
-                    post(new Runnable() {
-                        @Override
-                        public void run() {
-                            mCameraListener.onOpened();
-                        }
-                    });
-                }
-            }
-
-            @Override
-            public void onCameraClosed() {
-                if (mCameraListener != null) {
-                    post(new Runnable() {
-                        @Override
-                        public void run() {
-                            mCameraListener.onClosed();
-                        }
-                    });
-                }
-            }
-
-            @Override
-            public void onPreviewStarted() {
-                if (mPreviewListener != null) {
-                    post(new Runnable() {
-                        @Override
-                        public void run() {
-                            mPreviewListener.onStart();
-                        }
-                    });
-                }
-            }
-
-            @Override
-            public void onPreviewStopped() {
-                if (mPreviewListener != null) {
-                    post(new Runnable() {
-                        @Override
-                        public void run() {
-                            mPreviewListener.onStop();
-                        }
-                    });
-                }
-            }
-        });
 
         setFlash(mFlash);
         setImageMegaPixels(mImageMegaPixels);
 
-        addView(mCameraPreview);
+        isStarted = true;
+        if (getFacing() == CameraKit.FACING_BACK) {
+            mCameraPreview.start(CameraFacing.BACK);
+        } else {
+            mCameraPreview.start(CameraFacing.FRONT);
+        }
+    }
 
-        mCameraPreview.post(new Runnable() {
-            @Override
-            public void run() {
-                if (getFacing() == CameraKit.FACING_BACK) {
-                    mCameraPreview.start(CameraFacing.BACK);
-                } else {
-                    mCameraPreview.start(CameraFacing.FRONT);
-                }
-            }
-        });
+    public void onStop() {
+        if (isInEditMode()) {
+            return;
+        }
+
+        if (isStarted) {
+            isStarted = false;
+            mCameraPreview.stop();
+        }
+    }
+
+    public void onResume() {
+        if (isInEditMode()) {
+            return;
+        }
+
+        if (isStarted) {
+            mCameraPreview.resume();
+        }
     }
 
     /**
@@ -441,8 +459,21 @@ public class CameraKitView extends GestureLayout {
             return;
         }
 
-        if (mCameraPreview != null) {
+        if (isStarted) {
+            mCameraPreview.pause();
+        }
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        if (isStarted && mCameraPreview != null && w > 0 && h > 0) {
             mCameraPreview.stop();
+            if (getFacing() == CameraKit.FACING_BACK) {
+                mCameraPreview.start(CameraFacing.BACK);
+            } else {
+                mCameraPreview.start(CameraFacing.FRONT);
+            }
         }
     }
 
@@ -450,7 +481,7 @@ public class CameraKitView extends GestureLayout {
      * @param callback
      */
     public void captureImage(final ImageCallback callback) {
-        if (mCameraPreview != null) {
+        if (isStarted && mCameraPreview != null) {
             mCameraPreview.capturePhoto(new CameraPreview.PhotoCallback() {
                 @Override
                 public void onCapture(@NotNull final byte[] jpeg) {
@@ -592,6 +623,10 @@ public class CameraKitView extends GestureLayout {
                     deniedPermissions = deniedPermissions | flag;
                 }
             }
+
+            if (!isStarted) {
+                onStart();
+            }
         }
     }
 
@@ -633,14 +668,8 @@ public class CameraKitView extends GestureLayout {
     public void setFacing(@CameraKit.Facing int facing) {
         mFacing = facing;
 
-        if (mCameraPreview != null) {
-            mCameraPreview.stop();
-
-            if (facing == CameraKit.FACING_BACK) {
-                mCameraPreview.start(CameraFacing.BACK);
-            } else {
-                mCameraPreview.start(CameraFacing.FRONT);
-            }
+        if (isStarted && mCameraPreview != null) {
+            mCameraPreview.setFacing(facing == CameraKit.FACING_BACK ? CameraFacing.BACK : CameraFacing.FRONT);
         }
     }
 
@@ -674,7 +703,7 @@ public class CameraKitView extends GestureLayout {
     public void setFlash(@CameraKit.Flash int flash) {
         mFlash = flash;
 
-        if (mCameraPreview != null) {
+        if (isStarted && mCameraPreview != null) {
             switch (flash) {
                 case CameraKit.FLASH_OFF: {
                     mCameraPreview.setFlash(CameraFlash.OFF);
@@ -809,7 +838,7 @@ public class CameraKitView extends GestureLayout {
 
     public void setImageMegaPixels(float imageMegaPixels) {
         mImageMegaPixels = imageMegaPixels;
-        if (mCameraPreview != null) {
+        if (isStarted && mCameraPreview != null) {
             mCameraPreview.setImageMegaPixels(mImageMegaPixels, null);
         }
     }
@@ -914,7 +943,7 @@ public class CameraKitView extends GestureLayout {
     }
 
     public CameraSize getPreviewResolution() {
-        if (mCameraPreview == null) {
+        if (!isStarted || mCameraPreview == null) {
             return null;
         }
 
@@ -922,7 +951,7 @@ public class CameraKitView extends GestureLayout {
     }
 
     public CameraSize getPhotoResolution() {
-        if (mCameraPreview == null) {
+        if (!isStarted || mCameraPreview == null) {
             return null;
         }
 

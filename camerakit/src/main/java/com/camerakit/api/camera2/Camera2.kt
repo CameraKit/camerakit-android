@@ -63,7 +63,6 @@ class Camera2(eventsDelegate: CameraEvents, context: Context) :
                 override fun onError(cameraDevice: CameraDevice, error: Int) {
                     cameraDevice.close()
                     this@Camera2.cameraDevice = null
-                    throw RuntimeException()
 
                 }
             }, cameraHandler)
@@ -74,6 +73,8 @@ class Camera2(eventsDelegate: CameraEvents, context: Context) :
     override fun release() {
         cameraDevice?.close()
         cameraDevice = null
+        captureSession?.close()
+        captureSession = null
         cameraAttributes = null
         imageReader?.close()
         imageReader = null
@@ -93,15 +94,17 @@ class Camera2(eventsDelegate: CameraEvents, context: Context) :
             cameraDevice.getCaptureSession(surface, imageReader, cameraHandler) { captureSession ->
                 this.captureSession = captureSession
 
-                val previewRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
-                previewRequestBuilder.addTarget(surface)
-                previewRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE)
-                setFlashRequest(previewRequestBuilder)
+                if (captureSession != null) {
+                    val previewRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
+                    previewRequestBuilder.addTarget(surface)
+                    previewRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE)
+                    setFlashRequest(previewRequestBuilder)
 
-                captureSession.preview(previewRequestBuilder.build(), cameraHandler) { previewRequest ->
-                    this.previewRequestBuilder = previewRequestBuilder
-                    this.previewRequest = previewRequest
-                    onPreviewStarted()
+                    this.captureSession?.preview(previewRequestBuilder.build(), cameraHandler) { previewRequest ->
+                        this.previewRequestBuilder = previewRequestBuilder
+                        this.previewRequest = previewRequest
+                        onPreviewStarted()
+                    }
                 }
             }
         }
@@ -110,10 +113,11 @@ class Camera2(eventsDelegate: CameraEvents, context: Context) :
     @Synchronized
     override fun stopPreview() {
         val captureSession = captureSession
+        this.captureSession = null
         if (captureSession != null) {
             captureSession.stopRepeating()
+            captureSession.abortCaptures()
             captureSession.close()
-            this.captureSession = null
             onPreviewStopped()
         }
     }
@@ -138,7 +142,7 @@ class Camera2(eventsDelegate: CameraEvents, context: Context) :
 
     @Synchronized
     override fun setPhotoSize(size: CameraSize) {
-        this.imageReader = ImageReader.newInstance(size.width, size.height, ImageFormat.JPEG, 1)
+        this.imageReader = ImageReader.newInstance(size.width, size.height, ImageFormat.JPEG, 4)
     }
 
     @Synchronized
@@ -173,16 +177,6 @@ class Camera2(eventsDelegate: CameraEvents, context: Context) :
         val cameraDevice = cameraDevice
         val imageReader = imageReader
         if (captureSession != null && cameraDevice != null && imageReader != null) {
-            imageReader.setOnImageAvailableListener({
-                val image = imageReader.acquireLatestImage()
-                val buffer = image.planes[0].buffer
-                val bytes = ByteArray(buffer.remaining())
-                buffer.get(bytes)
-                this.photoCallback?.invoke(bytes)
-                this.photoCallback = null
-                image.close()
-            }, cameraHandler)
-
             val captureBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE)
             captureBuilder.addTarget(imageReader.surface)
 
@@ -218,6 +212,15 @@ class Camera2(eventsDelegate: CameraEvents, context: Context) :
         private fun process(result: CaptureResult) {
             when (captureState) {
                 STATE_PREVIEW -> {
+                    val image = imageReader?.acquireLatestImage()
+                    if (image != null) {
+                        val buffer = image.planes[0].buffer
+                        val bytes = ByteArray(buffer.remaining())
+                        buffer.get(bytes)
+                        photoCallback?.invoke(bytes)
+                        photoCallback = null
+                        image.close()
+                    }
                 }
                 STATE_WAITING_LOCK -> {
                     val afState = result.get(CaptureResult.CONTROL_AF_STATE)

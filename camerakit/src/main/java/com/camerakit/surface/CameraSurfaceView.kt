@@ -20,6 +20,7 @@ class CameraSurfaceView : GLSurfaceView, GLSurfaceView.Renderer {
     init {
         setEGLContextClientVersion(2)
         setRenderer(this)
+        preserveEGLContextOnPause = true
         renderMode = RENDERMODE_WHEN_DIRTY
     }
 
@@ -37,9 +38,12 @@ class CameraSurfaceView : GLSurfaceView, GLSurfaceView.Renderer {
     }
 
     override fun onPause() {
+        super.onPause()
+    }
+
+    fun stop() {
         cameraTexture = null
         surfaceTextureCallback = null
-        super.onPause()
     }
 
     // GLSurfaceView.Renderer:
@@ -48,19 +52,20 @@ class CameraSurfaceView : GLSurfaceView, GLSurfaceView.Renderer {
     }
 
     override fun onSurfaceChanged(gl: GL10, width: Int, height: Int) {
-        GLUtil.genTexture(this::texture)
-        val surfaceTexture = CameraSurfaceTexture(texture, context, width, height)
+        val cameraTexture = cameraTexture
+        if (cameraTexture != null) {
+            cameraTexture.setSurfaceSize(width, height)
+        } else {
+            GLUtil.genTexture(this::texture)
+            val surfaceTexture = CameraSurfaceTexture(texture, context, width, height)
 
-        val callback = surfaceTextureCallback
-        if (callback != null) {
-            callback(surfaceTexture)
+            val callback = surfaceTextureCallback
+            if (callback != null) {
+                callback(surfaceTexture)
+            }
+
+            this.cameraTexture = surfaceTexture
         }
-
-        surfaceTexture.setOnFrameAvailableListener {
-            requestRender()
-        }
-
-        cameraTexture = surfaceTexture
     }
 
     override fun onDrawFrame(gl: GL10) {
