@@ -29,7 +29,7 @@
             <com.camerakit.CameraKitView
                 android:id="@+id/camera"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:adjustViewBounds="true"
                 app:camera_facing="back"
                 app:camera_focus="continuous"
@@ -50,9 +50,65 @@
                 android:layout_width="108dp"
                 android:layout_height="192dp"
                 android:layout_gravity="top|right"
-                android:layout_margin="12dp"
-                android:alpha="0.8"
-                android:scaleType="centerInside" />
+                android:layout_margin="16dp"
+                android:alpha="1.0"
+                android:scaleType="centerCrop" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:orientation="vertical">
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:id="@+id/facingText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="20dp"
+                    android:shadowColor="#333333"
+                    android:shadowDx="1"
+                    android:shadowDy="1"
+                    android:shadowRadius="3"
+                    android:singleLine="true"
+                    android:textColor="#FFFFFF"
+                    android:textSize="11dp" />
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:id="@+id/flashText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="20dp"
+                    android:shadowColor="#333333"
+                    android:shadowDx="1"
+                    android:shadowDy="1"
+                    android:shadowRadius="3"
+                    android:singleLine="true"
+                    android:textColor="#FFFFFF"
+                    android:textSize="11dp" />
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:id="@+id/previewSizeText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="20dp"
+                    android:shadowColor="#333333"
+                    android:shadowDx="1"
+                    android:shadowDy="1"
+                    android:shadowRadius="3"
+                    android:singleLine="true"
+                    android:textColor="#FFFFFF"
+                    android:textSize="11dp" />
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:id="@+id/photoSizeText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="20dp"
+                    android:shadowColor="#333333"
+                    android:shadowDx="1"
+                    android:shadowDy="1"
+                    android:shadowRadius="3"
+                    android:singleLine="true"
+                    android:textColor="#FFFFFF"
+                    android:textSize="11dp" />
+
+            </LinearLayout>
 
         </FrameLayout>
 
@@ -62,38 +118,76 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center_horizontal"
-        android:layout_margin="12dp"
-        android:orientation="vertical">
+        android:layout_margin="12dp">
 
-        <android.support.v7.widget.AppCompatButton
-            android:id="@+id/facingButton"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="left"
-            android:backgroundTint="@color/colorPrimaryDark"
-            android:drawableLeft="@drawable/ic_facing"
-            android:padding="14dp"
-            android:text=" Toggle\nFacing" />
+            android:layout_gravity="left|bottom"
+            android:orientation="vertical">
 
-        <android.support.v7.widget.AppCompatButton
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/facingFrontButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/colorPrimaryDark"
+                android:drawableLeft="@drawable/ic_facing_front"
+                android:padding="14dp"
+                android:text=" Facing:\nFront" />
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/facingBackButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/colorPrimaryDark"
+                android:drawableLeft="@drawable/ic_facing_back"
+                android:padding="14dp"
+                android:text=" Facing:\nBack" />
+
+        </LinearLayout>
+
+        <android.support.design.widget.FloatingActionButton
             android:id="@+id/photoButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:backgroundTint="@color/colorPrimaryDark"
-            android:drawableLeft="@drawable/ic_photo"
-            android:padding="14dp"
-            android:text=" Capture\nImage" />
+            android:layout_gravity="center_horizontal|bottom"
+            android:layout_marginBottom="12dp"
+            android:src="@drawable/ic_photo" />
 
-        <android.support.v7.widget.AppCompatButton
-            android:id="@+id/flashButton"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            android:backgroundTint="@color/colorPrimaryDark"
-            android:drawableLeft="@drawable/ic_flash"
-            android:padding="14dp"
-            android:text=" Toggle\nFlash" />
+            android:layout_gravity="right|bottom"
+            android:orientation="vertical">
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/flashAutoButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/colorPrimaryDark"
+                android:drawableLeft="@drawable/ic_flash_auto"
+                android:padding="14dp"
+                android:text=" Flash:\nAuto" />
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/flashOnButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/colorPrimaryDark"
+                android:drawableLeft="@drawable/ic_flash_on"
+                android:padding="14dp"
+                android:text=" Flash:\nOn" />
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/flashOffButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/colorPrimaryDark"
+                android:drawableLeft="@drawable/ic_flash_off"
+                android:padding="14dp"
+                android:text=" Flash:\nOff" />
+
+        </LinearLayout>
 
     </FrameLayout>
 

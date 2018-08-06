@@ -48,13 +48,6 @@
 
         <attr name="camera_imageJpegQuality" format="integer" />
 
-        <attr name="camera_shader" format="enum">
-            <enum name="off" value="0" />
-            <enum name="edges" value="1" />
-            <enum name="twirl" value="2" />
-            <enum name="warp" value="3" />
-        </attr>
-
     </declare-styleable>
 
 </resources>

@@ -5,16 +5,20 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
 import com.camerakit.CameraKit;
 import com.camerakit.CameraKitView;
+import com.camerakit.type.CameraSize;
 import com.jpegkit.Jpeg;
 import com.jpegkit.JpegImageView;
 
@@ -23,9 +27,19 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     private CameraKitView cameraView;
     private Toolbar toolbar;
 
-    private Button photoButton;
-    private Button flashButton;
-    private Button facingButton;
+    private AppCompatTextView facingText;
+    private AppCompatTextView flashText;
+    private AppCompatTextView previewSizeText;
+    private AppCompatTextView photoSizeText;
+
+    private Button flashAutoButton;
+    private Button flashOnButton;
+    private Button flashOffButton;
+
+    private FloatingActionButton photoButton;
+
+    private Button facingFrontButton;
+    private Button facingBackButton;
 
     private Button permissionsButton;
 
@@ -42,14 +56,27 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         toolbar.inflateMenu(R.menu.main);
         toolbar.setOnMenuItemClickListener(this);
 
+        facingText = findViewById(R.id.facingText);
+        flashText = findViewById(R.id.flashText);
+        previewSizeText = findViewById(R.id.previewSizeText);
+        photoSizeText = findViewById(R.id.photoSizeText);
+
         photoButton = findViewById(R.id.photoButton);
         photoButton.setOnClickListener(photoOnClickListener);
 
-        flashButton = findViewById(R.id.flashButton);
-        flashButton.setOnClickListener(flashOnClickListener);
+        flashAutoButton = findViewById(R.id.flashAutoButton);
+        flashOnButton = findViewById(R.id.flashOnButton);
+        flashOffButton = findViewById(R.id.flashOffButton);
 
-        facingButton = findViewById(R.id.facingButton);
-        facingButton.setOnClickListener(facingOnClickListener);
+        flashAutoButton.setOnClickListener(flashAutoOnClickListener);
+        flashOnButton.setOnClickListener(flashOnOnClickListener);
+        flashOffButton.setOnClickListener(flashOffOnClickListener);
+
+        facingFrontButton = findViewById(R.id.facingFrontButton);
+        facingBackButton = findViewById(R.id.facingBackButton);
+
+        facingFrontButton.setOnClickListener(facingFrontOnClickListener);
+        facingBackButton.setOnClickListener(facingBackOnClickListener);
 
         permissionsButton = findViewById(R.id.permissionsButton);
         permissionsButton.setOnClickListener(new View.OnClickListener() {
@@ -70,6 +97,31 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
             @Override
             public void onPermissionsFailure() {
                 permissionsButton.setVisibility(View.VISIBLE);
+            }
+        });
+
+        cameraView.setCameraListener(new CameraKitView.CameraListener() {
+            @Override
+            public void onOpened() {
+                Log.v("CameraKitView", "CameraListener: onOpened()");
+            }
+
+            @Override
+            public void onClosed() {
+                Log.v("CameraKitView", "CameraListener: onClosed()");
+            }
+        });
+
+        cameraView.setPreviewListener(new CameraKitView.PreviewListener() {
+            @Override
+            public void onStart() {
+                Log.v("CameraKitView", "PreviewListener: onStart()");
+                updateInfoText();
+            }
+
+            @Override
+            public void onStop() {
+                Log.v("CameraKitView", "PreviewListener: onStop()");
             }
         });
     }
@@ -116,35 +168,105 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         public void onClick(View v) {
             cameraView.captureImage(new CameraKitView.ImageCallback() {
                 @Override
-                public void onImage(CameraKitView vew, final byte[] photo) {
-                    runOnUiThread(new Runnable() {
+                public void onImage(CameraKitView view, final byte[] photo) {
+                    new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            Jpeg jpeg = new Jpeg(photo);
-                            imageView.setJpeg(jpeg);
+                            final Jpeg jpeg = new Jpeg(photo);
+                            imageView.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    imageView.setJpeg(jpeg);
+                                }
+                            });
                         }
-                    });
+                    }).start();
                 }
             });
         }
     };
 
-    private View.OnClickListener flashOnClickListener = new View.OnClickListener() {
+    private View.OnClickListener flashAutoOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if (cameraView.getFlash() == CameraKit.FLASH_OFF) {
-                cameraView.setFlash(CameraKit.FLASH_ON);
-            } else {
-                cameraView.setFlash(CameraKit.FLASH_OFF);
+            if (cameraView.getFlash() != CameraKit.FLASH_AUTO) {
+                cameraView.setFlash(CameraKit.FLASH_AUTO);
+                updateInfoText();
             }
         }
     };
 
-    private View.OnClickListener facingOnClickListener = new View.OnClickListener() {
+    private View.OnClickListener flashOnOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            cameraView.toggleFacing();
+            if (cameraView.getFlash() != CameraKit.FLASH_ON) {
+                cameraView.setFlash(CameraKit.FLASH_ON);
+                updateInfoText();
+            }
         }
     };
+
+    private View.OnClickListener flashOffOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (cameraView.getFlash() != CameraKit.FLASH_OFF) {
+                cameraView.setFlash(CameraKit.FLASH_OFF);
+                updateInfoText();
+            }
+        }
+    };
+
+    private View.OnClickListener facingFrontOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            cameraView.setFacing(CameraKit.FACING_FRONT);
+        }
+    };
+
+    private View.OnClickListener facingBackOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            cameraView.setFacing(CameraKit.FACING_BACK);
+        }
+    };
+
+    private void updateInfoText() {
+        String facingValue = cameraView.getFacing() == CameraKit.FACING_BACK ? "BACK" : "FRONT";
+        facingText.setText(Html.fromHtml("<b>Facing:</b> " + facingValue));
+
+        String flashValue = "OFF";
+        switch (cameraView.getFlash()) {
+            case CameraKit.FLASH_OFF: {
+                flashValue = "OFF";
+                break;
+            }
+
+            case CameraKit.FLASH_ON: {
+                flashValue = "ON";
+                break;
+            }
+
+            case CameraKit.FLASH_AUTO: {
+                flashValue = "AUTO";
+                break;
+            }
+
+            case CameraKit.FLASH_TORCH: {
+                flashValue = "TORCH";
+                break;
+            }
+        }
+        flashText.setText(Html.fromHtml("<b>Flash:</b> " + flashValue));
+
+        CameraSize previewSize = cameraView.getPreviewResolution();
+        if (previewSize != null) {
+            previewSizeText.setText(Html.fromHtml(String.format("<b>Preview Resolution:</b> %d x %d", previewSize.getWidth(), previewSize.getHeight())));
+        }
+
+        CameraSize photoSize = cameraView.getPhotoResolution();
+        if (photoSize != null) {
+            photoSizeText.setText(Html.fromHtml(String.format("<b>Photo Resolution:</b> %d x %d", photoSize.getWidth(), photoSize.getHeight())));
+        }
+    }
 
 }
