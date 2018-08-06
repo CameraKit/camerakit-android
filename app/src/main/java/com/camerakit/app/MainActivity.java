@@ -9,6 +9,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -22,12 +23,15 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
 
     private CameraKitView cameraView;
     private Toolbar toolbar;
+    private Menu menu;
 
     private Button photoButton;
     private Button flashButton;
     private Button facingButton;
 
     private Button permissionsButton;
+
+    private MenuItem flashState;
 
     private JpegImageView imageView;
 
@@ -41,6 +45,10 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         toolbar = findViewById(R.id.toolbar);
         toolbar.inflateMenu(R.menu.main);
         toolbar.setOnMenuItemClickListener(this);
+        
+        menu = toolbar.getMenu();
+
+        flashState = menu.findItem(R.id.main_menu_flash);
 
         photoButton = findViewById(R.id.photoButton);
         photoButton.setOnClickListener(photoOnClickListener);
@@ -134,8 +142,13 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         public void onClick(View v) {
             if (cameraView.getFlash() == CameraKit.FLASH_OFF) {
                 cameraView.setFlash(CameraKit.FLASH_ON);
+                flashState.setIcon(R.drawable.ic_flash);
+            } else if (cameraView.getFlash() == CameraKit.FLASH_ON){
+                cameraView.setFlash(CameraKit.FLASH_TORCH);
+                flashState.setIcon(R.drawable.ic_torch);
             } else {
                 cameraView.setFlash(CameraKit.FLASH_OFF);
+                flashState.setIcon(R.drawable.ic_flash_off);
             }
         }
     };

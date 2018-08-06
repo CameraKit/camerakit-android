@@ -673,6 +673,7 @@ public class CameraKitView extends GestureLayout {
 
         if (mCameraPreview != null) {
             mCameraPreview.reconfigure();
+            mCameraPreview.mApi.setFlash(mFlash);
         }
     }
 
@@ -1841,7 +1842,27 @@ public class CameraKitView extends GestureLayout {
                 }
 
                 @Override
-                public void setFlash(int flash) {
+                public void setFlash(final int flash) {
+                    background(new Runnable() {
+                        @Override
+                        public void run() {
+                            switch(flash) {
+                                case CameraKit.FLASH_OFF: {
+                                    mPreviewRequestBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_OFF);
+                                    break;
+                                }
+
+                                case CameraKit.FLASH_TORCH: {
+                                    mPreviewRequestBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_TORCH);
+                                    break;
+                                }
+                            }
+                            try {
+                                mCaptureSession.setRepeatingRequest(mPreviewRequestBuilder.build(), null, null);
+                            } catch (Exception e) {
+                            }
+                        }
+                    });
 
                 }
 
