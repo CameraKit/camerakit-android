@@ -29,7 +29,7 @@ bintray {
     key = getBintrayKey()
     configurations = ['archives']
     pkg {
-        repo = 'camerakit-android'
+        repo = 'camerakit-v1-prereleases'
         name = 'camerakit-android'
         userOrg = 'camerakit'
         vcsUrl = 'https://github.com/CameraKit/camerakit-android.git'
@@ -91,7 +91,7 @@ task deployRelease {
 
     doLast {
         bintrayUpload.setUserOrg('camerakit')
-        bintrayUpload.setRepoName('camerakit-android')
+        bintrayUpload.setRepoName('camerakit-v1-prereleases')
 
         logger.lifecycle('Deploying version ' + bintrayUpload.getVersionName() + ' in ' + bintrayUpload.getRepoName())
     }
