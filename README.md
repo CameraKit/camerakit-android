@@ -5,11 +5,11 @@
 </p>
 
 <p align="center">
-    <a href="https://www.wonderkiln.com" target="_blank">
-        <img alt='WonderKiln Promo' src='.repo/gh-readme-wk.png'/>
-    </a>
     <a href="https://play.google.com/store/apps/details?id=com.camerakit.demo&hl=en" target="_blank">
-        <img alt='CameraKit Header' src='.repo/gh-readme-app.png'/>
+        <img alt='CameraKit Header' height="42px" src='.repo/gh-readme-app.svg'/>
+    </a>
+    <a href="https://buddy.works/" target="_blank">
+        <img alt='Buddy.Works' height="42px" src='https://assets.buddy.works/automated-dark.svg'/>
     </a>
 </p>
 
@@ -21,12 +21,11 @@
 
 CameraKit takes one of the hardest Android APIs and makes it into a high level and easy to use library that solves all of your problems.
 
-## Supported by these Awesome Services
-[![Buddy](https://assets.buddy.works/automated-dark.svg)](https://buddy.works/)
-
-## Sponsors
+## Sponsored By
 <a href="https://www.expensify.com/"><img src=".repo/gh-readme-expensify.png"></a>
 <a href="https://www.buddy.works/"><img src=".repo/gh-readme-buddyworks.png"></a>
+
+## Used By
 
 ## Setup
 Add __CameraKit__ to the dependencies block in your `app` level `build.gradle`:
