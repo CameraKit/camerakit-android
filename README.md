@@ -1,6 +1,6 @@
 <p align="center">
     <a href="https://camerakit.website" target="_blank">
-        <img alt='CameraKit Header' src='.repo/gh-readme-header.png' />
+        <img alt='CameraKit Header' src='.repo/gh-readme-header.svg' />
     </a>
 </p>
 
