@@ -43,8 +43,6 @@ With CameraKit you are able to effortlessly do the following...
 <a href="https://www.expensify.com/"><img src=".repo/gh-readme-expensify.png"></a>
 <a href="https://www.buddy.works/"><img src=".repo/gh-readme-buddyworks.png"></a>
 
-## Used By
-
 ## Setup
 
 Add __CameraKit__ to the dependencies block in your `app` level `build.gradle`:
