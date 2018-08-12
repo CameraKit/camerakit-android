@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-    <a href="https://join-slack.camerakit.website"><img src="https://join-slack.camerakit.website/badge.svg" alt="Build Status"></a>
+    <a href="https://join-slack.camerakit.website"><img src="https://join-slack.camerakit.website/badge.svg" alt="Join Slack"></a>
     <a href="https://codeclimate.com/github/wonderkiln/CameraKit-Android"><img src="https://codeclimate.com/github/wonderkiln/CameraKit-Android/badges/coverage.svg" alt="Code Climate"></a>
     <a href="https://codeclimate.com/github/wonderkiln/CameraKit-Android"><img src="https://codeclimate.com/github/wonderkiln/CameraKit-Android/badges/issue_count.svg" alt="Code Climate"></a>
 </p>
@@ -23,7 +23,7 @@
 
 CameraKit takes one of the hardest Android APIs and makes it into a high level and easy to use library that solves all of your problems.
 
-With CameraKit you are able to seamlessly do the following...
+With CameraKit you are able to effortlessly do the following...
 
 - Image and video capture seamlessly working with the same preview session.
 - Automatic system permission handling.
