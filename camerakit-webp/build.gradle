@@ -1,0 +1,16 @@
+apply plugin: 'camerakit-library'
+
+android {
+    externalNativeBuild {
+        cmake {
+            path 'src/main/cpp/CMakeLists.txt'
+        }
+    }
+}
+
+camerakit {
+    artifact = 'webp'
+    name = 'camerakit-webp'
+    description = ''
+    publish = true
+}

@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">CameraKit</string>
+    <string name="title_activity_main">CameraKit</string>
+    <string name="title_activity_image">CameraKit Image</string>
+    <string name="title_activity_video">CameraKit Video</string>
+
+    <string name="tab_text_camera">Camera</string>
+    <string name="tab_text_gallery">Gallery</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="action_info">Info</string>
+
+    <string name="info_title">CameraKit v%1$s</string>
+    <string name="info_message">
+        <b>Native API Call Results</b>\nPress the large capture button to capture a photo and long press to capture a video using the native camera APIs.
+        \n\n<b>CameraKit IO Results</b>\nUse the Floating Action Buttons on the right to capture photos and video using CameraKit surface IO.
+    </string>
+    <string name="info_button">Okay</string>
+</resources>

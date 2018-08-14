@@ -1,0 +1,28 @@
+buildscript {
+    repositories {
+        google()
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'org.gradle.api.plugins:gradle-nexus-plugin:0.7.1'
+    }
+}
+
+apply plugin: 'groovy'
+apply plugin: 'maven'
+apply plugin: 'nexus'
+
+dependencies {
+    repositories {
+        google()
+        jcenter()
+    }
+
+    implementation gradleApi()
+    implementation localGroovy()
+    implementation 'com.android.tools.build:gradle:3.1.4'
+    implementation 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.2.60'
+    implementation 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.1'
+    implementation 'com.github.dcendents:android-maven-gradle-plugin:2.1'
+}

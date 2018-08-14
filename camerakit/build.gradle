@@ -1,35 +1,16 @@
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-    id 'com.github.dcendents.android-maven' version '1.5'
-}
+apply plugin : 'camerakit-library'
 
 android {
-    compileSdkVersion versions.compileSdk
-    defaultConfig {
-        minSdkVersion versions.minSdk
-    }
-    testOptions {
-        unitTests.returnDefaultValues = true
-    }
-}
-
-dependencies {
-    api 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.2.50'
-    api 'com.android.support:support-annotations:27.1.1'
-    api 'com.camerakit:jpegkit:0.2.0-alpha1'
-    testImplementation 'junit:junit:4.12'
-    testImplementation 'org.mockito:mockito-core:1.10.19'
-}
-
-install {
-    repositories.mavenInstaller {
-        pom.project {
-            groupId project.group
-            artifactId 'camerakit'
-            packaging 'aar'
+    externalNativeBuild {
+        cmake {
+            path 'src/main/cpp/CMakeLists.txt'
         }
     }
 }
 
-apply from : 'deploy.gradle'
+camerakit {
+    artifact = 'core'
+    name = 'camerakit'
+    description = ''
+    publish = true
+}

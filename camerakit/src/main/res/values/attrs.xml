@@ -1,52 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Declarable attributes for a CameraKitView defined in XML. -->
     <declare-styleable name="CameraKitView">
 
-        <!-- Should the view handle layout_width or layout_height set as wrap_content. -->
         <attr name="android:adjustViewBounds" />
 
-        <!-- Aspect ratio to force the view to measure to. Depends on a adjustViewBounds and
-             having one dimension set as wrap_content. -->
-        <attr name="camera_aspectRatio" format="float" />
+        <attr name="camera_aspectRatio" format="float|string" />
 
-        <!-- Default camera orientation to use. -->
         <attr name="camera_facing" format="enum">
             <enum name="back" value="0" />
             <enum name="front" value="1" />
         </attr>
 
-        <!-- Default camera flash mode to use. -->
-        <attr name="camera_flash" format="enum">
+        <attr name="camera_flash" format="boolean">
             <enum name="off" value="0" />
             <enum name="on" value="1" />
             <enum name="auto" value="2" />
             <enum name="torch" value="3" />
         </attr>
 
-        <!-- How should the lens continuously focus. -->
-        <attr name="camera_focus" format="enum">
-            <enum name="off" value="0" />
-            <enum name="auto" value="1" />
-            <enum name="continuous" value="2" />
+    </declare-styleable>
+
+    <declare-styleable name="CameraPreview">
+
+        <attr name="camera_backend" format="enum">
+            <enum name="auto" value="0" />
+            <enum name="camera1" value="1" />
+            <enum name="camera2" value="2" />
         </attr>
 
-        <!-- Default zoom. Accepts a float representing the factor to zoom by. -->
-        <attr name="camera_zoomFactor" format="float" />
-
-        <attr name="camera_permissions">
-            <flag name="none" value="0" />
-            <flag name="camera" value="1" />
-            <flag name="audio" value="2" />
-            <flag name="storage" value="4" />
-            <flag name="location" value="8" />
-            <flag name="all" value="15" />
+        <attr name="preview_backend" format="enum">
+            <enum name="auto" value="0" />
+            <enum name="cpu" value="1" />
+            <enum name="gpu" value="2" />
         </attr>
 
-        <attr name="camera_imageMegaPixels" format="float" />
-
-        <attr name="camera_imageJpegQuality" format="integer" />
+        <attr name="preview_frontend" format="enum">
+            <enum name="auto" value="0" />
+            <enum name="textureView" value="1" />
+            <enum name="surfaceView" value="2" />
+            <enum name="glSurfaceView" value="3" />
+        </attr>
 
     </declare-styleable>
 

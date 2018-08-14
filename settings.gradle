@@ -1,1 +1,6 @@
-include ':app', ':camerakit'
+include ':camerakit'
+include ':camerakit-jpeg'
+include ':camerakit-webp'
+
+include ':app'
+include ':demo'

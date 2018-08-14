@@ -1,0 +1,48 @@
+apply plugin : 'com.android.application'
+apply plugin : 'kotlin-android'
+
+buildscript {
+    repositories {
+        google()
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.1.4'
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.2.60'
+    }
+}
+
+android {
+    compileSdkVersion 28
+    defaultConfig {
+        applicationId 'camerakit.android.demo'
+        minSdkVersion 16
+        targetSdkVersion 28
+        versionCode 1
+        versionName '1.0.0'
+        vectorDrawables.useSupportLibrary = true
+    }
+    splits {
+        abi {
+            enable true
+        }
+    }
+}
+
+repositories {
+    google()
+    jcenter()
+}
+
+dependencies {
+    implementation project(':camerakit')
+    implementation project(':camerakit-jpeg')
+    implementation project(':camerakit-webp')
+
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.2.60'
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support:design:27.1.1'
+    implementation 'com.android.support:support-v4:27.1.1'
+    implementation 'com.android.support:support-vector-drawable:27.1.1'
+}
