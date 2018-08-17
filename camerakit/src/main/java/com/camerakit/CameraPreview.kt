@@ -26,7 +26,7 @@ import kotlin.math.absoluteValue
 class CameraPreview : FrameLayout, CameraEvents {
 
     companion object {
-        private const val FORCE_DEPRECATED_API = true
+        private const val FORCE_DEPRECATED_API = false
     }
 
     var listener: Listener? = null

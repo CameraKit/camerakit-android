@@ -128,15 +128,13 @@ class Camera2(eventsDelegate: CameraEvents, context: Context) :
     }
 
     private fun setFlashRequest(captureRequest: CaptureRequest.Builder) {
+        captureRequest.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_OFF)
         if (flash == CameraFlash.OFF) {
             captureRequest.set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_AE_MODE_ON)
-            captureRequest.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_OFF)
         } else if (flash == CameraFlash.ON) {
             captureRequest.set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_AE_MODE_ON_ALWAYS_FLASH)
-            captureRequest.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_SINGLE)
         } else if (flash == CameraFlash.AUTO) {
             captureRequest.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH)
-            captureRequest.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_OFF)
         }
     }
 
@@ -182,6 +180,9 @@ class Camera2(eventsDelegate: CameraEvents, context: Context) :
 
             captureBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE)
             setFlashRequest(captureBuilder)
+            if (flash == CameraFlash.ON) {
+                captureBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_SINGLE)
+            }
 
             captureSession.stopRepeating()
             captureSession.abortCaptures()
