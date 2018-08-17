@@ -1,8 +1,0 @@
-[submodule "camerakit-jpeg/src/main/cpp/libjpeg-turbo"]
-	path = camerakit-jpeg/src/main/cpp/libjpeg-turbo
-	url = https://github.com/CameraKit/libjpeg-turbo
-	branch = camerakit
-[submodule "camerakit-webp/src/main/cpp/libwebp"]
-	path = camerakit-webp/src/main/cpp/libwebp
-	url = https://github.com/CameraKit/libwebp
-	branch = camerakit
