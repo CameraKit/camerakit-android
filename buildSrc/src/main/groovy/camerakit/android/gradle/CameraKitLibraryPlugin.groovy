@@ -86,7 +86,11 @@ class CameraKitLibraryPlugin implements Plugin<Project> {
             }
 
             if (camerakit.publish) {
-                setupPublishing(project, camerakit, android)
+                try {
+                    setupPublishing(project, camerakit, android)
+                } catch (FileNotFoundException e) {
+                    // todo: output something about this
+                }
             }
         }
     }
