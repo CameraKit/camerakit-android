@@ -168,7 +168,6 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
 
             dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTextColor(Color.parseColor("#91B8CC"));
             dialog.getButton(DialogInterface.BUTTON_NEUTRAL).setText(Html.fromHtml("<b>Dismiss</b>"));
-
             return true;
         }
 

@@ -17,7 +17,6 @@ import com.camerakit.type.CameraFacing
 import com.camerakit.type.CameraFlash
 import com.camerakit.type.CameraSize
 
-
 @RequiresApi(21)
 @SuppressWarnings("MissingPermission")
 class Camera2(eventsDelegate: CameraEvents, context: Context) :
@@ -32,14 +31,13 @@ class Camera2(eventsDelegate: CameraEvents, context: Context) :
     private var cameraAttributes: CameraAttributes? = null
 
     private var captureSession: CameraCaptureSession? = null
-
     private var previewRequestBuilder: CaptureRequest.Builder? = null
-    private var previewRequest: CaptureRequest? = null
 
     private var imageReader: ImageReader? = null
     private var photoCallback: ((jpeg: ByteArray) -> Unit)? = null
 
     private var flash: CameraFlash = CameraFlash.OFF
+    private var previewStarted = false
 
     @Synchronized
     override fun open(facing: CameraFacing) {
@@ -78,7 +76,12 @@ class Camera2(eventsDelegate: CameraEvents, context: Context) :
         cameraAttributes = null
         imageReader?.close()
         imageReader = null
+        previewStarted = false
         onCameraClosed()
+    }
+
+    @Synchronized
+    override fun setPreviewOrientation(degrees: Int) {
     }
 
     @Synchronized
@@ -98,13 +101,10 @@ class Camera2(eventsDelegate: CameraEvents, context: Context) :
                     val previewRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
                     previewRequestBuilder.addTarget(surface)
                     previewRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE)
-                    setFlashRequest(previewRequestBuilder)
+                    previewRequestBuilder.set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_MODE_AUTO)
 
-                    this.captureSession?.preview(previewRequestBuilder.build(), cameraHandler) { previewRequest ->
-                        this.previewRequestBuilder = previewRequestBuilder
-                        this.previewRequest = previewRequest
-                        onPreviewStarted()
-                    }
+                    captureSession.setRepeatingRequest(previewRequestBuilder.build(), captureCallback, cameraHandler)
+                    this.previewRequestBuilder = previewRequestBuilder
                 }
             }
         }
@@ -120,6 +120,7 @@ class Camera2(eventsDelegate: CameraEvents, context: Context) :
             captureSession.close()
             onPreviewStopped()
         }
+        previewStarted = false
     }
 
     @Synchronized
@@ -127,20 +128,9 @@ class Camera2(eventsDelegate: CameraEvents, context: Context) :
         this.flash = flash
     }
 
-    private fun setFlashRequest(captureRequest: CaptureRequest.Builder) {
-        captureRequest.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_OFF)
-        if (flash == CameraFlash.OFF) {
-            captureRequest.set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_AE_MODE_ON)
-        } else if (flash == CameraFlash.ON) {
-            captureRequest.set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_AE_MODE_ON_ALWAYS_FLASH)
-        } else if (flash == CameraFlash.AUTO) {
-            captureRequest.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH)
-        }
-    }
-
     @Synchronized
     override fun setPhotoSize(size: CameraSize) {
-        this.imageReader = ImageReader.newInstance(size.width, size.height, ImageFormat.JPEG, 4)
+        this.imageReader = ImageReader.newInstance(size.width, size.height, ImageFormat.JPEG, 2)
     }
 
     @Synchronized
@@ -154,9 +144,9 @@ class Camera2(eventsDelegate: CameraEvents, context: Context) :
         val captureSession = captureSession
         if (previewRequestBuilder != null && captureSession != null) {
             previewRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, CameraMetadata.CONTROL_AF_TRIGGER_START)
-            setFlashRequest(previewRequestBuilder)
             captureState = STATE_WAITING_LOCK
             captureSession.capture(previewRequestBuilder.build(), captureCallback, cameraHandler)
+            previewRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, null)
         }
     }
 
@@ -167,6 +157,14 @@ class Camera2(eventsDelegate: CameraEvents, context: Context) :
             previewRequestBuilder.set(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER, CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_START)
             captureState = STATE_WAITING_PRECAPTURE
             captureSession.capture(previewRequestBuilder.build(), captureCallback, cameraHandler)
+            previewRequestBuilder.set(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER, null)
+
+            previewRequestBuilder.set(CaptureRequest.FLASH_MODE, when (this.flash) {
+                CameraFlash.ON -> CaptureRequest.FLASH_MODE_TORCH
+                else -> CaptureRequest.FLASH_MODE_OFF
+            })
+            captureSession.setRepeatingRequest(previewRequestBuilder.build(), captureCallback, cameraHandler)
+
         }
     }
 
@@ -177,20 +175,24 @@ class Camera2(eventsDelegate: CameraEvents, context: Context) :
         if (captureSession != null && cameraDevice != null && imageReader != null) {
             val captureBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE)
             captureBuilder.addTarget(imageReader.surface)
-
             captureBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE)
-            setFlashRequest(captureBuilder)
-            if (flash == CameraFlash.ON) {
-                captureBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_SINGLE)
+            captureBuilder.set(CaptureRequest.FLASH_MODE, when (flash) {
+                CameraFlash.ON -> CaptureRequest.FLASH_MODE_SINGLE
+                else -> CaptureRequest.FLASH_MODE_OFF
+            })
+
+            val delay = when (flash) {
+                CameraFlash.ON -> 75L
+                else -> 0L
             }
 
-            captureSession.stopRepeating()
-            captureSession.abortCaptures()
-            captureSession.capture(captureBuilder.build(), object : CameraCaptureSession.CaptureCallback() {
-                override fun onCaptureCompleted(session: CameraCaptureSession, request: CaptureRequest, result: TotalCaptureResult) {
-                    unlockFocus()
-                }
-            }, cameraHandler)
+            cameraHandler.postDelayed({
+                captureSession.capture(captureBuilder.build(), object : CameraCaptureSession.CaptureCallback() {
+                    override fun onCaptureCompleted(session: CameraCaptureSession, request: CaptureRequest, result: TotalCaptureResult) {
+                        unlockFocus()
+                    }
+                }, cameraHandler)
+            }, delay)
         }
     }
 
@@ -199,10 +201,11 @@ class Camera2(eventsDelegate: CameraEvents, context: Context) :
         val captureSession = captureSession
         if (previewRequestBuilder != null && captureSession != null) {
             previewRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, CameraMetadata.CONTROL_AF_TRIGGER_CANCEL)
-            setFlashRequest(previewRequestBuilder)
             captureSession.capture(previewRequestBuilder.build(), captureCallback, cameraHandler)
             captureState = STATE_PREVIEW
-            captureSession.setRepeatingRequest(previewRequest, captureCallback, cameraHandler)
+            previewRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, null)
+            previewRequestBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_OFF)
+            captureSession.setRepeatingRequest(previewRequestBuilder.build(), captureCallback, cameraHandler)
         }
     }
 
@@ -225,16 +228,8 @@ class Camera2(eventsDelegate: CameraEvents, context: Context) :
                 }
                 STATE_WAITING_LOCK -> {
                     val afState = result.get(CaptureResult.CONTROL_AF_STATE)
-                    if (afState == null) {
-                        captureStillPicture()
-                    } else if (CaptureResult.CONTROL_AF_STATE_FOCUSED_LOCKED == afState || CaptureResult.CONTROL_AF_STATE_NOT_FOCUSED_LOCKED == afState) {
-                        val aeState = result.get(CaptureResult.CONTROL_AE_STATE)
-                        if (aeState == null || aeState == CaptureResult.CONTROL_AE_STATE_CONVERGED) {
-                            captureState = STATE_PICTURE_TAKEN
-                            captureStillPicture()
-                        } else {
-                            runPreCaptureSequence()
-                        }
+                    if (CaptureResult.CONTROL_AF_STATE_FOCUSED_LOCKED == afState || CaptureResult.CONTROL_AF_STATE_NOT_FOCUSED_LOCKED == afState) {
+                        runPreCaptureSequence()
                     }
                 }
                 STATE_WAITING_PRECAPTURE -> {
@@ -247,6 +242,7 @@ class Camera2(eventsDelegate: CameraEvents, context: Context) :
                 }
                 STATE_WAITING_NON_PRECAPTURE -> {
                     val aeState = result.get(CaptureResult.CONTROL_AE_STATE)
+                    CaptureResult.CONTROL_AE_STATE
                     if (aeState == null || aeState != CaptureResult.CONTROL_AE_STATE_PRECAPTURE) {
                         captureState = STATE_PICTURE_TAKEN
                         captureStillPicture()
@@ -256,6 +252,11 @@ class Camera2(eventsDelegate: CameraEvents, context: Context) :
         }
 
         override fun onCaptureCompleted(session: CameraCaptureSession, request: CaptureRequest, result: TotalCaptureResult) {
+            if (!previewStarted) {
+                onPreviewStarted()
+                previewStarted = true
+            }
+
             process(result)
         }
 

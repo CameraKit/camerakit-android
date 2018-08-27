@@ -22,6 +22,11 @@ class ManagedCameraApi(private val delegate: CameraApi) : CameraApi by delegate 
     }
 
     @Synchronized
+    override fun setPreviewOrientation(degrees: Int) {
+        cameraHandler.run { delegate.setPreviewOrientation(degrees) }
+    }
+
+    @Synchronized
     override fun startPreview(surfaceTexture: SurfaceTexture) {
         cameraHandler.run { delegate.startPreview(surfaceTexture) }
     }

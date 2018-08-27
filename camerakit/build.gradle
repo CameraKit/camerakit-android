@@ -4,10 +4,26 @@ plugins {
     id 'com.github.dcendents.android-maven' version '1.5'
 }
 
+kotlin {
+    experimental {
+        coroutines 'enable'
+    }
+}
+
 android {
     compileSdkVersion versions.compileSdk
     defaultConfig {
         minSdkVersion versions.minSdk
+        externalNativeBuild {
+            cmake {
+                cppFlags '-std=c++11'
+            }
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path 'src/main/cpp/CMakeLists.txt'
+        }
     }
     testOptions {
         unitTests.returnDefaultValues = true
@@ -15,7 +31,8 @@ android {
 }
 
 dependencies {
-    api 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.2.50'
+    api 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.2.61'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:0.24.0'
     api 'com.android.support:support-annotations:27.1.1'
     api 'com.camerakit:jpegkit:0.2.0-alpha1'
     testImplementation 'junit:junit:4.12'

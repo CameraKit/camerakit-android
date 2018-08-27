@@ -53,14 +53,20 @@ class Camera1(eventsDelegate: CameraEvents) :
     }
 
     @Synchronized
+    override fun setPreviewOrientation(degrees: Int) {
+        val camera = camera
+        if (camera != null) {
+            camera.setDisplayOrientation(degrees)
+        }
+    }
+
+    @Synchronized
     override fun setPreviewSize(size: CameraSize) {
         val camera = camera
         if (camera != null) {
             val parameters = camera.parameters
             parameters.setPreviewSize(size.width, size.height)
             camera.parameters = parameters
-        } else {
-            throw IllegalStateException()
         }
     }
 
@@ -79,8 +85,6 @@ class Camera1(eventsDelegate: CameraEvents) :
                 onPreviewStarted()
             }
             camera.startPreview()
-        } else {
-            throw IllegalStateException()
         }
     }
 
@@ -90,8 +94,6 @@ class Camera1(eventsDelegate: CameraEvents) :
         if (camera != null) {
             camera.stopPreview()
             onPreviewStopped()
-        } else {
-            throw IllegalStateException()
         }
     }
 

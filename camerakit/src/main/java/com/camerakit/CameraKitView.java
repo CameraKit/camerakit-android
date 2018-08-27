@@ -12,7 +12,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.ViewGroup;
 
 import com.camerakit.type.CameraFacing;
@@ -26,6 +25,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.List;
+
+import camerakit.android.CameraPreview;
 
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
@@ -223,8 +224,10 @@ public class CameraKitView extends GestureLayout {
     private ErrorListener mErrorListener;
     private PermissionsListener mPermissionsListener;
 
+    private static CameraFacing cameraFacing;
+    private static CameraFlash cameraFlash;
+
     private CameraPreview mCameraPreview;
-    private boolean isStarted = false;
 
     public CameraKitView(Context context) {
         super(context);
@@ -243,11 +246,19 @@ public class CameraKitView extends GestureLayout {
 
     private void obtainAttributes(Context context, AttributeSet attrs) {
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.CameraKitView);
-
         mAdjustViewBounds = a.getBoolean(R.styleable.CameraKitView_android_adjustViewBounds, false);
         mAspectRatio = a.getFloat(R.styleable.CameraKitView_camera_aspectRatio, -1f);
+
         mFacing = a.getInteger(R.styleable.CameraKitView_camera_facing, CameraKit.FACING_BACK);
+        if (cameraFacing == CameraFacing.FRONT) {
+            mFacing = CameraKit.FACING_FRONT;
+        }
+
         mFlash = a.getInteger(R.styleable.CameraKitView_camera_flash, CameraKit.FLASH_OFF);
+        if (cameraFlash == CameraFlash.ON) {
+            mFlash = CameraKit.FLASH_ON;
+        }
+
         mFocus = a.getInteger(R.styleable.CameraKitView_camera_focus, CameraKit.FOCUS_AUTO);
         mZoomFactor = a.getFloat(R.styleable.CameraKitView_camera_zoomFactor, 1.0f);
         mPermissions = a.getInteger(R.styleable.CameraKitView_camera_permissions, PERMISSION_CAMERA);
@@ -258,6 +269,7 @@ public class CameraKitView extends GestureLayout {
 
         mCameraPreview = new CameraPreview(getContext());
         addView(mCameraPreview);
+
         mCameraPreview.setListener(new CameraPreview.Listener() {
             @Override
             public void onCameraOpened() {
@@ -322,8 +334,8 @@ public class CameraKitView extends GestureLayout {
                 if (mAspectRatio > 0) {
                     width = (int) (height * mAspectRatio);
                     widthMeasureSpec = MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY);
-                } else if (mCameraPreview != null && mCameraPreview.getAdjustedPreviewSize() != null) {
-                    CameraSize previewSize = mCameraPreview.getAdjustedPreviewSize();
+                } else if (mCameraPreview != null && mCameraPreview.getSurfaceSize().area() > 0) {
+                    CameraSize previewSize = mCameraPreview.getSurfaceSize();
 
                     width = (int) (((float) height / (float) previewSize.getHeight()) * previewSize.getWidth());
                     widthMeasureSpec = MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY);
@@ -335,8 +347,8 @@ public class CameraKitView extends GestureLayout {
                 if (mAspectRatio > 0) {
                     height = (int) (width * mAspectRatio);
                     heightMeasureSpec = MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY);
-                } else if (mCameraPreview != null && mCameraPreview.getAdjustedPreviewSize() != null) {
-                    CameraSize previewSize = mCameraPreview.getAdjustedPreviewSize();
+                } else if (mCameraPreview != null && mCameraPreview.getSurfaceSize().area() > 0) {
+                    CameraSize previewSize = mCameraPreview.getSurfaceSize();
 
                     height = (int) (((float) width / (float) previewSize.getWidth()) * previewSize.getHeight());
                     heightMeasureSpec = MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY);
@@ -418,16 +430,11 @@ public class CameraKitView extends GestureLayout {
             mPermissionsListener.onPermissionsSuccess();
         }
 
-
         setFlash(mFlash);
         setImageMegaPixels(mImageMegaPixels);
 
-        isStarted = true;
-        if (getFacing() == CameraKit.FACING_BACK) {
-            mCameraPreview.start(CameraFacing.BACK);
-        } else {
-            mCameraPreview.start(CameraFacing.FRONT);
-        }
+        cameraFacing = getFacing() == CameraKit.FACING_BACK ? CameraFacing.BACK : CameraFacing.FRONT;
+        mCameraPreview.start(cameraFacing);
     }
 
     public void onStop() {
@@ -435,10 +442,7 @@ public class CameraKitView extends GestureLayout {
             return;
         }
 
-        if (isStarted) {
-            isStarted = false;
-            mCameraPreview.stop();
-        }
+        mCameraPreview.stop();
     }
 
     public void onResume() {
@@ -446,9 +450,7 @@ public class CameraKitView extends GestureLayout {
             return;
         }
 
-        if (isStarted) {
-            mCameraPreview.resume();
-        }
+        mCameraPreview.resume();
     }
 
     /**
@@ -459,41 +461,24 @@ public class CameraKitView extends GestureLayout {
             return;
         }
 
-        if (isStarted) {
-            mCameraPreview.pause();
-        }
-    }
-
-    @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
-        if (isStarted && mCameraPreview != null && w > 0 && h > 0) {
-            mCameraPreview.stop();
-            if (getFacing() == CameraKit.FACING_BACK) {
-                mCameraPreview.start(CameraFacing.BACK);
-            } else {
-                mCameraPreview.start(CameraFacing.FRONT);
-            }
-        }
+        mCameraPreview.pause();
     }
 
     /**
      * @param callback
      */
     public void captureImage(final ImageCallback callback) {
-        if (isStarted && mCameraPreview != null) {
-            mCameraPreview.capturePhoto(new CameraPreview.PhotoCallback() {
-                @Override
-                public void onCapture(@NotNull final byte[] jpeg) {
-                    post(new Runnable() {
-                        @Override
-                        public void run() {
-                            callback.onImage(CameraKitView.this, jpeg);
-                        }
-                    });
-                }
-            });
-        }
+        mCameraPreview.capturePhoto(new CameraPreview.PhotoCallback() {
+            @Override
+            public void onCapture(@NotNull final byte[] jpeg) {
+                post(new Runnable() {
+                    @Override
+                    public void run() {
+                        callback.onImage(CameraKitView.this, jpeg);
+                    }
+                });
+            }
+        });
     }
 
     /**
@@ -624,9 +609,7 @@ public class CameraKitView extends GestureLayout {
                 }
             }
 
-            if (!isStarted) {
-                onStart();
-            }
+            onStart();
         }
     }
 
@@ -667,9 +650,20 @@ public class CameraKitView extends GestureLayout {
      */
     public void setFacing(@CameraKit.Facing int facing) {
         mFacing = facing;
+        switch (mCameraPreview.getLifecycleState()) {
+            case PAUSED:
+            case STARTED: {
+                onStop();
+                onStart();
+                break;
+            }
 
-        if (isStarted && mCameraPreview != null) {
-            mCameraPreview.setFacing(facing == CameraKit.FACING_BACK ? CameraFacing.BACK : CameraFacing.FRONT);
+            case RESUMED: {
+                onStop();
+                onStart();
+                onResume();
+                break;
+            }
         }
     }
 
@@ -703,22 +697,18 @@ public class CameraKitView extends GestureLayout {
     public void setFlash(@CameraKit.Flash int flash) {
         mFlash = flash;
 
-        if (isStarted && mCameraPreview != null) {
-            switch (flash) {
-                case CameraKit.FLASH_OFF: {
-                    mCameraPreview.setFlash(CameraFlash.OFF);
-                    break;
-                }
-                case CameraKit.FLASH_ON: {
-                    mCameraPreview.setFlash(CameraFlash.ON);
-                    break;
-                }
-                case CameraKit.FLASH_AUTO: {
-                    mCameraPreview.setFlash(CameraFlash.AUTO);
-                    break;
-                }
+        switch (flash) {
+            case CameraKit.FLASH_OFF: {
+                cameraFlash = CameraFlash.OFF;
+                break;
+            }
+            case CameraKit.FLASH_ON: {
+                cameraFlash = CameraFlash.ON;
+                break;
             }
         }
+
+        mCameraPreview.setFlash(cameraFlash);
     }
 
     /**
@@ -838,9 +828,7 @@ public class CameraKitView extends GestureLayout {
 
     public void setImageMegaPixels(float imageMegaPixels) {
         mImageMegaPixels = imageMegaPixels;
-        if (isStarted && mCameraPreview != null) {
-            mCameraPreview.setImageMegaPixels(mImageMegaPixels, null);
-        }
+        mCameraPreview.setImageMegaPixels(mImageMegaPixels);
     }
 
     public float getImageMegaPixels() {
@@ -943,7 +931,7 @@ public class CameraKitView extends GestureLayout {
     }
 
     public CameraSize getPreviewResolution() {
-        if (!isStarted || mCameraPreview == null) {
+        if (mCameraPreview.getPreviewSize().area() == 0) {
             return null;
         }
 
@@ -951,7 +939,7 @@ public class CameraKitView extends GestureLayout {
     }
 
     public CameraSize getPhotoResolution() {
-        if (!isStarted || mCameraPreview == null) {
+        if (mCameraPreview.getPhotoSize().area() == 0) {
             return null;
         }
 
