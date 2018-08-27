@@ -1,4 +1,4 @@
-package camerakit.android.preview
+package com.camerakit.preview
 
 import android.graphics.SurfaceTexture
 import android.opengl.Matrix

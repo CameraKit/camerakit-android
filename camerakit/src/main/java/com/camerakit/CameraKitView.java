@@ -26,8 +26,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.List;
 
-import camerakit.android.CameraPreview;
-
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
 /**

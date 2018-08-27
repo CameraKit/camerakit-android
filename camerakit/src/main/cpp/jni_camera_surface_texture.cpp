@@ -76,7 +76,7 @@ namespace camerakit {
 
   namespace jni {
 
-    const char* const classPathName = "camerakit/android/preview/CameraSurfaceTexture";
+    const char* const classPathName = "com/camerakit/preview/CameraSurfaceTexture";
 
     static JNINativeMethod methods[] = {
         {"nativeInit",           "(II)V",   (void*) CameraSurfaceTexture_init},

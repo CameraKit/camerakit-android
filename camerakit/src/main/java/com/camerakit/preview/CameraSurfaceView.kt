@@ -1,4 +1,4 @@
-package camerakit.android.preview
+package com.camerakit.preview
 
 import android.content.Context
 import android.opengl.GLES20.glGenTextures

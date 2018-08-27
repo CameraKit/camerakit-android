@@ -1,14 +1,14 @@
-package camerakit.android
+package com.camerakit
 
 import android.content.Context
 import android.os.Build
 import android.util.AttributeSet
 import android.view.WindowManager
 import android.widget.FrameLayout
-import camerakit.android.preview.CameraSurfaceTexture
-import camerakit.android.preview.CameraSurfaceTextureListener
-import camerakit.android.preview.CameraSurfaceView
-import camerakit.android.util.CameraSizeCalculator
+import com.camerakit.preview.CameraSurfaceTexture
+import com.camerakit.preview.CameraSurfaceTextureListener
+import com.camerakit.preview.CameraSurfaceView
+import com.camerakit.util.CameraSizeCalculator
 import com.camerakit.api.CameraApi
 import com.camerakit.api.CameraAttributes
 import com.camerakit.api.CameraEvents

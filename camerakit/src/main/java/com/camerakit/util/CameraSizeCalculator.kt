@@ -1,4 +1,4 @@
-package camerakit.android.util
+package com.camerakit.util
 
 import com.camerakit.type.CameraSize
 import kotlin.math.absoluteValue

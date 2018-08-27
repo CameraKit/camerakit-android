@@ -83,7 +83,7 @@ namespace camerakit {
 
   namespace jni {
 
-    const char* const classPathName = "camerakit/android/preview/CameraSurfaceView";
+    const char* const classPathName = "com/camerakit/preview/CameraSurfaceView";
 
     static JNINativeMethod methods[] = {
             {"nativeInit",             "()V",    (void*) CameraSurfaceView_init},
