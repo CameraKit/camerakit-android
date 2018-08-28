@@ -38,9 +38,11 @@ class Camera2(eventsDelegate: CameraEvents, context: Context) :
 
     private var flash: CameraFlash = CameraFlash.OFF
     private var previewStarted = false
+    private var cameraFacing: CameraFacing = CameraFacing.BACK
 
     @Synchronized
     override fun open(facing: CameraFacing) {
+        cameraFacing = facing
         val cameraId = cameraManager.getCameraId(facing) ?: throw RuntimeException()
         val cameraCharacteristics = cameraManager.getCameraCharacteristics(cameraId)
         cameraManager.whenDeviceAvailable(cameraId, cameraHandler) {
@@ -136,7 +138,12 @@ class Camera2(eventsDelegate: CameraEvents, context: Context) :
     @Synchronized
     override fun capturePhoto(callback: (jpeg: ByteArray) -> Unit) {
         this.photoCallback = callback
-        lockFocus()
+
+        if (cameraFacing == CameraFacing.BACK) {
+            lockFocus()
+        } else {
+            captureStillPicture()
+        }
     }
 
     private fun lockFocus() {
@@ -158,7 +165,6 @@ class Camera2(eventsDelegate: CameraEvents, context: Context) :
             captureState = STATE_WAITING_PRECAPTURE
             captureSession.capture(previewRequestBuilder.build(), captureCallback, cameraHandler)
             previewRequestBuilder.set(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER, null)
-
             previewRequestBuilder.set(CaptureRequest.FLASH_MODE, when (this.flash) {
                 CameraFlash.ON -> CaptureRequest.FLASH_MODE_TORCH
                 else -> CaptureRequest.FLASH_MODE_OFF
@@ -242,7 +248,6 @@ class Camera2(eventsDelegate: CameraEvents, context: Context) :
                 }
                 STATE_WAITING_NON_PRECAPTURE -> {
                     val aeState = result.get(CaptureResult.CONTROL_AE_STATE)
-                    CaptureResult.CONTROL_AE_STATE
                     if (aeState == null || aeState != CaptureResult.CONTROL_AE_STATE_PRECAPTURE) {
                         captureState = STATE_PICTURE_TAKEN
                         captureStillPicture()
