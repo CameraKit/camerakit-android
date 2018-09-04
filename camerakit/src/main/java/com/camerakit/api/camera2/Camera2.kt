@@ -7,6 +7,7 @@ import android.graphics.SurfaceTexture
 import android.hardware.camera2.*
 import android.media.ImageReader
 import android.support.annotation.RequiresApi
+import android.util.Log
 import android.view.Surface
 import com.camerakit.api.CameraApi
 import com.camerakit.api.CameraAttributes
@@ -39,6 +40,7 @@ class Camera2(eventsDelegate: CameraEvents, context: Context) :
     private var flash: CameraFlash = CameraFlash.OFF
     private var previewStarted = false
     private var cameraFacing: CameraFacing = CameraFacing.BACK
+    private var waitingFrames: Int = 0
 
     @Synchronized
     override fun open(facing: CameraFacing) {
@@ -57,13 +59,14 @@ class Camera2(eventsDelegate: CameraEvents, context: Context) :
                 override fun onDisconnected(cameraDevice: CameraDevice) {
                     cameraDevice.close()
                     this@Camera2.cameraDevice = null
+                    this@Camera2.captureSession = null
                     onCameraClosed()
                 }
 
                 override fun onError(cameraDevice: CameraDevice, error: Int) {
                     cameraDevice.close()
                     this@Camera2.cameraDevice = null
-
+                    this@Camera2.captureSession = null
                 }
             }, cameraHandler)
         }
@@ -117,10 +120,14 @@ class Camera2(eventsDelegate: CameraEvents, context: Context) :
         val captureSession = captureSession
         this.captureSession = null
         if (captureSession != null) {
-            captureSession.stopRepeating()
-            captureSession.abortCaptures()
-            captureSession.close()
-            onPreviewStopped()
+            try {
+                captureSession.stopRepeating()
+                captureSession.abortCaptures()
+                captureSession.close()
+            } catch (e: Exception) {
+            } finally {
+                onPreviewStopped()
+            }
         }
         previewStarted = false
     }
@@ -150,10 +157,14 @@ class Camera2(eventsDelegate: CameraEvents, context: Context) :
         val previewRequestBuilder = previewRequestBuilder
         val captureSession = captureSession
         if (previewRequestBuilder != null && captureSession != null) {
-            previewRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, CameraMetadata.CONTROL_AF_TRIGGER_START)
-            captureState = STATE_WAITING_LOCK
-            captureSession.capture(previewRequestBuilder.build(), captureCallback, cameraHandler)
-            previewRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, null)
+            try {
+                previewRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, CameraMetadata.CONTROL_AF_TRIGGER_START)
+                captureState = STATE_WAITING_LOCK
+                waitingFrames = 0
+                captureSession.capture(previewRequestBuilder.build(), captureCallback, cameraHandler)
+                previewRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, null)
+            } catch (e: Exception) {
+            }
         }
     }
 
@@ -236,6 +247,13 @@ class Camera2(eventsDelegate: CameraEvents, context: Context) :
                     val afState = result.get(CaptureResult.CONTROL_AF_STATE)
                     if (CaptureResult.CONTROL_AF_STATE_FOCUSED_LOCKED == afState || CaptureResult.CONTROL_AF_STATE_NOT_FOCUSED_LOCKED == afState) {
                         runPreCaptureSequence()
+                    } else if (null == afState || CaptureResult.CONTROL_AF_STATE_INACTIVE == afState) {
+                        captureStillPicture()
+                    } else if (waitingFrames >= 5) {
+                        waitingFrames = 0
+                        captureStillPicture()
+                    } else {
+                        waitingFrames++
                     }
                 }
                 STATE_WAITING_PRECAPTURE -> {
