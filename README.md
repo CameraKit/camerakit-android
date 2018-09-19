@@ -58,6 +58,7 @@ To use CameraKit, simply add a `CameraView` to your layout:
     android:id="@+id/camera"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:keepScreenOn="true"    
     android:adjustViewBounds="true" />
 ```
 
