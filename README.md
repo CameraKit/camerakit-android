@@ -48,7 +48,7 @@ With CameraKit you are able to effortlessly do the following...
 Add __CameraKit__ to the dependencies block in your `app` level `build.gradle`:
 
 ```groovy
-implementation 'com.camerakit:camerakit:1.0.0'
+implementation 'com.camerakit:camerakit:1.0.0-beta3.9'
 ```
 
 
