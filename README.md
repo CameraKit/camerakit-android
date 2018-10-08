@@ -1,26 +1,28 @@
 <p align="center">
-    <a href="https://camerakit.website" target="_blank">
-        <img alt='CameraKit Header' src='.repo/gh-readme-header.png' />
+    <a href="https://camerakit.io" target="_blank">
+        <img alt='CameraKit Header' src='.repo/gh-readme-header.svg' />
     </a>
 </p>
 
 <p align="center">
-    <a href="https://www.wonderkiln.com" target="_blank">
-        <img alt='CameraKit Header' src='.repo/gh-readme-wk.png'/>
+    <a href="https://play.google.com/store/apps/details?id=com.camerakit.demo&hl=en" target="_blank">
+        <img alt='CameraKit Header' height="42px" src='.repo/gh-readme-app.svg'/>
     </a>
-    <a href="https://play.google.com/store/apps/details?id=com.wonderkiln.camerakit.demo&hl=en" target="_blank">
-        <img alt='CameraKit Header' src='.repo/gh-readme-app.png'/>
+    <a href="https://buddy.works/" target="_blank">
+        <img alt='Buddy.Works' height="42px" src='https://assets.buddy.works/automated-dark.svg'/>
     </a>
 </p>
 
 <p align="center">
-    <a href="#backers" alt="Backers on Open Collective"><img src="https://opencollective.com/CameraKit-Android/backers/badge.svg" /></a> 
-    <a href="#sponsors" alt="Sponsors on Open Collective"><img src="https://opencollective.com/CameraKit-Android/sponsors/badge.svg" /></a>
-    <a href="https://join-slack.camerakit.website"><img src="https://join-slack.camerakit.website/badge.svg" alt="Build Status"></a>
-    <a href="https://circleci.com/gh/CameraKit/camerakit-android/tree/master"><img src="https://circleci.com/gh/CameraKit/camerakit-android/tree/master.svg?style=shield" alt="CircleCI"></a>
-    <a href="https://codeclimate.com/github/wonderkiln/CameraKit-Android"><img src="https://codeclimate.com/github/wonderkiln/CameraKit-Android/badges/gpa.svg" alt="Code Climate"></a>
-    <a href="https://codeclimate.com/github/wonderkiln/CameraKit-Android"><img src="https://codeclimate.com/github/wonderkiln/CameraKit-Android/badges/coverage.svg" alt="Code Climate"></a>
-    <a href="https://codeclimate.com/github/wonderkiln/CameraKit-Android"><img src="https://codeclimate.com/github/wonderkiln/CameraKit-Android/badges/issue_count.svg" alt="Code Climate"></a>
+    <a href="https://spectrum.chat/camerakit/">
+        <img src=".repo/gh-join-spectrum.svg" alt="Join Slack" height="28px">
+    </a>
+    <a href="https://codeclimate.com/github/wonderkiln/CameraKit-Android">
+        <img src="https://codeclimate.com/github/wonderkiln/CameraKit-Android/badges/coverage.svg" alt="Code Climate" style="margin-bottom: 4px;">
+    </a>
+    <a href="https://codeclimate.com/github/wonderkiln/CameraKit-Android">
+        <img src="https://codeclimate.com/github/wonderkiln/CameraKit-Android/badges/issue_count.svg" alt="Code Climate" style="margin-bottom: 4px;">
+    </a>
 </p>
 
 CameraKit takes one of the hardest Android APIs and makes it into a high level and easy to use library that solves all of your problems.
@@ -40,95 +42,88 @@ With CameraKit you are able to seamlessly do the following...
 - Built-in tap to focus.
 - Built-in pinch to zoom.
 
+## Sponsored By
+<a href="https://www.infitting.com/"><img src=".repo/gh-brand-infitting-logo.svg" height="50px" style="margin: 20px"></a>
+<a href="https://www.expensify.com/"><img src=".repo/gh-readme-expensify-logo.svg" height="50px" style="margin: 20px"></a>
+<a href="https://www.goosechase.com/"><img src=".repo/gh-brand-goosechase-logo.svg" height="50px" style="margin: 20px"></a>
+<a href="https://www.alpha-apps.ae/"><img src=".repo/gh-brand-alphaapps-logo.png" height="50px" style="margin: 20px; margin-bottom: 25px"></a>
+<a href="https://www.buddy.works/"><img src=".repo/gh-readme-buddyworks.png" height="100px"></a>
+
+# Pardon the dust
+__CameraKit__ has been going through major changes in the past few months. We've slowed support on verison `0.13.2` and moved our focus to `1.0.0`. This release will bring improved stability, faster processing and a standard API for future development of __CameraKit__. The lastest version is currently in beta, `1.0.0-beta3.9`. 
+
+The code lives on the branch `v1.0.0`. You can read the discussion about `1.0.0` on the pull request #318. If you have a question or want to talk directly with the team, leave us a message on [spectrum.chat](https://spectrum.chat/camerakit/).
+
+The official `1.0.0` release is coming in a few short weeks. With it we will launch an all new documentation site. In the mean time check out the setup instructions for `1.0.0-beta3.9` below!
+
 
 ## Setup
-Add __CameraKit__ to the dependencies block in your `app` level `build.gradle`:
+To include __CameraKit__ in your project, add the following to your `app` level `build.gradle`.
+```
+repositories {
+    maven { url 'https://dl.bintray.com/camerakit/camerakit-android' }
+}
 
-```groovy		
-compile 'com.wonderkiln:camerakit:0.13.1'
-```		
-
-
+dependencies {
+    implementation 'com.camerakit:camerakit:1.0.0-beta3.9'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.2.61'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:0.24.0'
+}
+```
 ## Usage
-
-To use CameraKit, simply add a `CameraView` to your layout:
-
-```xml
-<com.wonderkiln.camerakit.CameraView
+Create a `CameraKitView` in your layout as follows:
+```
+<com.camerakit.CameraKitView
     android:id="@+id/camera"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:adjustViewBounds="true" />
+    android:adjustViewBounds="true"
+    app:camera_facing="back"
+    app:camera_focus="continuous"
+    app:camera_permissions="camera" />
 ```
 
-Make sure you override `onResume` and `onPause` in your activity, and make calls respectively to `CameraView.start()` and `CameraView.stop()`.
+Then create a new `CameraKitView` object in your `Activity` and override the following methods.
+```
+private CameraKitView cameraKitView;
 
-```java
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_main);
+    cameraKitView = findViewById(R.id.camera);
+}
+
+@Override
+protected void onStart() {
+    super.onStart();
+    cameraKitView.onStart();
+}
+
 @Override
 protected void onResume() {
     super.onResume();
-    cameraView.start();
+    cameraKitView.onResume();
 }
 
 @Override
 protected void onPause() {
-    cameraView.stop();
+    cameraKitView.onPause();
     super.onPause();
 }
+
+@Override
+protected void onStop() {
+    cameraKitView.onStop();
+    super.onStop();
+}
+
+@Override
+public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    cameraKitView.onRequestPermissionsResult(requestCode, permissions, grantResults);
+}
 ```
-
-## ProGuard
-
-Starting in version 0.13.0 you need to add the following options to your Proguard rules:
-
-```
--dontwarn com.google.android.gms.**
-```
-
-## Documentation
-Check out our [Documentation Website](http://docs.camerakit.website) for more documentation on how to use to CameraKit.
-
-# Sponsoring
-
-Most of the core team members, CameraKit contributors and contributors in the ecosystem do this open source work in their free time. If you use CameraKit for a serious task, and you'd like us to invest more time on it, please donate. This project increases your income/productivity too. It makes development and applications faster and it reduces the required bandwidth.
-
-This is how we use the donations:
-
-- Allow the core team to work on CameraKit
-- Thank contributors if they invested a large amount of time in contributing
-- Support projects in the ecosystem that are of great value for users
-- Infrastructure cost
-- Fees for money handling
-
-## Sponsors
-
-[[Become a sponsor](https://opencollective.com/CameraKit-Android#sponsor)] and your logo will show up here with a link to your website.
-
-<a href="https://www.expensify.com/"><img src=".repo/expensify-logo.png" width="150"></a>
-
-<a href="https://opencollective.com/CameraKit-Android/sponsor/0/website" target="_blank"><img src="https://opencollective.com/CameraKit-Android/sponsor/0/avatar.svg"></a>
-<a href="https://opencollective.com/CameraKit-Android/sponsor/1/website" target="_blank"><img src="https://opencollective.com/CameraKit-Android/sponsor/1/avatar.svg"></a>
-<a href="https://opencollective.com/CameraKit-Android/sponsor/2/website" target="_blank"><img src="https://opencollective.com/CameraKit-Android/sponsor/2/avatar.svg"></a>
-<a href="https://opencollective.com/CameraKit-Android/sponsor/3/website" target="_blank"><img src="https://opencollective.com/CameraKit-Android/sponsor/3/avatar.svg"></a>
-<a href="https://opencollective.com/CameraKit-Android/sponsor/4/website" target="_blank"><img src="https://opencollective.com/CameraKit-Android/sponsor/4/avatar.svg"></a>
-<a href="https://opencollective.com/CameraKit-Android/sponsor/5/website" target="_blank"><img src="https://opencollective.com/CameraKit-Android/sponsor/5/avatar.svg"></a>
-<a href="https://opencollective.com/CameraKit-Android/sponsor/6/website" target="_blank"><img src="https://opencollective.com/CameraKit-Android/sponsor/6/avatar.svg"></a>
-<a href="https://opencollective.com/CameraKit-Android/sponsor/7/website" target="_blank"><img src="https://opencollective.com/CameraKit-Android/sponsor/7/avatar.svg"></a>
-<a href="https://opencollective.com/CameraKit-Android/sponsor/8/website" target="_blank"><img src="https://opencollective.com/CameraKit-Android/sponsor/8/avatar.svg"></a>
-<a href="https://opencollective.com/CameraKit-Android/sponsor/9/website" target="_blank"><img src="https://opencollective.com/CameraKit-Android/sponsor/9/avatar.svg"></a>
-
-## Backers
-
-[[Become a backer](https://opencollective.com/CameraKit-Android#backer)] and get your image on our README on Github with a link to your site.
-
-<a href="https://opencollective.com/CameraKit-Android#backers" target="_blank"><img src="https://opencollective.com/CameraKit-Android/backers.svg?width=890"></a>
-
-## Contributors
-
-This project exists thanks to all the people who contribute. [[Contribute]](CONTRIBUTING.md).
-<a href="graphs/contributors"><img src="https://opencollective.com/CameraKit-Android/contributors.svg?width=890" /></a>
-
 ---
-
 ## License
-CameraKit is [MIT License](https://github.com/wonderkiln/CameraKit-Android/blob/master/LICENSE)
+CameraKit is [MIT License](https://github.com/CameraKit/CameraKit-Android/blob/master/LICENSE)
