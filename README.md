@@ -15,19 +15,19 @@
 
 <p align="center">
     <a href="https://spectrum.chat/camerakit/">
-        <img src=".repo/gh-join-spectrum.svg" alt="Join Slack" height="28px">
+        <img src=".repo/gh-join-spectrum.svg" alt="Join Spectrum" height="28px" align="center">
     </a>
     <a href="https://codeclimate.com/github/wonderkiln/CameraKit-Android">
-        <img src="https://codeclimate.com/github/wonderkiln/CameraKit-Android/badges/coverage.svg" alt="Code Climate" style="margin-bottom: 4px;">
+        <img src="https://codeclimate.com/github/wonderkiln/CameraKit-Android/badges/coverage.svg" alt="Code Coverage" align="center">
     </a>
     <a href="https://codeclimate.com/github/wonderkiln/CameraKit-Android">
-        <img src="https://codeclimate.com/github/wonderkiln/CameraKit-Android/badges/issue_count.svg" alt="Code Climate" style="margin-bottom: 4px;">
+        <img src="https://codeclimate.com/github/wonderkiln/CameraKit-Android/badges/issue_count.svg" alt="Issue Count" align="center">
     </a>
 </p>
 
 CameraKit takes one of the hardest Android APIs and makes it into a high level and easy to use library that solves all of your problems.
 
-With CameraKit you are able to seamlessly do the following...
+With CameraKit you are able to effortlessly do the following...
 
 - Image and video capture seamlessly working with the same preview session.
 - Automatic system permission handling.
@@ -43,27 +43,25 @@ With CameraKit you are able to seamlessly do the following...
 - Built-in pinch to zoom.
 
 ## Sponsored By
-<a href="https://www.infitting.com/"><img src=".repo/gh-brand-infitting-logo.svg" height="50px" style="margin: 20px"></a>
-<a href="https://www.expensify.com/"><img src=".repo/gh-readme-expensify-logo.svg" height="50px" style="margin: 20px"></a>
-<a href="https://www.goosechase.com/"><img src=".repo/gh-brand-goosechase-logo.svg" height="50px" style="margin: 20px"></a>
-<a href="https://www.alpha-apps.ae/"><img src=".repo/gh-brand-alphaapps-logo.png" height="50px" style="margin: 20px; margin-bottom: 25px"></a>
-<a href="https://www.buddy.works/"><img src=".repo/gh-readme-buddyworks.png" height="100px"></a>
+<a href="https://www.infitting.com/"><img src=".repo/gh-readme-infitting-logo.svg" height="50px" width="165px" align="center"></a>
+<a href="https://www.expensify.com/"><img src=".repo/gh-readme-expensify-logo.svg" height="50px" width="375px" align="center"></a>
+<a href="https://www.goosechase.com/"><img src=".repo/gh-readme-goosechase-logo.svg" height="50px"
+width="280px" align="center"></a>
+<a href="https://www.alpha-apps.ae/"><img src=".repo/gh-readme-alphaapps-logo.png" height="50px"
+width="130px" align="center"></a>
+<a href="https://www.buddy.works/"><img src=".repo/gh-readme-buddyworks-logo.png" height="100px"  width="250px" align="center"></a>
 
 # Pardon the dust
 __CameraKit__ has been going through major changes in the past few months. We've slowed support on verison `0.13.2` and moved our focus to `1.0.0`. This release will bring improved stability, faster processing and a standard API for future development of __CameraKit__. The lastest version is currently in beta, `1.0.0-beta3.9`. 
 
-The code lives on the branch `v1.0.0`. You can read the discussion about `1.0.0` on the pull request #318. If you have a question or want to talk directly with the team, leave us a message on [spectrum.chat](https://spectrum.chat/camerakit/).
+The code lives on the branch `v1.0.0`. You can read the discussion about `1.0.0` on the pull request [#318](https://github.com/CameraKit/camerakit-android/pull/318). If you have a question or want to talk directly with the team, leave us a message on [spectrum.chat](https://spectrum.chat/camerakit/).
 
-The official `1.0.0` release is coming in a few short weeks. With it we will launch an all new documentation site. In the mean time check out the setup instructions for `1.0.0-beta3.9` below!
+With the official `1.0.0` release we will launch an all new documentation site. In the meantime check out the setup instructions for `1.0.0-beta3.9` below!
 
 
 ## Setup
 To include __CameraKit__ in your project, add the following to your `app` level `build.gradle`.
-```
-repositories {
-    maven { url 'https://dl.bintray.com/camerakit/camerakit-android' }
-}
-
+```java
 dependencies {
     implementation 'com.camerakit:camerakit:1.0.0-beta3.9'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.2.61'
@@ -78,13 +76,15 @@ Create a `CameraKitView` in your layout as follows:
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:adjustViewBounds="true"
+    android:keepScreenOn="true"   <!-- keep screen awake while CameraKitView is active -->
+    app:camera_flash="auto"
     app:camera_facing="back"
     app:camera_focus="continuous"
     app:camera_permissions="camera" />
 ```
 
 Then create a new `CameraKitView` object in your `Activity` and override the following methods.
-```
+```java
 private CameraKitView cameraKitView;
 
 @Override
@@ -124,6 +124,5 @@ public void onRequestPermissionsResult(int requestCode, String[] permissions, in
     cameraKitView.onRequestPermissionsResult(requestCode, permissions, grantResults);
 }
 ```
----
 ## License
 CameraKit is [MIT License](https://github.com/CameraKit/CameraKit-Android/blob/master/LICENSE)
