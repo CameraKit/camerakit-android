@@ -36,6 +36,11 @@ captures/
 *.iml
 .idea/workspace.xml
 
+# Eclipse
+*.project
+*.classpath
+*.prefs
+
 # Keystore files
 *.jks
 
