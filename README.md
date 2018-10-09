@@ -5,23 +5,14 @@
 </p>
 
 <p align="center">
-    <a href="https://play.google.com/store/apps/details?id=com.camerakit.demo&hl=en" target="_blank">
-        <img alt='CameraKit Header' height="42px" src='.repo/gh-readme-app.svg'/>
+    <a href="https://play.google.com/store/apps/details?id=com.wonderkiln.camerakit.demo" target="_blank">
+        <img alt='Google Play Link' height="42px" src='.repo/gh-readme-googleplay-demo-button.svg'/>
+    </a>
+        <a href="https://spectrum.chat/camerakit/">
+        <img alt="Join Spectrum" height="42px" src=".repo/gh-readme-spectrum-button.svg" >
     </a>
     <a href="https://buddy.works/" target="_blank">
-        <img alt='Buddy.Works' height="42px" src='https://assets.buddy.works/automated-dark.svg'/>
-    </a>
-</p>
-
-<p align="center">
-    <a href="https://spectrum.chat/camerakit/">
-        <img src=".repo/gh-join-spectrum.svg" alt="Join Spectrum" height="28px" align="center">
-    </a>
-    <a href="https://codeclimate.com/github/wonderkiln/CameraKit-Android">
-        <img src="https://codeclimate.com/github/wonderkiln/CameraKit-Android/badges/coverage.svg" alt="Code Coverage" align="center">
-    </a>
-    <a href="https://codeclimate.com/github/wonderkiln/CameraKit-Android">
-        <img src="https://codeclimate.com/github/wonderkiln/CameraKit-Android/badges/issue_count.svg" alt="Issue Count" align="center">
+        <img alt='Buddy.Works' height="41px" src='https://assets.buddy.works/automated-dark.svg'/>
     </a>
 </p>
 
@@ -43,13 +34,17 @@ With CameraKit you are able to effortlessly do the following...
 - Built-in pinch to zoom.
 
 ## Sponsored By
-<a href="https://www.infitting.com/"><img src=".repo/gh-readme-infitting-logo.svg" height="50px" width="165px" align="center"></a>
-<a href="https://www.expensify.com/"><img src=".repo/gh-readme-expensify-logo.svg" height="50px" width="375px" align="center"></a>
-<a href="https://www.goosechase.com/"><img src=".repo/gh-readme-goosechase-logo.svg" height="50px"
-width="280px" align="center"></a>
-<a href="https://www.alpha-apps.ae/"><img src=".repo/gh-readme-alphaapps-logo.png" height="50px"
-width="130px" align="center"></a>
-<a href="https://www.buddy.works/"><img src=".repo/gh-readme-buddyworks-logo.png" height="100px"  width="250px" align="center"></a>
+<a href="https://www.expensify.com/"><img alt="Expensify" src=".repo/gh-readme-expensify-logo.svg" height="45px" width="375px" align="center"></a>
+<a href="https://www.buddy.works/"><img alt="Buddy.Works" src=".repo/gh-readme-buddyworks-logo.png" height="100px"  width="250px" align="center"></a>
+
+
+## Trusted By
+<a href="https://www.infitting.com/"><img alt="InFitting" src=".repo/gh-readme-infitting-logo.svg" height="30px" width="110px" align="center"></a>
+<a href="https://www.goosechase.com/"><img alt="GooseChase" src=".repo/gh-readme-goosechase-logo.svg" height="30px" width="175px" align="center"></a>
+<a href="https://www.alpha-apps.ae/"><img alt="Alpha Apps" src=".repo/gh-readme-alphaapps-logo.png" height="30px" width="78px" align="center"></a>
+<a href="https://www.expensify.com/"><img alt="Expensify" src=".repo/gh-readme-expensify-logo.svg" height="26px" width="220px" align="center"></a>
+<a href="https://www.buddy.works/"><img alt="Buddy.Works" src=".repo/gh-readme-buddyworks-logo.png" height="55px"  width="137px" align="center"></a>
+
 
 # Pardon the dust
 __CameraKit__ has been going through major changes in the past few months. We've slowed support on verison `0.13.2` and moved our focus to `1.0.0`. This release will bring improved stability, faster processing and a standard API for future development of __CameraKit__. The lastest version is currently in beta, `1.0.0-beta3.9`. 
