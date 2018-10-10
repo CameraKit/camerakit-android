@@ -3,6 +3,7 @@ package com.wonderkiln.camerakit;
 import android.support.annotation.Nullable;
 
 import com.google.android.gms.vision.Detector;
+import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.text.TextBlock;
 
 import java.io.File;
@@ -27,6 +28,7 @@ abstract class CameraImpl {
     abstract void setFocus(@Focus int focus);
     abstract void setMethod(@CaptureMethod int method);
     abstract void setTextDetector(Detector<TextBlock> detector);
+    abstract void setBarCodeDetector(Detector<Barcode> detector);
 
     abstract void setVideoQuality(@VideoQuality int videoQuality);
     abstract void setVideoBitRate(int videoBitRate);

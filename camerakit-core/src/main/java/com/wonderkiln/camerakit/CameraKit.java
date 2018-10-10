@@ -2,6 +2,8 @@ package com.wonderkiln.camerakit;
 
 import android.content.res.Resources;
 
+import com.google.android.gms.vision.barcode.Barcode;
+
 public class CameraKit {
 
     static class Internal {
@@ -42,6 +44,11 @@ public class CameraKit {
         public static final int VIDEO_QUALITY_HIGHEST = 4;
         public static final int VIDEO_QUALITY_LOWEST = 5;
         public static final int VIDEO_QUALITY_QVGA = 6;
+
+        public static final int BARCODE_QR = Barcode.QR_CODE;
+        public static final int BARCODE_ALL = Barcode.ALL_FORMATS;
+        public static final int BARCODE_EAN8 = Barcode.EAN_8;
+        public static final int BACODE_EAN13 = Barcode.EAN_13;
 
     }
 

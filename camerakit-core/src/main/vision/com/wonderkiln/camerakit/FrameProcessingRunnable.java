@@ -1,5 +1,6 @@
 package com.wonderkiln.camerakit;
 
+import android.annotation.SuppressLint;
 import android.graphics.ImageFormat;
 import android.hardware.Camera;
 import android.util.Log;
@@ -50,8 +51,10 @@ public class FrameProcessingRunnable implements Runnable {
     private Size mPreviewSize;
     private Camera mCamera;
 
+    @SuppressLint("Assert")
     public FrameProcessingRunnable(Detector<?> detector, Size mPreviewSize, Camera mCamera) {
         mDetector = detector;
+        assert mDetector.isOperational();
         this.mPreviewSize = mPreviewSize;
         this.mCamera = mCamera;
 
@@ -65,7 +68,12 @@ public class FrameProcessingRunnable implements Runnable {
     @android.annotation.SuppressLint("Assert")
     public void release() {
         assert (mProcessingThread.getState() == Thread.State.TERMINATED);
-        mDetector.release();
+
+        /*  This call has been removed as this releases the underlying processor as well, breaking the detector
+         *  mDetector.release();
+         *  this should only be called once the program is finished, or provide an option to not release every-time
+         *  The only other way around this would be to also pass a copy of the processor to the FPR constructor, so that it can reattach it!
+        */
     }
 
     /**
@@ -93,8 +101,10 @@ public class FrameProcessingRunnable implements Runnable {
                     try {
                         // Wait for the next frame to be received from the camera, since we
                         // don't have it yet.
+                        Log.i(TAG,"Waiting on frame!");
                         mLock.wait();
                     } catch (InterruptedException e) {
+                        Log.i(TAG,"Interrupted " + e.getLocalizedMessage());
                         return;
                     }
                 }
@@ -113,6 +123,7 @@ public class FrameProcessingRunnable implements Runnable {
                     continue;
                 }
 
+                //Build the frame.
                 outputFrame = new Frame.Builder()
                         .setImageData(mPendingFrameData, mPreviewSize.getWidth(),
                                 mPreviewSize.getHeight(), android.graphics.ImageFormat.NV21)
@@ -128,7 +139,7 @@ public class FrameProcessingRunnable implements Runnable {
                 mPendingFrameData = null;
             }
 
-            // The code below needs to run outside of synchronization, because this will allow
+
             // The code below needs to run outside of synchronization, because this will allow
             // the camera to add pending frame(s) while we are running detection on the current
             // frame.
@@ -144,7 +155,12 @@ public class FrameProcessingRunnable implements Runnable {
     }
 
     public void cleanup() {
-        // stop text dectection thread
+        // stop detectioncycle
+
+        //Leave this here, BEFORE we join. Else the loop never terminates!
+        setActive(false);
+
+
         if (mProcessingThread != null) {
             try {
                 // Wait for the thread to complete to ensure that we can't have multiple threads
@@ -157,14 +173,16 @@ public class FrameProcessingRunnable implements Runnable {
             mProcessingThread = null;
         }
 
-        setActive(false);
+
         mBytesToByteBuffer.clear();
     }
 
     public void start() {
-        mProcessingThread = new Thread(this);
-        setActive(true);
-        mProcessingThread.start();
+
+        mCamera.addCallbackBuffer(createPreviewBuffer(mPreviewSize));
+        mCamera.addCallbackBuffer(createPreviewBuffer(mPreviewSize));
+        mCamera.addCallbackBuffer(createPreviewBuffer(mPreviewSize));
+        mCamera.addCallbackBuffer(createPreviewBuffer(mPreviewSize));
 
         mCamera.setPreviewCallbackWithBuffer(new Camera.PreviewCallback() {
             @Override
@@ -172,10 +190,14 @@ public class FrameProcessingRunnable implements Runnable {
                 setNextFrame(bytes, camera);
             }
         });
-        mCamera.addCallbackBuffer(createPreviewBuffer(mPreviewSize));
-        mCamera.addCallbackBuffer(createPreviewBuffer(mPreviewSize));
-        mCamera.addCallbackBuffer(createPreviewBuffer(mPreviewSize));
-        mCamera.addCallbackBuffer(createPreviewBuffer(mPreviewSize));
+
+        mProcessingThread = new Thread(this);
+        setActive(true);
+        mProcessingThread.start();
+
+
+
+
     }
 
     /**

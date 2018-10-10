@@ -22,9 +22,12 @@ android {
     }
 }
 
+
 dependencies {
     compile project(':camerakit')
-    compile 'com.android.support:appcompat-v7:27.0.2'
+    //noinspection GradleCompatible
+    compile 'com.android.support:appcompat-v7:27.1.0'
     compile 'com.jakewharton:butterknife:8.6.0'
+    testCompile 'org.mockito:mockito-core:2.17.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.6.0'
 }
