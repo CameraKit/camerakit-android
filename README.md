@@ -43,7 +43,6 @@ With CameraKit you are able to effortlessly do the following...
 <a href="https://www.goosechase.com/"><img alt="GooseChase" src=".repo/gh-readme-goosechase-logo.svg" height="30px" width="175px" align="center"></a>
 <a href="https://www.alpha-apps.ae/"><img alt="Alpha Apps" src=".repo/gh-readme-alphaapps-logo.png" height="30px" width="78px" align="center"></a>
 <a href="https://www.expensify.com/"><img alt="Expensify" src=".repo/gh-readme-expensify-logo.svg" height="26px" width="220px" align="center"></a>
-<a href="https://www.buddy.works/"><img alt="Buddy.Works" src=".repo/gh-readme-buddyworks-logo.png" height="55px"  width="137px" align="center"></a>
 
 
 # Pardon the dust
