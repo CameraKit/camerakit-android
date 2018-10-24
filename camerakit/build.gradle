@@ -2,7 +2,6 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
@@ -20,8 +19,8 @@ android {
 }
 
 dependencies {
-    compile project(':camerakit-core')
-    compile project(':camerakit-vision')
+    api project(':camerakit-core')
+    api project(':camerakit-vision')
 }
 
 group = 'com.wonderkiln'
