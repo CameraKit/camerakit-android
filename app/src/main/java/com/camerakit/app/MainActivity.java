@@ -33,7 +33,6 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     private AppCompatTextView previewSizeText;
     private AppCompatTextView photoSizeText;
 
-    private Button flashAutoButton;
     private Button flashOnButton;
     private Button flashOffButton;
 
@@ -65,11 +64,9 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         photoButton = findViewById(R.id.photoButton);
         photoButton.setOnClickListener(photoOnClickListener);
 
-        flashAutoButton = findViewById(R.id.flashAutoButton);
         flashOnButton = findViewById(R.id.flashOnButton);
         flashOffButton = findViewById(R.id.flashOffButton);
 
-        flashAutoButton.setOnClickListener(flashAutoOnClickListener);
         flashOnButton.setOnClickListener(flashOnOnClickListener);
         flashOffButton.setOnClickListener(flashOffOnClickListener);
 
@@ -201,16 +198,6 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
                     }).start();
                 }
             });
-        }
-    };
-
-    private View.OnClickListener flashAutoOnClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            if (cameraView.getFlash() != CameraKit.FLASH_AUTO) {
-                cameraView.setFlash(CameraKit.FLASH_AUTO);
-                updateInfoText();
-            }
         }
     };
 

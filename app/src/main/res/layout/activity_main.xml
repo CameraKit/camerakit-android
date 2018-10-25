@@ -161,15 +161,6 @@
             android:orientation="vertical">
 
             <android.support.v7.widget.AppCompatButton
-                android:id="@+id/flashAutoButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:backgroundTint="@color/colorPrimaryDark"
-                android:drawableLeft="@drawable/ic_flash_auto"
-                android:padding="14dp"
-                android:text=" Flash:\nAuto" />
-
-            <android.support.v7.widget.AppCompatButton
                 android:id="@+id/flashOnButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
