@@ -3,7 +3,7 @@
 We love pull requests from everyone. By participating in this project, you
 agree to abide by the CameraKit [code of conduct].
 
-[code of conduct]: .github/CODE-OF-CONDUCT.md
+[code of conduct]: CODE-OF-CONDUCT.md
 
 Fork, then clone the repo:
 

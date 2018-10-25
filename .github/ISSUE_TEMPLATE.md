@@ -22,12 +22,19 @@
   Now scroll below!
 -->
 
-### Have you read the [Contributing Guidelines](.github/CONTRIBUTING.md)?
+### Have you read the [Contributing Guidelines](CONTRIBUTING.md)?
 
 (Write your answer here.)
 
 ### Environment
 
+(Please include the following information along with any other relevant environment details.)
+
+CameraKit Version:
+
+Android Device:
+
+Android Version:
 
 ### Steps to Reproduce
 
@@ -72,6 +79,7 @@
 
 (Paste the link to an example project and exact instructions to reproduce the issue.)
 
+(Include your CameraKit setup and usage.)
 <!--
   What happens if you skip this step?
 
