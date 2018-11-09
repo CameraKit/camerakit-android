@@ -2,7 +2,7 @@ package com.camerakit.preview
 
 import android.graphics.SurfaceTexture
 import android.opengl.Matrix
-import android.support.annotation.Keep
+import androidx.annotation.Keep
 import com.camerakit.type.CameraSize
 
 class CameraSurfaceTexture(inputTexture: Int, val outputTexture: Int) : SurfaceTexture(inputTexture) {

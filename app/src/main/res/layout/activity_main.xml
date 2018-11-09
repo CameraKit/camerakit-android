@@ -11,7 +11,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <android.support.v7.widget.Toolbar
+        <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -60,7 +60,7 @@
                 android:layout_margin="16dp"
                 android:orientation="vertical">
 
-                <android.support.v7.widget.AppCompatTextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/facingText"
                     android:layout_width="wrap_content"
                     android:layout_height="20dp"
@@ -72,7 +72,7 @@
                     android:textColor="#FFFFFF"
                     android:textSize="11dp" />
 
-                <android.support.v7.widget.AppCompatTextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/flashText"
                     android:layout_width="wrap_content"
                     android:layout_height="20dp"
@@ -84,7 +84,7 @@
                     android:textColor="#FFFFFF"
                     android:textSize="11dp" />
 
-                <android.support.v7.widget.AppCompatTextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/previewSizeText"
                     android:layout_width="wrap_content"
                     android:layout_height="20dp"
@@ -96,7 +96,7 @@
                     android:textColor="#FFFFFF"
                     android:textSize="11dp" />
 
-                <android.support.v7.widget.AppCompatTextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/photoSizeText"
                     android:layout_width="wrap_content"
                     android:layout_height="20dp"
@@ -126,7 +126,7 @@
             android:layout_gravity="left|bottom"
             android:orientation="vertical">
 
-            <android.support.v7.widget.AppCompatButton
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/facingFrontButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -135,7 +135,7 @@
                 android:padding="14dp"
                 android:text=" Facing:\nFront" />
 
-            <android.support.v7.widget.AppCompatButton
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/facingBackButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -146,7 +146,7 @@
 
         </LinearLayout>
 
-        <android.support.design.widget.FloatingActionButton
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/photoButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -160,7 +160,7 @@
             android:layout_gravity="right|bottom"
             android:orientation="vertical">
 
-            <android.support.v7.widget.AppCompatButton
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/flashOnButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -169,7 +169,7 @@
                 android:padding="14dp"
                 android:text=" Flash:\nOn" />
 
-            <android.support.v7.widget.AppCompatButton
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/flashOffButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

@@ -1,8 +1,8 @@
 package com.camerakit;
 
-import android.support.annotation.IntDef;
-import android.support.annotation.RestrictTo;
-import android.support.annotation.RestrictTo.Scope;
+import androidx.annotation.IntDef;
+import androidx.annotation.RestrictTo;
+import androidx.annotation.RestrictTo.Scope;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

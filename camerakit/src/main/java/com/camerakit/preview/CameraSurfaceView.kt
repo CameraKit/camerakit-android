@@ -3,7 +3,7 @@ package com.camerakit.preview
 import android.content.Context
 import android.opengl.GLES20.glGenTextures
 import android.opengl.GLSurfaceView
-import android.support.annotation.Keep
+import androidx.annotation.Keep
 import android.util.AttributeSet
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
