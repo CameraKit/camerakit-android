@@ -5,7 +5,6 @@ import android.hardware.camera2.CameraDevice
 import android.media.ImageReader
 import android.os.Handler
 import androidx.annotation.RequiresApi
-import android.util.Log
 import android.view.Surface
 
 @RequiresApi(21)

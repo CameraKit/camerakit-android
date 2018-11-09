@@ -7,7 +7,6 @@ import android.graphics.SurfaceTexture
 import android.hardware.camera2.*
 import android.media.ImageReader
 import androidx.annotation.RequiresApi
-import android.util.Log
 import android.view.Surface
 import com.camerakit.api.CameraApi
 import com.camerakit.api.CameraAttributes
