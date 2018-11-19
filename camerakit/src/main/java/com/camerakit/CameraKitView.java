@@ -905,10 +905,17 @@ public class CameraKitView extends GestureLayout {
     }
 
     /**
-     * @return
+     * @return CameraListener
      */
     public CameraListener getCameraListener() {
         return mCameraListener;
+    }
+
+    /**
+     * Delete CameraListener
+     */
+    public void removeCameraListener() {
+        mCameraListener = null;
     }
 
     /**
@@ -919,10 +926,17 @@ public class CameraKitView extends GestureLayout {
     }
 
     /**
-     * @return
+     * @return PreviewListener
      */
     public PreviewListener getPreviewListener() {
         return mPreviewListener;
+    }
+
+    /**
+     * Delete PreviewListener
+     */
+    public void removePreviewListener() {
+        mPreviewListener = null;
     }
 
     /**
@@ -933,11 +947,18 @@ public class CameraKitView extends GestureLayout {
     }
 
     /**
-     * @return
+     * @return ErrorListener
      * @see #setErrorListener(ErrorListener)
      */
     public ErrorListener getErrorListener() {
         return mErrorListener;
+    }
+
+    /**
+     * Delete ErrorListener
+     */
+    public void removeErrorListener() {
+        mErrorListener = null;
     }
 
     public CameraSize getPreviewResolution() {
