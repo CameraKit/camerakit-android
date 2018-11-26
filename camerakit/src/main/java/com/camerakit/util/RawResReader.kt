@@ -1,7 +1,7 @@
 package com.camerakit.util
 
 import android.content.Context
-import android.support.annotation.RawRes
+import androidx.annotation.RawRes
 
 class RawResReader(context: Context, @RawRes resId: Int) {
 

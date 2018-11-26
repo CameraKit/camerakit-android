@@ -33,7 +33,7 @@ android {
 dependencies {
     api 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.2.61'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:0.24.0'
-    api 'com.android.support:support-annotations:27.1.1'
+    api 'androidx.annotation:annotation:1.0.0'
     api 'com.camerakit:jpegkit:0.2.0-alpha1'
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.mockito:mockito-core:1.10.19'

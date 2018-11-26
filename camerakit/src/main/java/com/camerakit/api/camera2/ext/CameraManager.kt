@@ -3,7 +3,7 @@ package com.camerakit.api.camera2.ext
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
 import android.os.Handler
-import android.support.annotation.RequiresApi
+import androidx.annotation.RequiresApi
 import com.camerakit.type.CameraFacing
 
 @RequiresApi(21)

@@ -2,7 +2,7 @@ package com.camerakit.api.camera2.ext
 
 import android.graphics.ImageFormat
 import android.hardware.camera2.CameraCharacteristics
-import android.support.annotation.RequiresApi
+import androidx.annotation.RequiresApi
 import android.view.SurfaceHolder
 import com.camerakit.type.CameraFlash
 import com.camerakit.type.CameraSize
