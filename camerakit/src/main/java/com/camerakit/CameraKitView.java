@@ -7,11 +7,12 @@ import android.content.ContextWrapper;
 import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
 import android.os.Build;
-import android.support.annotation.IntDef;
-import android.support.annotation.NonNull;
-import android.support.annotation.RestrictTo;
-import android.support.annotation.RestrictTo.Scope;
+import androidx.annotation.IntDef;
+import androidx.annotation.NonNull;
+import androidx.annotation.RestrictTo;
+import androidx.annotation.RestrictTo.Scope;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.ViewGroup;
 
 import com.camerakit.type.CameraFacing;
@@ -695,15 +696,26 @@ public class CameraKitView extends GestureLayout {
     public void setFlash(@CameraKit.Flash int flash) {
         mFlash = flash;
 
-        switch (flash) {
-            case CameraKit.FLASH_OFF: {
-                cameraFlash = CameraFlash.OFF;
-                break;
+        try {
+            switch (flash) {
+                case CameraKit.FLASH_OFF: {
+                    cameraFlash = CameraFlash.OFF;
+                    break;
+                }
+                case CameraKit.FLASH_ON: {
+                    cameraFlash = CameraFlash.ON;
+                    break;
+                }
+                case CameraKit.FLASH_AUTO: {
+                    throw new CameraException("FLASH_AUTO is not supported in this version of CameraKit.");
+                }
+                case CameraKit.FLASH_TORCH: {
+                    throw new CameraException("FLASH_TORCH is not supported in this version of CameraKit.");
+                }
             }
-            case CameraKit.FLASH_ON: {
-                cameraFlash = CameraFlash.ON;
-                break;
-            }
+        } catch(CameraException exception) {
+            Log.e("CameraException: Flash", exception.getMessage());
+            return;
         }
 
         mCameraPreview.setFlash(cameraFlash);
@@ -893,10 +905,17 @@ public class CameraKitView extends GestureLayout {
     }
 
     /**
-     * @return
+     * @return CameraListener
      */
     public CameraListener getCameraListener() {
         return mCameraListener;
+    }
+
+    /**
+     * Delete CameraListener
+     */
+    public void removeCameraListener() {
+        mCameraListener = null;
     }
 
     /**
@@ -907,10 +926,17 @@ public class CameraKitView extends GestureLayout {
     }
 
     /**
-     * @return
+     * @return PreviewListener
      */
     public PreviewListener getPreviewListener() {
         return mPreviewListener;
+    }
+
+    /**
+     * Delete PreviewListener
+     */
+    public void removePreviewListener() {
+        mPreviewListener = null;
     }
 
     /**
@@ -921,11 +947,18 @@ public class CameraKitView extends GestureLayout {
     }
 
     /**
-     * @return
+     * @return ErrorListener
      * @see #setErrorListener(ErrorListener)
      */
     public ErrorListener getErrorListener() {
         return mErrorListener;
+    }
+
+    /**
+     * Delete ErrorListener
+     */
+    public void removeErrorListener() {
+        mErrorListener = null;
     }
 
     public CameraSize getPreviewResolution() {

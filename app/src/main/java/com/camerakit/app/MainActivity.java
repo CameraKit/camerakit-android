@@ -5,12 +5,12 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.AppCompatTextView;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.NonNull;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatTextView;
+import androidx.appcompat.widget.Toolbar;
 import android.text.Html;
 import android.util.Log;
 import android.view.MenuItem;
@@ -33,7 +33,6 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     private AppCompatTextView previewSizeText;
     private AppCompatTextView photoSizeText;
 
-    private Button flashAutoButton;
     private Button flashOnButton;
     private Button flashOffButton;
 
@@ -65,11 +64,9 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         photoButton = findViewById(R.id.photoButton);
         photoButton.setOnClickListener(photoOnClickListener);
 
-        flashAutoButton = findViewById(R.id.flashAutoButton);
         flashOnButton = findViewById(R.id.flashOnButton);
         flashOffButton = findViewById(R.id.flashOffButton);
 
-        flashAutoButton.setOnClickListener(flashAutoOnClickListener);
         flashOnButton.setOnClickListener(flashOnOnClickListener);
         flashOffButton.setOnClickListener(flashOffOnClickListener);
 
@@ -201,16 +198,6 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
                     }).start();
                 }
             });
-        }
-    };
-
-    private View.OnClickListener flashAutoOnClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            if (cameraView.getFlash() != CameraKit.FLASH_AUTO) {
-                cameraView.setFlash(CameraKit.FLASH_AUTO);
-                updateInfoText();
-            }
         }
     };
 
