@@ -19,12 +19,11 @@ import com.camerakit.type.CameraFacing
 import com.camerakit.type.CameraFlash
 import com.camerakit.type.CameraSize
 import com.jpegkit.Jpeg
-import kotlinx.coroutines.experimental.CoroutineDispatcher
-import kotlinx.coroutines.experimental.launch
-import kotlinx.coroutines.experimental.newSingleThreadContext
-import kotlinx.coroutines.experimental.runBlocking
-import kotlin.coroutines.experimental.Continuation
-import kotlin.coroutines.experimental.suspendCoroutine
+import kotlinx.coroutines.*
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.suspendCoroutine
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 class CameraPreview : FrameLayout, CameraEvents {
 
@@ -112,7 +111,7 @@ class CameraPreview : FrameLayout, CameraEvents {
     }
 
     fun start(facing: CameraFacing) {
-        launch(cameraDispatcher) {
+        GlobalScope.launch(cameraDispatcher) {
             runBlocking {
                 lifecycleState = LifecycleState.STARTED
                 cameraFacing = facing
@@ -122,7 +121,7 @@ class CameraPreview : FrameLayout, CameraEvents {
     }
 
     fun resume() {
-        launch(cameraDispatcher) {
+        GlobalScope.launch(cameraDispatcher) {
             runBlocking {
                 lifecycleState = LifecycleState.RESUMED
                 try {
@@ -135,7 +134,7 @@ class CameraPreview : FrameLayout, CameraEvents {
     }
 
     fun pause() {
-        launch(cameraDispatcher) {
+        GlobalScope.launch(cameraDispatcher) {
             runBlocking {
                 lifecycleState = LifecycleState.PAUSED
                 stopPreview()
@@ -144,7 +143,7 @@ class CameraPreview : FrameLayout, CameraEvents {
     }
 
     fun stop() {
-        launch(cameraDispatcher) {
+        GlobalScope.launch(cameraDispatcher) {
             runBlocking {
                 lifecycleState = LifecycleState.STOPPED
                 closeCamera()
@@ -153,7 +152,7 @@ class CameraPreview : FrameLayout, CameraEvents {
     }
 
     fun capturePhoto(callback: PhotoCallback) {
-        launch(cameraDispatcher) {
+        GlobalScope.launch(cameraDispatcher) {
             runBlocking {
                 cameraApi.setFlash(flash)
                 cameraApi.capturePhoto {
