@@ -4,12 +4,6 @@ plugins {
     id 'com.github.dcendents.android-maven' version '1.5'
 }
 
-kotlin {
-    experimental {
-        coroutines 'enable'
-    }
-}
-
 android {
     compileSdkVersion versions.compileSdk
     defaultConfig {
