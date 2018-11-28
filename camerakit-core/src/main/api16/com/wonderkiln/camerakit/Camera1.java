@@ -480,10 +480,10 @@ public class Camera1 extends CameraImpl {
     }
 
     @Override
-    void captureVideo(File videoFile, VideoCapturedCallback callback) {
+    void captureVideo(File videoFile, int maxDuration, VideoCapturedCallback callback) {
         synchronized (mCameraLock) {
             try {
-                if (prepareMediaRecorder(videoFile)) {
+                if (prepareMediaRecorder(videoFile, maxDuration)) {
                     mMediaRecorder.start();
                     mRecording = true;
                     this.mVideoCallback = callback;
@@ -901,7 +901,7 @@ public class Camera1 extends CameraImpl {
         return output;
     }
 
-    private boolean prepareMediaRecorder(File videoFile) throws IOException {
+    private boolean prepareMediaRecorder(File videoFile, int maxDuration) throws IOException {
         synchronized (mCameraLock) {
             mCamera.unlock();
 
@@ -923,6 +923,18 @@ public class Camera1 extends CameraImpl {
             mMediaRecorder.setOutputFile(videoFile.getPath());
             mMediaRecorder.setPreviewDisplay(mPreview.getSurface());
             mMediaRecorder.setOrientationHint(calculateCaptureRotation());
+
+            if (maxDuration > 0) {
+                mMediaRecorder.setMaxDuration(maxDuration);
+                mMediaRecorder.setOnInfoListener(new MediaRecorder.OnInfoListener() {
+                    @Override
+                    public void onInfo(MediaRecorder mediaRecorder, int what, int extra) {
+                        if (what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED) {
+                            stopVideo();
+                        }
+                    }
+                });
+            }
 
             try {
                 mMediaRecorder.prepare();

@@ -41,7 +41,11 @@ abstract class CameraImpl {
         void imageCaptured(byte[] jpeg);
     }
 
-    abstract void captureVideo(File videoFile, VideoCapturedCallback callback);
+    void captureVideo(File videoFile, VideoCapturedCallback callback) {
+        captureVideo(videoFile, 0, callback);
+    }
+
+    abstract void captureVideo(File videoFile, int maxDuration, VideoCapturedCallback callback);
     interface VideoCapturedCallback {
         void videoCaptured(File file);
     }
