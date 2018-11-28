@@ -5,8 +5,9 @@ import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.TypedArray;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.Nullable;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.Nullable;
+
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -24,10 +25,6 @@ import com.wonderkiln.camerakit.OnCameraKitEvent;
 
 import java.io.File;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnTouch;
-
 public class CameraControls extends LinearLayout {
 
     private int cameraViewId = -1;
@@ -36,11 +33,10 @@ public class CameraControls extends LinearLayout {
     private int coverViewId = -1;
     private View coverView;
 
-    @BindView(R.id.facingButton)
     ImageView facingButton;
-
-    @BindView(R.id.flashButton)
     ImageView flashButton;
+    ImageView captureImageButton;
+    ImageView captureVideoButton;
 
     private long captureDownTime;
     private long captureStartTime;
@@ -58,7 +54,16 @@ public class CameraControls extends LinearLayout {
     public CameraControls(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         LayoutInflater.from(getContext()).inflate(R.layout.camera_controls, this);
-        ButterKnife.bind(this);
+
+        facingButton = findViewById(R.id.facingButton);
+        flashButton = findViewById(R.id.flashButton);
+        captureImageButton = findViewById(R.id.captureImageButton);
+        captureVideoButton = findViewById(R.id.captureVideoButton);
+
+        facingButton.setOnClickListener(onTouchFacing);
+        flashButton.setOnClickListener(onTouchFlash);
+        captureImageButton.setOnClickListener(onTouchCaptureImage);
+        captureVideoButton.setOnClickListener(onTouchCaptureVideo);
 
         if (attrs != null) {
             TypedArray a = context.getTheme().obtainStyledAttributes(
@@ -104,7 +109,7 @@ public class CameraControls extends LinearLayout {
         }
     }
 
-    //@OnCameraKitEvent(CameraKitImage.class)
+    @OnCameraKitEvent(CameraKitImage.class)
     public void imageCaptured(CameraKitImage image) {
         byte[] jpeg = image.getJpeg();
 
@@ -129,109 +134,93 @@ public class CameraControls extends LinearLayout {
         }
     }
 
-    @OnTouch(R.id.captureButton)
-    boolean onTouchCapture(View view, MotionEvent motionEvent) {
-        handleViewTouchFeedback(view, motionEvent);
-        switch (motionEvent.getAction()) {
-            case MotionEvent.ACTION_DOWN: {
-                captureDownTime = System.currentTimeMillis();
-                pendingVideoCapture = true;
-                postDelayed(new Runnable() {
+    private View.OnClickListener onTouchCaptureImage = new View.OnClickListener() {
+        @Override
+        public void onClick(final View view) {
+            pendingVideoCapture = false;
+
+            if (capturingVideo) {
+                capturingVideo = false;
+                cameraView.stopVideo();
+            } else {
+                captureStartTime = System.currentTimeMillis();
+                cameraView.captureImage(new CameraKitEventCallback<CameraKitImage>() {
                     @Override
-                    public void run() {
-                        if (pendingVideoCapture) {
-                            capturingVideo = true;
-                            cameraView.captureVideo();
-                        }
+                    public void callback(CameraKitImage event) {
+                        imageCaptured(event);
                     }
-                }, 250);
-                break;
+                });
             }
+        }
+    };
 
-            case MotionEvent.ACTION_UP: {
-                pendingVideoCapture = false;
+    private View.OnClickListener onTouchCaptureVideo = new View.OnClickListener() {
+        @Override
+        public void onClick(final View view) {
+            pendingVideoCapture = true;
+            postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (pendingVideoCapture) {
+                        capturingVideo = true;
+                        cameraView.captureVideo();
+                    }
+                }
+            }, 250);
+        }
+    };
 
-                if (capturingVideo) {
-                    capturingVideo = false;
-                    cameraView.stopVideo();
-                } else {
-                    captureStartTime = System.currentTimeMillis();
-                    cameraView.captureImage(new CameraKitEventCallback<CameraKitImage>() {
+    private View.OnClickListener onTouchFacing = new View.OnClickListener() {
+        @Override
+        public void onClick(final View view) {
+            coverView.setAlpha(0);
+            coverView.setVisibility(VISIBLE);
+            coverView.animate()
+                    .alpha(1)
+                    .setStartDelay(0)
+                    .setDuration(300)
+                    .setListener(new AnimatorListenerAdapter() {
                         @Override
-                        public void callback(CameraKitImage event) {
-                            imageCaptured(event);
-                        }
-                    });
-                }
-                break;
-            }
-        }
-        return true;
-    }
-
-    @OnTouch(R.id.facingButton)
-    boolean onTouchFacing(final View view, MotionEvent motionEvent) {
-        handleViewTouchFeedback(view, motionEvent);
-        switch (motionEvent.getAction()) {
-            case MotionEvent.ACTION_UP: {
-                coverView.setAlpha(0);
-                coverView.setVisibility(VISIBLE);
-                coverView.animate()
-                        .alpha(1)
-                        .setStartDelay(0)
-                        .setDuration(300)
-                        .setListener(new AnimatorListenerAdapter() {
-                            @Override
-                            public void onAnimationEnd(Animator animation) {
-                                super.onAnimationEnd(animation);
-                                if (cameraView.isFacingFront()) {
-                                    cameraView.setFacing(CameraKit.Constants.FACING_BACK);
-                                    changeViewImageResource((ImageView) view, R.drawable.ic_facing_front);
-                                } else {
-                                    cameraView.setFacing(CameraKit.Constants.FACING_FRONT);
-                                    changeViewImageResource((ImageView) view, R.drawable.ic_facing_back);
-                                }
-
-                                coverView.animate()
-                                        .alpha(0)
-                                        .setStartDelay(200)
-                                        .setDuration(300)
-                                        .setListener(new AnimatorListenerAdapter() {
-                                            @Override
-                                            public void onAnimationEnd(Animator animation) {
-                                                super.onAnimationEnd(animation);
-                                                coverView.setVisibility(GONE);
-                                            }
-                                        })
-                                        .start();
+                        public void onAnimationEnd(Animator animation) {
+                            super.onAnimationEnd(animation);
+                            if (cameraView.isFacingFront()) {
+                                cameraView.setFacing(CameraKit.Constants.FACING_BACK);
+                                changeViewImageResource((ImageView) view, R.drawable.ic_facing_front);
+                            } else {
+                                cameraView.setFacing(CameraKit.Constants.FACING_FRONT);
+                                changeViewImageResource((ImageView) view, R.drawable.ic_facing_back);
                             }
-                        })
-                        .start();
 
-                break;
+                            coverView.animate()
+                                    .alpha(0)
+                                    .setStartDelay(200)
+                                    .setDuration(300)
+                                    .setListener(new AnimatorListenerAdapter() {
+                                        @Override
+                                        public void onAnimationEnd(Animator animation) {
+                                            super.onAnimationEnd(animation);
+                                            coverView.setVisibility(GONE);
+                                        }
+                                    })
+                                    .start();
+                        }
+                    })
+                    .start();
+        }
+    };
+
+    private View.OnClickListener onTouchFlash = new View.OnClickListener() {
+        @Override
+        public void onClick(final View view) {
+            if (cameraView.getFlash() == CameraKit.Constants.FLASH_OFF) {
+                cameraView.setFlash(CameraKit.Constants.FLASH_ON);
+                changeViewImageResource((ImageView) view, R.drawable.ic_flash_on);
+            } else {
+                cameraView.setFlash(CameraKit.Constants.FLASH_OFF);
+                changeViewImageResource((ImageView) view, R.drawable.ic_flash_off);
             }
         }
-        return true;
-    }
-
-    @OnTouch(R.id.flashButton)
-    boolean onTouchFlash(View view, MotionEvent motionEvent) {
-        handleViewTouchFeedback(view, motionEvent);
-        switch (motionEvent.getAction()) {
-            case MotionEvent.ACTION_UP: {
-                if (cameraView.getFlash() == CameraKit.Constants.FLASH_OFF) {
-                    cameraView.setFlash(CameraKit.Constants.FLASH_ON);
-                    changeViewImageResource((ImageView) view, R.drawable.ic_flash_on);
-                } else {
-                    cameraView.setFlash(CameraKit.Constants.FLASH_OFF);
-                    changeViewImageResource((ImageView) view, R.drawable.ic_flash_off);
-                }
-
-                break;
-            }
-        }
-        return true;
-    }
+    };
 
     boolean handleViewTouchFeedback(View view, MotionEvent motionEvent) {
         switch (motionEvent.getAction()) {
