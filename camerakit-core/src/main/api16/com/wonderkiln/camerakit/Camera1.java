@@ -692,11 +692,13 @@ public class Camera1 extends CameraImpl {
 
     private void setupPreview() {
         synchronized (mCameraLock) {
-            try {
-                mCamera.reconnect();
-                mCamera.setPreviewDisplay(mPreview.getSurfaceHolder());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            if (mCamera != null) {
+                try {
+                    mCamera.reconnect();
+                    mCamera.setPreviewDisplay(mPreview.getSurfaceHolder());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
     }
