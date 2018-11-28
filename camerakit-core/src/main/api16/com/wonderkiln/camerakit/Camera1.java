@@ -90,6 +90,8 @@ public class Camera1 extends CameraImpl {
 
     private final Object mCameraLock = new Object();
 
+    private File mMediaRecorderOutputFile;
+
     Camera1(EventDispatcher eventDispatcher, PreviewImpl preview) {
         super(eventDispatcher, preview);
 
@@ -502,16 +504,14 @@ public class Camera1 extends CameraImpl {
     void stopVideo() {
         synchronized (mCameraLock) {
             if (mRecording) {
-                File videoFile = getVideoFile();
-
                 try {
                     mMediaRecorder.stop();
                     if (this.mVideoCallback != null) {
-                        mVideoCallback.videoCaptured(videoFile);
+                        mVideoCallback.videoCaptured(mMediaRecorderOutputFile);
                         mVideoCallback = null;
                     }
                 } catch (RuntimeException e) {
-                    videoFile.delete();
+                    mMediaRecorderOutputFile.delete();
                 }
 
                 releaseMediaRecorder();
@@ -920,6 +920,7 @@ public class Camera1 extends CameraImpl {
                 return false;
             }
 
+            mMediaRecorderOutputFile = videoFile;
             mMediaRecorder.setOutputFile(videoFile.getPath());
             mMediaRecorder.setPreviewDisplay(mPreview.getSurface());
             mMediaRecorder.setOrientationHint(calculateCaptureRotation());
