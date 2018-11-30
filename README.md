@@ -119,8 +119,8 @@ public void onRequestPermissionsResult(int requestCode, String[] permissions, in
     cameraKitView.onRequestPermissionsResult(requestCode, permissions, grantResults);
 }
 ```
-## ProGaurd
-If using ProGaurd, add the following rules:
+## ProGuard
+If using ProGuard, add the following rules:
 ```
 -dontwarn com.google.android.gms.**
 -keepclasseswithmembers class com.camerakit.preview.CameraSurfaceView {
