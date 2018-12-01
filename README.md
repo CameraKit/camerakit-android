@@ -16,9 +16,9 @@
     </a>
 </p>
 
-CameraKit takes one of the hardest Android APIs and makes it into a high level and easy to use library that solves all of your problems.
+CameraKit helps you add reliable camera to your app quickly. Our open source camera platform provides consistent capture results, service that scales, and endless camera possibilities.
 
-With CameraKit you are able to effortlessly do the following...
+With CameraKit you are able to effortlessly do the following: 
 
 - Image and video capture seamlessly working with the same preview session.
 - Automatic system permission handling.
@@ -46,21 +46,23 @@ With CameraKit you are able to effortlessly do the following...
 
 
 # Pardon the dust
-__CameraKit__ has been going through major changes in the past few months. We've slowed support on verison `0.13.2` and moved our focus to `1.0.0`. This release will bring improved stability, faster processing and a standard API for future development of __CameraKit__. The lastest version is currently in beta, `1.0.0-beta3.9`. 
+__CameraKit__ has been going through major changes in the past few months. We've slowed support on verison `0.13.x` and moved our focus to `1.0.0`. This release will bring improved stability, faster processing and a standard API for future development of __CameraKit__. The lastest version is currently in beta, `1.0.0-beta3.10`. 
 
 The code lives on the branch `v1.0.0`. You can read the discussion about `1.0.0` on the pull request [#318](https://github.com/CameraKit/camerakit-android/pull/318). If you have a question or want to talk directly with the team, leave us a message on [spectrum.chat](https://spectrum.chat/camerakit/).
 
-With the official `1.0.0` release we will launch an all new documentation site. In the meantime check out the setup instructions for `1.0.0-beta3.9` below!
+
+## Documentation Site
+Setup instructions for `1.0.0-beta3.10` are below. To see the full documentation head over to our website, [camerakit.io/docs](https://camerakit.io/docs).
 
 
 ## Setup
 To include __CameraKit__ in your project, add the following to your `app` level `build.gradle`.
 ```java
 dependencies {
-    implementation 'com.camerakit:camerakit:1.0.0-beta3.9'
+    implementation 'com.camerakit:camerakit:1.0.0-beta3.10'
     implementation 'com.camerakit:jpegkit:0.1.0'
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.2.61'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:0.24.0'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.3.0'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.0.0'
 }
 ```
 ## Usage
@@ -119,8 +121,8 @@ public void onRequestPermissionsResult(int requestCode, String[] permissions, in
     cameraKitView.onRequestPermissionsResult(requestCode, permissions, grantResults);
 }
 ```
-## ProGaurd
-If using ProGaurd, add the following rules:
+## ProGuard
+If using ProGuard, add the following rules:
 ```
 -dontwarn com.google.android.gms.**
 -keepclasseswithmembers class com.camerakit.preview.CameraSurfaceView {
