@@ -1,6 +1,6 @@
 package com.wonderkiln.camerakit;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 public class CameraKitError extends CameraKitEvent {
 

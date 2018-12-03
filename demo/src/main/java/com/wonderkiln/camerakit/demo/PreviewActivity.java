@@ -5,9 +5,12 @@ import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
+//import android.support.annotation.Nullable;
+//import android.support.v7.app.ActionBar;
+//import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import android.text.Html;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,32 +21,28 @@ import android.widget.TextView;
 import android.widget.VideoView;
 
 import java.io.File;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
+//
+//import butterknife.BindView;
+//import butterknife.ButterKnife;
 
 public class PreviewActivity extends AppCompatActivity {
 
-    @BindView(R.id.image)
     ImageView imageView;
-
-    @BindView(R.id.video)
     VideoView videoView;
-
-    @BindView(R.id.actualResolution)
     TextView actualResolution;
-
-    @BindView(R.id.approxUncompressedSize)
     TextView approxUncompressedSize;
-
-    @BindView(R.id.captureLatency)
     TextView captureLatency;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_preview);
-        ButterKnife.bind(this);
+
+        videoView = findViewById(R.id.video);
+        imageView = findViewById(R.id.image);
+        actualResolution = findViewById(R.id.actualResolution);
+        approxUncompressedSize = findViewById(R.id.approxUncompressedSize);
+        captureLatency = findViewById(R.id.captureLatency);
 
         setupToolbar();
 

@@ -18,12 +18,12 @@ import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.hardware.display.DisplayManagerCompat;
-import android.support.v4.view.ViewCompat;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.hardware.display.DisplayManagerCompat;
+import androidx.core.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.Display;
 import android.view.Surface;
@@ -486,8 +486,12 @@ public class CameraView extends CameraViewLayout {
         captureVideo(null, callback);
     }
 
-    public void captureVideo(File videoFile, final CameraKitEventCallback<CameraKitVideo> callback) {
-        mCameraImpl.captureVideo(videoFile, new CameraImpl.VideoCapturedCallback() {
+    public void captureVideo(File videoFile, CameraKitEventCallback<CameraKitVideo> callback) {
+        captureVideo(videoFile, 0, callback);
+    }
+
+    public void captureVideo(File videoFile, int maxDuration, final CameraKitEventCallback<CameraKitVideo> callback) {
+        mCameraImpl.captureVideo(videoFile, maxDuration, new CameraImpl.VideoCapturedCallback() {
             @Override
             public void videoCaptured(File file) {
                 CameraKitVideo video = new CameraKitVideo(file);

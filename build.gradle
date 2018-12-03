@@ -1,14 +1,14 @@
 ext {
-    versionName = '0.13.2'
+    versionName = '0.13.3'
 
     bintrayUser = System.getenv('BINTRAY_USER')
     bintrayKey = System.getenv('BINTRAY_KEY')
 
-    compileSdkVersion = 27
-    buildToolsVersion = '27.0.0'
+    compileSdkVersion = 28
+    buildToolsVersion = '28.0.3'
 
-    minSdkVersion = 15
-    targetSdkVersion = 27
+    minSdkVersion = 24
+    targetSdkVersion = 28
 }
 
 buildscript {
@@ -17,7 +17,7 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.1'
+        classpath 'com.android.tools.build:gradle:3.2.1'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
     }
@@ -27,6 +27,7 @@ apply plugin: 'com.jfrog.bintray'
 
 allprojects {
     repositories {
+        google()
         jcenter()
         maven { url 'https://maven.google.com' }
         maven { url 'https://wonderkiln.bintray.com/snapshots' }

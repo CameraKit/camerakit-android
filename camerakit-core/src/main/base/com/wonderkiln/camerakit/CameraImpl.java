@@ -1,6 +1,6 @@
 package com.wonderkiln.camerakit;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.text.TextBlock;
@@ -41,7 +41,11 @@ abstract class CameraImpl {
         void imageCaptured(byte[] jpeg);
     }
 
-    abstract void captureVideo(File videoFile, VideoCapturedCallback callback);
+    void captureVideo(File videoFile, VideoCapturedCallback callback) {
+        captureVideo(videoFile, 0, callback);
+    }
+
+    abstract void captureVideo(File videoFile, int maxDuration, VideoCapturedCallback callback);
     interface VideoCapturedCallback {
         void videoCaptured(File file);
     }

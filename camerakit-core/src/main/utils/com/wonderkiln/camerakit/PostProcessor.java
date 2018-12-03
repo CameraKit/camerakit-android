@@ -1,8 +1,7 @@
 package com.wonderkiln.camerakit;
 
 import android.graphics.Rect;
-import android.support.media.ExifInterface;
-import android.util.Log;
+import androidx.exifinterface.media.ExifInterface;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
