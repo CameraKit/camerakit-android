@@ -101,7 +101,7 @@ class CameraPreview : FrameLayout, CameraEvents {
             override fun onSurfaceReady(cameraSurfaceTexture: CameraSurfaceTexture) {
                 surfaceTexture = cameraSurfaceTexture
                 surfaceState = SurfaceState.SURFACE_AVAILABLE
-                if (lifecycleState == LifecycleState.RESUMED) {
+                if (lifecycleState == LifecycleState.STARTED || lifecycleState == LifecycleState.RESUMED) {
                     resume()
                 }
             }
