@@ -168,6 +168,17 @@ class CameraPreview : FrameLayout, CameraEvents {
         }
     }
 
+    fun hasFlash(): Boolean {
+        if (attributes?.flashes != null) {
+            return true
+        }
+        return false
+    }
+
+    fun getSupportedFlashTypes(): Array<CameraFlash>? {
+        return attributes?.flashes
+    }
+
     interface PhotoCallback {
         fun onCapture(jpeg: ByteArray)
     }
