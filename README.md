@@ -44,7 +44,7 @@ With CameraKit you are able to effortlessly do the following:
 <a href="https://www.alpha-apps.ae/"><img alt="Alpha Apps" src=".repo/gh-readme-alphaapps-logo.png" height="30px" width="78px" align="center"></a>
 <a href="https://www.expensify.com/"><img alt="Expensify" src=".repo/gh-readme-expensify-logo.svg" height="26px" width="220px" align="center"></a>
 
-
+&nbsp;
 
 # Get The Most From CameraKit
 There are currently two versions of CameraKit that we support, `v1.0.0-beta3.X` and `v0.13.X`. 
