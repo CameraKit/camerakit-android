@@ -1,5 +1,5 @@
 ext {
-    versionName = '0.13.3'
+    versionName = '0.13.4'
 
     bintrayUser = System.getenv('BINTRAY_USER')
     bintrayKey = System.getenv('BINTRAY_KEY')
@@ -7,7 +7,7 @@ ext {
     compileSdkVersion = 28
     buildToolsVersion = '28.0.3'
 
-    minSdkVersion = 24
+    minSdkVersion = 15
     targetSdkVersion = 28
 }
 

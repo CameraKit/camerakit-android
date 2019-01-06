@@ -95,7 +95,7 @@ public class PostProcessor {
                     transformer.flipHorizontal();
                     break;
                 case ExifInterface.ORIENTATION_ROTATE_270:
-                    transformer.rotate(270);
+                    transformer.rotate(90);
                     break;
                 case ExifInterface.ORIENTATION_NORMAL:
                 case ExifInterface.ORIENTATION_UNDEFINED:
