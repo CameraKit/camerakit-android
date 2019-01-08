@@ -1,6 +1,6 @@
 package com.wonderkiln.camerakit;
 
-import androidx.annotation.Nullable;
+import android.support.annotation.Nullable;
 
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.text.TextBlock;

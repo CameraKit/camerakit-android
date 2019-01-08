@@ -1,6 +1,6 @@
 package com.wonderkiln.camerakit.demo;
 
-import androidx.annotation.Nullable;
+import android.support.annotation.Nullable;
 
 import com.wonderkiln.camerakit.Size;
 

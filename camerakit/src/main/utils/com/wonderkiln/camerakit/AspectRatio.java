@@ -2,8 +2,8 @@ package com.wonderkiln.camerakit;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import androidx.annotation.NonNull;
-import androidx.collection.SparseArrayCompat;
+import android.support.annotation.NonNull;
+import android.support.v4.util.SparseArrayCompat;
 
 public class AspectRatio implements Comparable<AspectRatio>, Parcelable {
 

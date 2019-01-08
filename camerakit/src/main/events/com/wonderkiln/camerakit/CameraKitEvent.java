@@ -1,7 +1,7 @@
 package com.wonderkiln.camerakit;
 
 import android.os.Bundle;
-import androidx.annotation.NonNull;
+import android.support.annotation.NonNull;
 
 public class CameraKitEvent {
 
