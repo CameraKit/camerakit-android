@@ -25,6 +25,7 @@ import android.widget.TextView;
 
 import com.wonderkiln.camerakit.CameraKit;
 import com.wonderkiln.camerakit.CameraView;
+import com.wonderkiln.camerakit.core.BuildConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -109,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
                                 R.string.about_dialog_message,
                                 BuildConfig.VERSION_NAME,
                                 BuildConfig.VERSION_CODE,
-                                com.wonderkiln.camerakit.BuildConfig.VERSION_NAME
+                                BuildConfig.VERSION_NAME
                         ))
                         .setPositiveButton("DONE", null)
                         .show();
