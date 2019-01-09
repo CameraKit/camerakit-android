@@ -5,12 +5,9 @@ import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-//import android.support.annotation.Nullable;
-//import android.support.v7.app.ActionBar;
-//import android.support.v7.app.AppCompatActivity;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
+import android.support.annotation.Nullable;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,9 +18,6 @@ import android.widget.TextView;
 import android.widget.VideoView;
 
 import java.io.File;
-//
-//import butterknife.BindView;
-//import butterknife.ButterKnife;
 
 public class PreviewActivity extends AppCompatActivity {
 
