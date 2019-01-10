@@ -106,7 +106,9 @@ class CameraSurfaceView : GLSurfaceView, GLSurfaceView.Renderer {
     companion object {
 
         init {
-            System.loadLibrary("camerakit-core")
+            if (Build.VERSION.SDK_INT <= 17) {
+                System.loadLibrary("camerakit-core")
+            }
             System.loadLibrary("camerakit")
         }
 
