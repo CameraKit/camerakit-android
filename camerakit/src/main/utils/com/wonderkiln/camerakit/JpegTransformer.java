@@ -41,6 +41,7 @@ public class JpegTransformer {
     }
 
     static {
+        System.loadLibrary("yuvOperator");
         System.loadLibrary("jpegTransformer");
     }
 
