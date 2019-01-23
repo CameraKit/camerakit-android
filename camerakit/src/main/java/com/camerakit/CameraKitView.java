@@ -722,6 +722,22 @@ public class CameraKitView extends GestureLayout {
     }
 
     /**
+     * Determine if device is capable of flash
+     * @return boolean if device is capable of flash
+     */
+    public boolean hasFlash() {
+        return mCameraPreview.hasFlash();
+    }
+
+    /**
+     * Get supported flash types on device
+     * @return array of supported flash types
+     */
+    public CameraFlash[] getSupportedFlashTypes() {
+        return mCameraPreview.getSupportedFlashTypes();
+    }
+
+    /**
      * @return one of {@link CameraKit.Flash}'s constants.
      * @see #setFlash(int)
      */

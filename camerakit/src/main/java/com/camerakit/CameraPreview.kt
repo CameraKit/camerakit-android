@@ -101,7 +101,7 @@ class CameraPreview : FrameLayout, CameraEvents {
             override fun onSurfaceReady(cameraSurfaceTexture: CameraSurfaceTexture) {
                 surfaceTexture = cameraSurfaceTexture
                 surfaceState = SurfaceState.SURFACE_AVAILABLE
-                if (lifecycleState == LifecycleState.RESUMED) {
+                if (lifecycleState == LifecycleState.STARTED || lifecycleState == LifecycleState.RESUMED) {
                     resume()
                 }
             }
@@ -166,6 +166,17 @@ class CameraPreview : FrameLayout, CameraEvents {
                 }
             }
         }
+    }
+
+    fun hasFlash(): Boolean {
+        if (attributes?.flashes != null) {
+            return true
+        }
+        return false
+    }
+
+    fun getSupportedFlashTypes(): Array<CameraFlash>? {
+        return attributes?.flashes
     }
 
     interface PhotoCallback {

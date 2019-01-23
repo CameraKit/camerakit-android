@@ -3,6 +3,7 @@ package com.camerakit.preview
 import android.content.Context
 import android.opengl.GLES20.glGenTextures
 import android.opengl.GLSurfaceView
+import android.os.Build
 import androidx.annotation.Keep
 import android.util.AttributeSet
 import javax.microedition.khronos.egl.EGLConfig
@@ -106,6 +107,9 @@ class CameraSurfaceView : GLSurfaceView, GLSurfaceView.Renderer {
     companion object {
 
         init {
+            if (Build.VERSION.SDK_INT <= 17) {
+                System.loadLibrary("camerakit-core")
+            }
             System.loadLibrary("camerakit")
         }
 
