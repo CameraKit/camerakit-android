@@ -20,8 +20,8 @@ import android.widget.Button;
 import com.camerakit.CameraKit;
 import com.camerakit.CameraKitView;
 import com.camerakit.type.CameraSize;
-import com.jpegkit.Jpeg;
-import com.jpegkit.JpegImageView;
+import jpegkit.Jpeg;
+import jpegkit.JpegImageView;
 
 public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuItemClickListener {
 

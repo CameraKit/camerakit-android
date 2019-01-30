@@ -18,7 +18,7 @@ import com.camerakit.api.camera2.Camera2
 import com.camerakit.type.CameraFacing
 import com.camerakit.type.CameraFlash
 import com.camerakit.type.CameraSize
-import com.jpegkit.Jpeg
+import jpegkit.Jpeg
 import kotlinx.coroutines.*
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.suspendCoroutine

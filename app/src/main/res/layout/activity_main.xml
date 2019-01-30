@@ -45,7 +45,7 @@
                 android:text="Approve Permissions"
                 android:visibility="gone" />
 
-            <com.jpegkit.JpegImageView
+            <jpegkit.JpegImageView
                 android:id="@+id/imageView"
                 android:layout_width="108dp"
                 android:layout_height="192dp"
