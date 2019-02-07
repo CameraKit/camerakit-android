@@ -100,7 +100,11 @@ class Camera2(eventsDelegate: CameraEvents, context: Context) :
         if (cameraDevice != null && imageReader != null) {
             val surface = Surface(surfaceTexture)
             cameraDevice.getCaptureSession(surface, imageReader, cameraHandler) { captureSession ->
-                this.captureSession = captureSession
+
+                // can get called twice with the second time nulling out the first capture session immediately after the good one got set
+                if(captureSession != null) {
+                    this.captureSession = captureSession
+                }
 
                 if (captureSession != null) {
                     val previewRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)

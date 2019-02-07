@@ -134,26 +134,26 @@ class CameraPreview : FrameLayout, CameraEvents {
     }
 
     fun pause() {
-        GlobalScope.launch(cameraDispatcher) {
-            runBlocking {
+//        GlobalScope.launch(cameraDispatcher) {
+//            runBlocking {
                 lifecycleState = LifecycleState.PAUSED
                 stopPreview()
-            }
-        }
+//            }
+//        }
     }
 
     fun stop() {
-        GlobalScope.launch(cameraDispatcher) {
-            runBlocking {
+//        GlobalScope.launch(cameraDispatcher) {
+//            runBlocking {
                 lifecycleState = LifecycleState.STOPPED
                 closeCamera()
-            }
-        }
+//            }
+//        }
     }
 
     fun capturePhoto(callback: PhotoCallback) {
-        GlobalScope.launch(cameraDispatcher) {
-            runBlocking {
+//        GlobalScope.launch(cameraDispatcher) {
+//            runBlocking {
                 cameraApi.setFlash(flash)
                 cameraApi.capturePhoto {
                     cameraApi.cameraHandler.post {
@@ -164,8 +164,8 @@ class CameraPreview : FrameLayout, CameraEvents {
                         callback.onCapture(transformedBytes)
                     }
                 }
-            }
-        }
+//            }
+//        }
     }
 
     fun hasFlash(): Boolean {
@@ -294,16 +294,16 @@ class CameraPreview : FrameLayout, CameraEvents {
         }
     }
 
-    private suspend fun stopPreview(): Unit = suspendCoroutine {
+    private fun stopPreview(): Unit {
         cameraState = CameraState.PREVIEW_STOPPING
         cameraApi.stopPreview()
-        it.resume(Unit)
+//        it.resume(Unit)
     }
 
-    private suspend fun closeCamera(): Unit = suspendCoroutine {
+    private fun closeCamera(): Unit {
         cameraState = CameraState.CAMERA_CLOSING
         cameraApi.release()
-        it.resume(Unit)
+//        it.resume(Unit)
     }
 
     // Listener:
