@@ -134,36 +134,24 @@ class CameraPreview : FrameLayout, CameraEvents {
     }
 
     fun pause() {
-        GlobalScope.launch(cameraDispatcher) {
-            runBlocking {
-                lifecycleState = LifecycleState.PAUSED
-                stopPreview()
-            }
-        }
+        lifecycleState = LifecycleState.PAUSED
+        stopPreview()
     }
 
     fun stop() {
-        GlobalScope.launch(cameraDispatcher) {
-            runBlocking {
-                lifecycleState = LifecycleState.STOPPED
-                closeCamera()
-            }
-        }
+        lifecycleState = LifecycleState.STOPPED
+        closeCamera()
     }
 
     fun capturePhoto(callback: PhotoCallback) {
-        GlobalScope.launch(cameraDispatcher) {
-            runBlocking {
-                cameraApi.setFlash(flash)
-                cameraApi.capturePhoto {
-                    cameraApi.cameraHandler.post {
-                        val jpeg = Jpeg(it)
-                        jpeg.rotate(captureOrientation)
-                        val transformedBytes = jpeg.jpegBytes
-                        jpeg.release()
-                        callback.onCapture(transformedBytes)
-                    }
-                }
+        cameraApi.setFlash(flash)
+        cameraApi.capturePhoto {
+            cameraApi.cameraHandler.post {
+                val jpeg = Jpeg(it)
+                jpeg.rotate(captureOrientation)
+                val transformedBytes = jpeg.jpegBytes
+                jpeg.release()
+                callback.onCapture(transformedBytes)
             }
         }
     }
@@ -294,16 +282,14 @@ class CameraPreview : FrameLayout, CameraEvents {
         }
     }
 
-    private suspend fun stopPreview(): Unit = suspendCoroutine {
+    private fun stopPreview() {
         cameraState = CameraState.PREVIEW_STOPPING
         cameraApi.stopPreview()
-        it.resume(Unit)
     }
 
-    private suspend fun closeCamera(): Unit = suspendCoroutine {
+    private fun closeCamera() {
         cameraState = CameraState.CAMERA_CLOSING
         cameraApi.release()
-        it.resume(Unit)
     }
 
     // Listener:
