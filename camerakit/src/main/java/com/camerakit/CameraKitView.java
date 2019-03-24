@@ -18,7 +18,7 @@ import android.view.ViewGroup;
 import com.camerakit.type.CameraFacing;
 import com.camerakit.type.CameraFlash;
 import com.camerakit.type.CameraSize;
-import com.jpegkit.Jpeg;
+import jpegkit.Jpeg;
 
 import org.jetbrains.annotations.NotNull;
 
