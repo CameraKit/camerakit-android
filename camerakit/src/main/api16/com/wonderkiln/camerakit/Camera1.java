@@ -586,6 +586,15 @@ public class Camera1 extends CameraImpl {
 
     @Override
     Size getPreviewResolution() {
+        Size cameraPreviewResolution = getCameraPreviewResolution();
+        boolean invertPreviewSizes = (mCameraInfo.orientation + mDeviceOrientation) % 180 == 90;
+        if (invertPreviewSizes) {
+            return new Size(cameraPreviewResolution.getHeight(), cameraPreviewResolution.getWidth());
+        }
+        return cameraPreviewResolution;
+    }
+
+    Size getCameraPreviewResolution() {
         if (mPreviewSize == null && mCameraParameters != null) {
             TreeSet<Size> sizes = new TreeSet<>();
             for (Camera.Size size : mCameraParameters.getSupportedPreviewSizes()) {
@@ -627,11 +636,6 @@ public class Camera1 extends CameraImpl {
                     break;
                 }
             }
-        }
-
-        boolean invertPreviewSizes = (mCameraInfo.orientation + mDeviceOrientation) % 180 == 90;
-        if (mPreviewSize != null && invertPreviewSizes) {
-            return new Size(mPreviewSize.getHeight(), mPreviewSize.getWidth());
         }
 
         return mPreviewSize;
@@ -798,8 +802,8 @@ public class Camera1 extends CameraImpl {
             );
 
             mCameraParameters.setPreviewSize(
-                    getPreviewResolution().getWidth(),
-                    getPreviewResolution().getHeight()
+                    getCameraPreviewResolution().getWidth(),
+                    getCameraPreviewResolution().getHeight()
             );
 
             try {
