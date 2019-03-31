@@ -58,6 +58,7 @@ public class Camera1 extends CameraImpl {
     private boolean mRecording;
     private int mDisplayOrientation;
     private int mDeviceOrientation;
+    private boolean mAdjustCaptureForDeviceOrientation;
 
     @Facing
     private int mFacing;
@@ -153,6 +154,11 @@ public class Camera1 extends CameraImpl {
 
     void setDisplayAndDeviceOrientation() {
         setDisplayAndDeviceOrientation(this.mDisplayOrientation, this.mDeviceOrientation);
+    }
+
+    @Override
+    void setAdjustCaptureForDeviceOrientation(boolean adjustCaptureForDeviceOrientation) {
+        mAdjustCaptureForDeviceOrientation = adjustCaptureForDeviceOrientation;
     }
 
     @Override
@@ -744,10 +750,12 @@ public class Camera1 extends CameraImpl {
 
         // Accommodate for any extra device rotation relative to fixed screen orientations
         // (e.g. activity fixed in portrait, but user took photo/video in landscape)
-        if (mCameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-            captureRotation = ((captureRotation - (mDisplayOrientation - mDeviceOrientation)) + 360) % 360;
-        } else {  // back-facing camera
-            captureRotation = (captureRotation + (mDisplayOrientation - mDeviceOrientation) + 360) % 360;
+        if(mAdjustCaptureForDeviceOrientation) {
+            if (mCameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+                captureRotation = ((captureRotation - (mDisplayOrientation - mDeviceOrientation)) + 360) % 360;
+            } else {  // back-facing camera
+                captureRotation = (captureRotation + (mDisplayOrientation - mDeviceOrientation) + 360) % 360;
+            }
         }
 
         return captureRotation;
