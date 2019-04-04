@@ -5,26 +5,36 @@ apply plugin: 'kotlin-android'
 android {
     compileSdkVersion versions.compileSdk
     defaultConfig {
+        versionName version
         minSdkVersion versions.minSdk
+        targetSdkVersion versions.targetSdk
         externalNativeBuild {
             cmake {
                 cppFlags '-std=c++11'
             }
         }
     }
+
+    compileOptions {
+        sourceCompatibility versions.sourceCompatibility
+        targetCompatibility versions.targetCompatibility
+    }
+
     externalNativeBuild {
         cmake {
             path 'src/main/cpp/CMakeLists.txt'
         }
     }
+
     testOptions {
         unitTests.returnDefaultValues = true
     }
 }
 
 dependencies {
-    api 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.3.21'
+    compileOnly 'com.android.support:support-annotations:28.0.0'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.0.0'
+    api 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.3.21'
     api 'androidx.annotation:annotation:1.0.2'
     api 'com.camerakit:jpegkit:0.2.2'
     testImplementation 'junit:junit:4.12'
