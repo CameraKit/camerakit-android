@@ -1,8 +1,6 @@
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-    id 'com.github.dcendents.android-maven' version '1.5'
-}
+apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion versions.compileSdk
@@ -36,9 +34,26 @@ dependencies {
 install {
     repositories.mavenInstaller {
         pom.project {
-            groupId project.group
+            name 'CameraKit'
+            description description
             artifactId 'camerakit'
             packaging 'aar'
+            url projectUrl
+
+            scm {
+                url scmUrl
+                connection scmConnection
+                developerConnection scmDeveloperConnection
+            }
+
+            licenses projectLicenses
+
+            developers {
+                developer {
+                    id developerId
+                    name developerName
+                }
+            }
         }
     }
 }

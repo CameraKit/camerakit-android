@@ -7,6 +7,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:3.3.2'
         classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.21'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.1'
     }
 }
@@ -26,6 +27,25 @@ subprojects { project ->
             targetSdk  : 28,
             compileSdk : 28,
         ]
+
+        description = 'Library for Android Camera 1 and 2 APIs. Massively increase stability and reliability of photo and video capture on all Android devices.'
+
+        projectUrl = 'https://github.com/camerakit/camerakit-android/'
+        issuesUrl = 'https://github.com/camerakit/camerakit-android/issues'
+        scmUrl = 'https://github.com/camerakit/camerakit-android/'
+        scmConnection = 'scm:git:git://github.com/camerakit/camerakit-android.git'
+        scmDeveloperConnection = 'scm:git:ssh://git@github.com/camerakit/camerakit-android.git'
+
+        developerId = 'alterac'
+        developerName = 'Alterac, Inc.'
+
+        projectLicenses = {
+            license {
+                name 'The MIT License'
+                url 'https://opensource.org/licenses/MIT'
+                distribution 'repo'
+            }
+        }
     }
 }
 
