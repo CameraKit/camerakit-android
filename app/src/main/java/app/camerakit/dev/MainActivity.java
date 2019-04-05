@@ -1,4 +1,4 @@
-package com.camerakit.app;
+package app.camerakit.dev;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -20,6 +20,8 @@ import android.widget.Button;
 import com.camerakit.CameraKit;
 import com.camerakit.CameraKitView;
 import com.camerakit.type.CameraSize;
+
+import app.camerakit.dev.R;
 import jpegkit.Jpeg;
 import jpegkit.JpegImageView;
 
