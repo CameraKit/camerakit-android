@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:drawable="@drawable/ic_shutter_video"
+    tools:ignore="NewApi">
+
+    <target android:name="red">
+        <aapt:attr name="android:animation">
+            <set>
+                <objectAnimator
+                    android:duration="300"
+                    android:propertyName="pathData"
+                    android:valueFrom="M40,40m-8,0a8,8 0,1 1,16 0a8,8 0,1 1,-16 0"
+                    android:valueTo="M40,40m-40,0a40,40 0,1 1,80 0a40,40 0,1 1,-80 0"
+                    android:valueType="pathType" />
+            </set>
+        </aapt:attr>
+    </target>
+
+    <target android:name="square">
+        <aapt:attr name="android:animation">
+            <set>
+                <objectAnimator
+                    android:duration="300"
+                    android:propertyName="pathData"
+                    android:startOffset="200"
+                    android:valueFrom="M40,40h1v1h-1z"
+                    android:valueTo="M28,28h24v24h-24z"
+                    android:valueType="pathType" />
+                <objectAnimator
+                    android:duration="0"
+                    android:propertyName="fillAlpha"
+                    android:startOffset="200"
+                    android:valueFrom="0"
+                    android:valueTo="1"
+                    android:valueType="floatType" />
+            </set>
+        </aapt:attr>
+    </target>
+
+</animated-vector>

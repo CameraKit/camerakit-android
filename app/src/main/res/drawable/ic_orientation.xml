@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="NewApi">
+
+    <aapt:attr name="android:drawable">
+        <vector
+            android:width="24dp"
+            android:height="24dp"
+            android:viewportWidth="80"
+            android:viewportHeight="80">
+            <group
+                android:name="icon"
+                android:pivotX="40"
+                android:pivotY="40">
+                <path
+                    android:fillColor="#FFFFFF"
+                    android:fillType="evenOdd"
+                    android:pathData="M80,40C76.6667,40 75,40 75,40C75,20.675 59.325,5 40,5C28.1,5.0034 17.5875,10.9409 11.275,20L18.75,20L18.75,25.0034L2.5,25.0034L2.5,8.7534L7.5061,8.7534L7.5,16.6659C14.8,6.5659 26.6375,0.0034 40,-0C62.0875,0 80,17.9125 80,40ZM0,40C3.3333,40 5,40 5,40C5,59.325 20.675,75 40,75C51.9,74.9966 62.4125,69.0591 68.725,60L61.25,60L61.25,54.9966L77.5,54.9966L77.5,71.2466L72.4939,71.2466L72.5,63.3341C65.2,73.4341 53.3625,79.9966 40,80C17.9125,80 0,62.0875 0,40Z"
+                    android:strokeWidth="1"
+                    android:strokeColor="#00000000" />
+                <path
+                    android:fillColor="#00000000"
+                    android:fillType="evenOdd"
+                    android:pathData="M40.5,40.5m-10,0a10,10 0,1 1,20 0a10,10 0,1 1,-20 0"
+                    android:strokeWidth="5"
+                    android:strokeColor="#FFFFFF" />
+            </group>
+        </vector>
+    </aapt:attr>
+
+    <target android:name="icon">
+        <aapt:attr name="android:animation">
+            <set>
+                <objectAnimator
+                    android:duration="300"
+                    android:propertyName="rotation"
+                    android:valueFrom="0.0"
+                    android:valueTo="-180.0"
+                    android:valueType="floatType" />
+            </set>
+        </aapt:attr>
+    </target>
+
+</animated-vector>

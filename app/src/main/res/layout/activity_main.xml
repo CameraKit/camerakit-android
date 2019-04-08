@@ -1,185 +1,112 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/activityMain"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimaryReallyDark">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
-            android:elevation="6dp"
-            android:minHeight="?attr/actionBarSize"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-            app:logo="@drawable/logomark_light"
-            app:title="CameraKit App" />
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <com.camerakit.CameraKitView
-                android:id="@+id/camera"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:adjustViewBounds="true"
-                app:camera_facing="back"
-                app:camera_focus="continuous"
-                app:camera_imageJpegQuality="100"
-                app:camera_imageMegaPixels="2.0"
-                app:camera_permissions="camera" />
-
-            <Button
-                android:id="@+id/permissionsButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="Approve Permissions"
-                android:visibility="gone" />
-
-            <jpegkit.JpegImageView
-                android:id="@+id/imageView"
-                android:layout_width="108dp"
-                android:layout_height="192dp"
-                android:layout_gravity="top|center_horizontal"
-                android:layout_margin="16dp"
-                android:alpha="1.0"
-                android:scaleType="centerInside" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                android:orientation="vertical">
-
-                <android.support.v7.widget.AppCompatTextView
-                    android:id="@+id/facingText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="20dp"
-                    android:shadowColor="#333333"
-                    android:shadowDx="1"
-                    android:shadowDy="1"
-                    android:shadowRadius="3"
-                    android:singleLine="true"
-                    android:textColor="#FFFFFF"
-                    android:textSize="11dp" />
-
-                <android.support.v7.widget.AppCompatTextView
-                    android:id="@+id/flashText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="20dp"
-                    android:shadowColor="#333333"
-                    android:shadowDx="1"
-                    android:shadowDy="1"
-                    android:shadowRadius="3"
-                    android:singleLine="true"
-                    android:textColor="#FFFFFF"
-                    android:textSize="11dp" />
-
-                <android.support.v7.widget.AppCompatTextView
-                    android:id="@+id/previewSizeText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="20dp"
-                    android:shadowColor="#333333"
-                    android:shadowDx="1"
-                    android:shadowDy="1"
-                    android:shadowRadius="3"
-                    android:singleLine="true"
-                    android:textColor="#FFFFFF"
-                    android:textSize="11dp" />
-
-                <android.support.v7.widget.AppCompatTextView
-                    android:id="@+id/photoSizeText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="20dp"
-                    android:shadowColor="#333333"
-                    android:shadowDx="1"
-                    android:shadowDy="1"
-                    android:shadowRadius="3"
-                    android:singleLine="true"
-                    android:textColor="#FFFFFF"
-                    android:textSize="11dp" />
-
-            </LinearLayout>
-
-        </FrameLayout>
-
-    </LinearLayout>
+    android:background="#0F1018"
+    android:orientation="vertical">
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center_horizontal"
-        android:layout_margin="12dp">
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
-        <LinearLayout
-            android:layout_width="wrap_content"
+        <com.camerakit.CameraKitView xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/camera_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:camera_facing="back"
+            app:camera_permissions="camera" />
+
+        <ImageView
+            android:id="@+id/image_view"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="left|bottom"
-            android:orientation="vertical">
-
-            <android.support.v7.widget.AppCompatButton
-                android:id="@+id/facingFrontButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:backgroundTint="@color/colorPrimaryDark"
-                android:drawableLeft="@drawable/ic_facing_front"
-                android:padding="14dp"
-                android:text=" Facing:\nFront" />
-
-            <android.support.v7.widget.AppCompatButton
-                android:id="@+id/facingBackButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:backgroundTint="@color/colorPrimaryDark"
-                android:drawableLeft="@drawable/ic_facing_back"
-                android:padding="14dp"
-                android:text=" Facing:\nBack" />
-
-        </LinearLayout>
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/photoButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal|bottom"
-            android:layout_marginBottom="12dp"
-            android:src="@drawable/ic_photo" />
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right|bottom"
-            android:orientation="vertical">
-
-            <android.support.v7.widget.AppCompatButton
-                android:id="@+id/flashOnButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:backgroundTint="@color/colorPrimaryDark"
-                android:drawableLeft="@drawable/ic_flash_on"
-                android:padding="14dp"
-                android:text=" Flash:\nOn" />
-
-            <android.support.v7.widget.AppCompatButton
-                android:id="@+id/flashOffButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:backgroundTint="@color/colorPrimaryDark"
-                android:drawableLeft="@drawable/ic_flash_off"
-                android:padding="14dp"
-                android:text=" Flash:\nOff" />
-
-        </LinearLayout>
+            android:adjustViewBounds="true" />
 
     </FrameLayout>
 
-</FrameLayout>
+    <android.support.design.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:fitsSystemWindows="true">
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            app:cardBackgroundColor="@color/colorPrimary"
+            app:cardCornerRadius="0dp"
+            app:cardElevation="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:background="@color/colorPrimaryDark">
+
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="110dp"
+                    android:baselineAligned="false"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:padding="12dp">
+
+                    <FrameLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+
+                        <app.camerakit.dev.widget.OrientationView
+                            android:id="@+id/orientation_view"
+                            android:layout_width="66dp"
+                            android:layout_height="66dp"
+                            android:layout_gravity="center"
+                            android:padding="10dp" />
+
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+
+                        <app.camerakit.dev.widget.ImageShutterView
+                            android:id="@+id/image_shutter_view"
+                            android:layout_width="75dp"
+                            android:layout_height="75dp"
+                            android:layout_gravity="center" />
+
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+
+                        <app.camerakit.dev.widget.VideoShutterView
+                            android:id="@+id/video_shutter_view"
+                            android:layout_width="66dp"
+                            android:layout_height="66dp"
+                            android:layout_gravity="center"
+                            android:padding="10dp" />
+
+                    </FrameLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+    </android.support.design.widget.CoordinatorLayout>
+
+</LinearLayout>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:drawable="@drawable/ic_shutter"
+    tools:ignore="NewApi">
+
+    <target android:name="fill">
+        <aapt:attr name="android:animation">
+            <set>
+                <objectAnimator
+                    android:duration="55"
+                    android:propertyName="fillColor"
+                    android:valueFrom="#D1D8DC"
+                    android:valueTo="#5486EC"
+                    android:valueType="colorType" />
+            </set>
+        </aapt:attr>
+    </target>
+
+    <target android:name="shutter">
+        <aapt:attr name="android:animation">
+            <set>
+                <objectAnimator
+                    android:duration="55"
+                    android:propertyName="scaleX"
+                    android:valueFrom="0.94"
+                    android:valueTo="1.0"
+                    android:valueType="floatType" />
+                <objectAnimator
+                    android:duration="55"
+                    android:propertyName="scaleY"
+                    android:valueFrom="0.94"
+                    android:valueTo="1.0"
+                    android:valueType="floatType" />
+            </set>
+        </aapt:attr>
+    </target>
+
+</animated-vector>
