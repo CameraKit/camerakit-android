@@ -21,6 +21,7 @@ abstract class CameraImpl {
     abstract void stop();
 
     abstract void setDisplayAndDeviceOrientation(int displayOrientation, int deviceOrientation);
+    abstract void setAdjustCaptureForDeviceOrientation(boolean adjustCaptureForDeviceOrientation);
 
     abstract void setFacing(@Facing int facing);
     abstract void setFlash(@Flash int flash);

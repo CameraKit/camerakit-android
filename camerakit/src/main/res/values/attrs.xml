@@ -61,6 +61,8 @@
 
         <attr name="android:adjustViewBounds" />
 
+        <attr name="ckAdjustCaptureForDeviceOrientation" format="boolean"/>
+
     </declare-styleable>
 
 </resources>
