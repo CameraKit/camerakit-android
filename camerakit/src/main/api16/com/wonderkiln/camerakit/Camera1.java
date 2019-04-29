@@ -58,6 +58,7 @@ public class Camera1 extends CameraImpl {
     private boolean mRecording;
     private int mDisplayOrientation;
     private int mDeviceOrientation;
+    private boolean mAdjustCaptureForDeviceOrientation;
 
     @Facing
     private int mFacing;
@@ -153,6 +154,11 @@ public class Camera1 extends CameraImpl {
 
     void setDisplayAndDeviceOrientation() {
         setDisplayAndDeviceOrientation(this.mDisplayOrientation, this.mDeviceOrientation);
+    }
+
+    @Override
+    void setAdjustCaptureForDeviceOrientation(boolean adjustCaptureForDeviceOrientation) {
+        mAdjustCaptureForDeviceOrientation = adjustCaptureForDeviceOrientation;
     }
 
     @Override
@@ -586,6 +592,15 @@ public class Camera1 extends CameraImpl {
 
     @Override
     Size getPreviewResolution() {
+        Size cameraPreviewResolution = getCameraPreviewResolution();
+        boolean invertPreviewSizes = (mCameraInfo.orientation + mDisplayOrientation) % 180 == 90;
+        if (invertPreviewSizes) {
+            return new Size(cameraPreviewResolution.getHeight(), cameraPreviewResolution.getWidth());
+        }
+        return cameraPreviewResolution;
+    }
+
+    Size getCameraPreviewResolution() {
         if (mPreviewSize == null && mCameraParameters != null) {
             TreeSet<Size> sizes = new TreeSet<>();
             for (Camera.Size size : mCameraParameters.getSupportedPreviewSizes()) {
@@ -627,11 +642,6 @@ public class Camera1 extends CameraImpl {
                     break;
                 }
             }
-        }
-
-        boolean invertPreviewSizes = (mCameraInfo.orientation + mDeviceOrientation) % 180 == 90;
-        if (mPreviewSize != null && invertPreviewSizes) {
-            return new Size(mPreviewSize.getHeight(), mPreviewSize.getWidth());
         }
 
         return mPreviewSize;
@@ -740,10 +750,12 @@ public class Camera1 extends CameraImpl {
 
         // Accommodate for any extra device rotation relative to fixed screen orientations
         // (e.g. activity fixed in portrait, but user took photo/video in landscape)
-        if (mCameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-            captureRotation = ((captureRotation - (mDisplayOrientation - mDeviceOrientation)) + 360) % 360;
-        } else {  // back-facing camera
-            captureRotation = (captureRotation + (mDisplayOrientation - mDeviceOrientation) + 360) % 360;
+        if(mAdjustCaptureForDeviceOrientation) {
+            if (mCameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+                captureRotation = ((captureRotation - (mDisplayOrientation - mDeviceOrientation)) + 360) % 360;
+            } else {  // back-facing camera
+                captureRotation = (captureRotation + (mDisplayOrientation - mDeviceOrientation) + 360) % 360;
+            }
         }
 
         return captureRotation;
@@ -798,8 +810,8 @@ public class Camera1 extends CameraImpl {
             );
 
             mCameraParameters.setPreviewSize(
-                    getPreviewResolution().getWidth(),
-                    getPreviewResolution().getHeight()
+                    getCameraPreviewResolution().getWidth(),
+                    getCameraPreviewResolution().getHeight()
             );
 
             try {

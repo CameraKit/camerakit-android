@@ -79,6 +79,7 @@ public class CameraView extends CameraViewLayout {
     private boolean mDoubleTapToToggleFacing;
 
     private boolean mAdjustViewBounds;
+    private boolean mAdjustCaptureForDeviceOrientation;
 
     private DisplayOrientationDetector mDisplayOrientationDetector;
     private CameraImpl mCameraImpl;
@@ -122,6 +123,7 @@ public class CameraView extends CameraViewLayout {
                 mDoubleTapToToggleFacing = a.getBoolean(R.styleable.CameraView_ckDoubleTapToToggleFacing, CameraKit.Defaults.DEFAULT_DOUBLE_TAP_TO_TOGGLE_FACING);
                 mLockVideoAspectRatio = a.getBoolean(R.styleable.CameraView_ckLockVideoAspectRatio, false);
                 mAdjustViewBounds = a.getBoolean(R.styleable.CameraView_android_adjustViewBounds, CameraKit.Defaults.DEFAULT_ADJUST_VIEW_BOUNDS);
+                mAdjustCaptureForDeviceOrientation = a.getBoolean(R.styleable.CameraView_ckAdjustCaptureForDeviceOrientation, CameraKit.Defaults.DEFAULT_ADJUST_CAPTURE_FOR_DEVICE_ORIENTATION);
             } finally {
                 a.recycle();
             }
@@ -151,6 +153,7 @@ public class CameraView extends CameraViewLayout {
         setVideoQuality(mVideoQuality);
         setVideoBitRate(mVideoBitRate);
         setLockVideoAspectRatio(mLockVideoAspectRatio);
+        setAdjustCaptureForDeviceOrientation(mAdjustCaptureForDeviceOrientation);
 
         if (!isInEditMode()) {
             mDisplayOrientationDetector = new DisplayOrientationDetector(context) {
@@ -400,6 +403,11 @@ public class CameraView extends CameraViewLayout {
 
     public void setCropOutput(boolean cropOutput) {
         this.mCropOutput = cropOutput;
+    }
+
+    public void setAdjustCaptureForDeviceOrientation(boolean adjustCaptureForDeviceOrientation) {
+        mAdjustCaptureForDeviceOrientation = adjustCaptureForDeviceOrientation;
+        mCameraImpl.setAdjustCaptureForDeviceOrientation(adjustCaptureForDeviceOrientation);
     }
 
     @Facing

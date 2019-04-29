@@ -58,15 +58,7 @@ public class SurfaceViewContainer extends FrameLayout {
     }
 
     public void setPreviewSize(Size previewSize) {
-        setPreviewSize(previewSize, mDisplayOrientation);
-    }
-
-    public void setPreviewSize(Size previewSize, int displayOrientation) {
-        if (mDisplayOrientation == 0 || mDisplayOrientation == 180) {
-            this.mPreviewSize = previewSize;
-        } else if ((displayOrientation == 90 || displayOrientation == 270) && (mDisplayOrientation != 90 && mDisplayOrientation != 270)) {
-            this.mPreviewSize = new Size(previewSize.getHeight(), previewSize.getWidth());
-        }
+        mPreviewSize = previewSize;
 
         if (getChildCount() > 0) {
             post(new Runnable() {
@@ -79,11 +71,5 @@ public class SurfaceViewContainer extends FrameLayout {
     }
 
     public void setDisplayOrientation(int displayOrientation) {
-        if (mPreviewSize != null) {
-            setPreviewSize(mPreviewSize, displayOrientation);
-        } else {
-            this.mDisplayOrientation = displayOrientation;
-        }
     }
-
 }

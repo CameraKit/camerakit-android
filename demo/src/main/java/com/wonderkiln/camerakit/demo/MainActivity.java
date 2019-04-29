@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
 
     private int cameraMethod = CameraKit.Constants.METHOD_STANDARD;
     private boolean cropOutput = false;
+    private boolean adjustCaptureForDeviceOrientation = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -177,6 +178,7 @@ public class MainActivity extends AppCompatActivity {
         final List<CameraSetting> options = new ArrayList<>();
         options.add(captureMethodSetting);
         options.add(cropSetting);
+        options.add(ignoreDeviceOrientationSetting);
 
         drawerAdapter = new ArrayAdapter<CameraSetting>(this, R.layout.drawer_list_item, R.id.text1, options) {
             @Override
@@ -268,4 +270,19 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    private CameraSetting ignoreDeviceOrientationSetting = new CameraSetting() {
+        @Override
+        String getTitle() { return "ckAdjustCaptureForDeviceOrientation"; }
+
+        @Override
+        String getValue() {
+            return adjustCaptureForDeviceOrientation ? "true" : "false";
+        }
+
+        @Override
+        void toggle() {
+            adjustCaptureForDeviceOrientation = !adjustCaptureForDeviceOrientation;
+            camera.setAdjustCaptureForDeviceOrientation(adjustCaptureForDeviceOrientation);
+        }
+    };
 }
