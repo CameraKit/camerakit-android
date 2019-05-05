@@ -1,52 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Declarable attributes for a CameraKitView defined in XML. -->
-    <declare-styleable name="CameraKitView">
+    <declare-styleable name="CameraView">
 
-        <!-- Should the view handle layout_width or layout_height set as wrap_content. -->
-        <attr name="android:adjustViewBounds" />
-
-        <!-- Aspect ratio to force the view to measure to. Depends on a adjustViewBounds and
-             having one dimension set as wrap_content. -->
-        <attr name="camera_aspectRatio" format="float" />
-
-        <!-- Default camera orientation to use. -->
-        <attr name="camera_facing" format="enum">
+        <attr name="ckFacing" format="enum">
             <enum name="back" value="0" />
             <enum name="front" value="1" />
         </attr>
 
-        <!-- Default camera flash mode to use. -->
-        <attr name="camera_flash" format="enum">
+        <attr name="ckFlash" format="enum">
             <enum name="off" value="0" />
             <enum name="on" value="1" />
             <enum name="auto" value="2" />
             <enum name="torch" value="3" />
         </attr>
 
-        <!-- How should the lens continuously focus. -->
-        <attr name="camera_focus" format="enum">
+        <attr name="ckFocus" format="enum">
             <enum name="off" value="0" />
-            <enum name="auto" value="1" />
-            <enum name="continuous" value="2" />
+            <enum name="continuous" value="1" />
+            <enum name="tap" value="2" />
+            <enum name="tapWithMarker" value="3" />
         </attr>
 
-        <!-- Default zoom. Accepts a float representing the factor to zoom by. -->
-        <attr name="camera_zoomFactor" format="float" />
+        <attr name="ckPinchToZoom" format="boolean" />
 
-        <attr name="camera_permissions">
-            <flag name="none" value="0" />
-            <flag name="camera" value="1" />
-            <flag name="audio" value="2" />
-            <flag name="storage" value="4" />
-            <flag name="location" value="8" />
-            <flag name="all" value="15" />
+        <attr name="ckZoom" format="float" />
+
+        <attr name="ckMethod" format="enum">
+            <enum name="standard" value="0" />
+            <enum name="still" value="1" />
+
+            <!-- TODO: Set to unique value when feature added -->
+            <enum name="speed" value="0" />
         </attr>
 
-        <attr name="camera_imageMegaPixels" format="float" />
+        <attr name="ckPermissions" format="enum">
+            <enum name="strict" value="0" />
+            <enum name="lazy" value="1" />
+            <enum name="picture" value="2" />
+        </attr>
 
-        <attr name="camera_imageJpegQuality" format="integer" />
+        <attr name="ckJpegQuality" format="integer" />
+
+        <attr name="ckVideoQuality" format="enum">
+            <enum name="max480p" value="0" />
+            <enum name="max720p" value="1" />
+            <enum name="max1080p" value="2" />
+            <enum name="max2160p" value="3" />
+            <enum name="highest" value="4" />
+            <enum name="lowest" value="5" />
+            <enum name="qvga" value="6" />
+        </attr>
+
+        <attr name="ckCropOutput" format="boolean" />
+
+        <attr name="ckVideoBitRate" format="integer" />
+
+        <attr name="ckDoubleTapToToggleFacing" format="boolean" />
+        <attr name="ckLockVideoAspectRatio" format="boolean" />
+
+        <attr name="android:adjustViewBounds" />
 
     </declare-styleable>
 

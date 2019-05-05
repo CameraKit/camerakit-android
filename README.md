@@ -51,7 +51,7 @@ There are currently two versions of CameraKit that we support, `v1.0.0-beta3.X` 
 
 If photo is your only need, try out the latest and greatest CameraKit features with `v1.0.0-beta3.11`. Our `beta3.11` release does not yet support video, but that feature is coming! 
 
-In the meantime, if your application requires video we reccomend sticking with `v0.13.4`; the latest stable release with video implementation.
+In the meantime, if your application requires video we recommend sticking with `v0.13.4`; the latest stable release with video implementation.
 
 
 | Use Case | Version | Notes | Documentation Link |
