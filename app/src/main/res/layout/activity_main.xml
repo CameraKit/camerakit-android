@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/activityMain"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimaryReallyDark">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:elevation="6dp"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:logo="@drawable/logomark_light"
+            app:title="CameraKit App" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.camerakit.CameraKitView
+                android:id="@+id/camera"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                app:camera_facing="back"
+                app:camera_focus="continuous"
+                app:camera_imageJpegQuality="100"
+                app:camera_imageMegaPixels="2.0"
+                app:camera_permissions="camera" />
+
+            <Button
+                android:id="@+id/permissionsButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Approve Permissions"
+                android:visibility="gone" />
+
+            <jpegkit.JpegImageView
+                android:id="@+id/imageView"
+                android:layout_width="108dp"
+                android:layout_height="192dp"
+                android:layout_gravity="top|center_horizontal"
+                android:layout_margin="16dp"
+                android:alpha="1.0"
+                android:scaleType="centerInside" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/facingText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="20dp"
+                    android:shadowColor="#333333"
+                    android:shadowDx="1"
+                    android:shadowDy="1"
+                    android:shadowRadius="3"
+                    android:singleLine="true"
+                    android:textColor="#FFFFFF"
+                    android:textSize="11dp" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/flashText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="20dp"
+                    android:shadowColor="#333333"
+                    android:shadowDx="1"
+                    android:shadowDy="1"
+                    android:shadowRadius="3"
+                    android:singleLine="true"
+                    android:textColor="#FFFFFF"
+                    android:textSize="11dp" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/previewSizeText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="20dp"
+                    android:shadowColor="#333333"
+                    android:shadowDx="1"
+                    android:shadowDy="1"
+                    android:shadowRadius="3"
+                    android:singleLine="true"
+                    android:textColor="#FFFFFF"
+                    android:textSize="11dp" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/photoSizeText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="20dp"
+                    android:shadowColor="#333333"
+                    android:shadowDx="1"
+                    android:shadowDy="1"
+                    android:shadowRadius="3"
+                    android:singleLine="true"
+                    android:textColor="#FFFFFF"
+                    android:textSize="11dp" />
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_margin="12dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left|bottom"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/facingFrontButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/colorPrimaryDark"
+                android:drawableLeft="@drawable/ic_facing_front"
+                android:padding="14dp"
+                android:text=" Facing:\nFront" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/facingBackButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/colorPrimaryDark"
+                android:drawableLeft="@drawable/ic_facing_back"
+                android:padding="14dp"
+                android:text=" Facing:\nBack" />
+
+        </LinearLayout>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/photoButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal|bottom"
+            android:layout_marginBottom="12dp"
+            android:src="@drawable/ic_photo" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right|bottom"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/flashOnButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/colorPrimaryDark"
+                android:drawableLeft="@drawable/ic_flash_on"
+                android:padding="14dp"
+                android:text=" Flash:\nOn" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/flashOffButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/colorPrimaryDark"
+                android:drawableLeft="@drawable/ic_flash_off"
+                android:padding="14dp"
+                android:text=" Flash:\nOff" />
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+</FrameLayout>

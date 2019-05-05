@@ -44,22 +44,31 @@ With CameraKit you are able to effortlessly do the following:
 <a href="https://www.alpha-apps.ae/"><img alt="Alpha Apps" src=".repo/gh-readme-alphaapps-logo.png" height="30px" width="78px" align="center"></a>
 <a href="https://www.expensify.com/"><img alt="Expensify" src=".repo/gh-readme-expensify-logo.svg" height="26px" width="220px" align="center"></a>
 
+&nbsp;
 
-# Pardon the dust
-__CameraKit__ has been going through major changes in the past few months. We've slowed support on verison `0.13.x` and moved our focus to `1.0.0`. This release will bring improved stability, faster processing and a standard API for future development of __CameraKit__. The lastest version is currently in beta, `1.0.0-beta3.10`. 
+# Get The Most From CameraKit
+There are currently two versions of CameraKit that we support, `v1.0.0-beta3.X` and `v0.13.X`. 
 
-The code lives on the branch `v1.0.0`. You can read the discussion about `1.0.0` on the pull request [#318](https://github.com/CameraKit/camerakit-android/pull/318). If you have a question or want to talk directly with the team, leave us a message on [spectrum.chat](https://spectrum.chat/camerakit/).
+If photo is your only need, try out the latest and greatest CameraKit features with `v1.0.0-beta3.11`. Our `beta3.11` release does not yet support video, but that feature is coming! 
+
+In the meantime, if your application requires video we recommend sticking with `v0.13.4`; the latest stable release with video implementation.
+
+
+| Use Case | Version | Notes | Documentation Link |
+| --- | --- | --- | --- |
+| Photo only | `v1.0.0-beta3.11` | The latest and greatest CameraKit has to offer. Video support coming soon! | [camerakit.io/docs/beta3.11](https://camerakit.io/docs?v=1.0.0-beta3.10) |
+| Photo and Video | `v0.13.4` | Stable build with full photo and video support | [camerakit.io/docs/0.13.4](https://camerakit.io/docs?v=0.13.2) |
 
 
 ## Documentation Site
-Setup instructions for `1.0.0-beta3.10` are below. To see the full documentation head over to our website, [camerakit.io/docs](https://camerakit.io/docs).
+Setup instructions for `1.0.0-beta3.11` are below. To see the full documentation head over to our website, [camerakit.io/docs](https://camerakit.io/docs).
 
 
 ## Setup
 To include __CameraKit__ in your project, add the following to your `app` level `build.gradle`.
 ```java
 dependencies {
-    implementation 'com.camerakit:camerakit:1.0.0-beta3.10'
+    implementation 'com.camerakit:camerakit:1.0.0-beta3.11'
     implementation 'com.camerakit:jpegkit:0.1.0'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.3.0'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.0.0'

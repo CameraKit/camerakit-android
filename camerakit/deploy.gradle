@@ -1,0 +1,98 @@
+def getBintrayUser() {
+    if (System.getenv('BINTRAY_USER')) {
+        return System.getenv('BINTRAY_USER')
+    }
+
+    if (rootProject.file('local.properties').exists()) {
+        Properties properties = new Properties()
+        properties.load(rootProject.file('local.properties').newDataInputStream())
+        return properties.getProperty('bintray.user')
+    }
+}
+
+def getBintrayKey() {
+    if (System.getenv('BINTRAY_KEY')) {
+        return System.getenv('BINTRAY_KEY')
+    }
+
+    if (rootProject.file('local.properties').exists()) {
+        Properties properties = new Properties()
+        properties.load(rootProject.file('local.properties').newDataInputStream())
+        return properties.getProperty('bintray.key')
+    }
+}
+
+apply plugin: 'com.jfrog.bintray'
+
+bintray {
+    user = getBintrayUser()
+    key = getBintrayKey()
+    configurations = ['archives']
+    pkg {
+        repo = 'camerakit-v1-prereleases'
+        name = 'camerakit-android'
+        userOrg = 'camerakit'
+        vcsUrl = 'https://github.com/CameraKit/camerakit-android.git'
+        licenses = ['MIT']
+
+        version {
+            name = project.version
+            released = new Date()
+        }
+    }
+}
+
+task cleanForDeployment {
+    doLast {
+        logger.lifecycle('Deployment: Cleaning...')
+        logger.lifecycle('Deleting: ' + project.buildDir)
+        delete project.buildDir
+    }
+}
+
+task buildForDeployment {
+    shouldRunAfter(cleanForDeployment)
+    finalizedBy assemble
+
+    doFirst {
+        android.variantFilter { variant ->
+            if (variant.buildType.name == 'debug') {
+                variant.setIgnore(true)
+            }
+        }
+    }
+}
+
+task deploySnapshot {
+    shouldRunAfter(buildForDeployment)
+
+    dependsOn cleanForDeployment
+    dependsOn buildForDeployment
+    finalizedBy bintrayUpload
+
+    doLast {
+        version = version + '-Snapshot'
+        bintrayUpload.setVersionName(bintrayUpload.getVersionName() + '-Snapshot')
+        bintrayUpload.setUserOrg('camerakit')
+        bintrayUpload.setRepoName('camerakit-android-snapshots')
+        bintrayUpload.setOverride(true)
+        bintrayUpload.setPublish(true)
+
+        logger.lifecycle('Deploying version ' + bintrayUpload.getVersionName() + ' in ' + bintrayUpload.getRepoName())
+    }
+}
+
+task deployRelease {
+    shouldRunAfter(buildForDeployment)
+
+    dependsOn cleanForDeployment
+    dependsOn buildForDeployment
+    finalizedBy bintrayUpload
+
+    doLast {
+        bintrayUpload.setUserOrg('camerakit')
+        bintrayUpload.setRepoName('camerakit-v1-prereleases')
+
+        logger.lifecycle('Deploying version ' + bintrayUpload.getVersionName() + ' in ' + bintrayUpload.getRepoName())
+    }
+}
