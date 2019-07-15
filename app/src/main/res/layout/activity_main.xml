@@ -24,6 +24,15 @@
             android:layout_height="wrap_content"
             android:adjustViewBounds="true" />
 
+        <jpegkit.JpegImageView
+            android:id="@+id/imageView"
+            android:layout_width="108dp"
+            android:layout_height="192dp"
+            android:layout_gravity="top|center_horizontal"
+            android:layout_margin="16dp"
+            android:alpha="1.0"
+            android:scaleType="centerInside" />
+
     </FrameLayout>
 
     <android.support.design.widget.CoordinatorLayout

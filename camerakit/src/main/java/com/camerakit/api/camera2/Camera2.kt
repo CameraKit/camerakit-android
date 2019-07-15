@@ -100,19 +100,19 @@ class Camera2(eventsDelegate: CameraEvents, context: Context) :
         if (cameraDevice != null && imageReader != null) {
             val surface = Surface(surfaceTexture)
             cameraDevice.getCaptureSession(surface, imageReader, cameraHandler) { captureSession ->
+                try{
+                    if (captureSession != null) {
+                        this.captureSession = captureSession
+                        val previewRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
+                        previewRequestBuilder.addTarget(surface)
+                        previewRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE)
+                        previewRequestBuilder.set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_MODE_AUTO)
 
-                if(captureSession != null) {
-                    this.captureSession = captureSession
-                }
-                
-                if (captureSession != null) {
-                    val previewRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
-                    previewRequestBuilder.addTarget(surface)
-                    previewRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE)
-                    previewRequestBuilder.set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_MODE_AUTO)
-
-                    captureSession.setRepeatingRequest(previewRequestBuilder.build(), captureCallback, cameraHandler)
-                    this.previewRequestBuilder = previewRequestBuilder
+                        captureSession.setRepeatingRequest(previewRequestBuilder.build(), captureCallback, cameraHandler)
+                        this.previewRequestBuilder = previewRequestBuilder
+                    }
+                }catch (e: Exception){
+                    e.printStackTrace()
                 }
             }
         }
@@ -128,6 +128,7 @@ class Camera2(eventsDelegate: CameraEvents, context: Context) :
                 captureSession.abortCaptures()
                 captureSession.close()
             } catch (e: Exception) {
+                e.printStackTrace()
             } finally {
                 onPreviewStopped()
             }
@@ -167,6 +168,7 @@ class Camera2(eventsDelegate: CameraEvents, context: Context) :
                 captureSession.capture(previewRequestBuilder.build(), captureCallback, cameraHandler)
                 previewRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, null)
             } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
     }
