@@ -263,7 +263,9 @@ class Camera2(eventsDelegate: CameraEvents, context: Context) :
                     val aeState = result.get(CaptureResult.CONTROL_AE_STATE)
                     if (aeState == null ||
                             aeState == CaptureResult.CONTROL_AE_STATE_PRECAPTURE ||
-                            aeState == CaptureRequest.CONTROL_AE_STATE_FLASH_REQUIRED) {
+                            aeState == CaptureRequest.CONTROL_AE_STATE_FLASH_REQUIRED ||
+                            aeState == CaptureRequest.CONTROL_AF_STATE_PASSIVE_FOCUSED
+                    ) {
                         captureState = STATE_WAITING_NON_PRECAPTURE
                     }
                 }
