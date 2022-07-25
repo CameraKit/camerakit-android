@@ -13,31 +13,42 @@ public class JpegTransformer {
     }
 
     public byte[] getJpeg() {
+        if (mHandler == null) return null;
         return jniCommit(mHandler);
     }
 
     public int getWidth() {
+        if (mHandler == null) return 0;
         return jniGetWidth(mHandler);
     }
 
     public int getHeight() {
+        if (mHandler == null) return 0;
         return jniGetHeight(mHandler);
     }
 
     public void rotate(int degrees) {
-        jniRotate(mHandler, degrees);
+        if (mHandler != null) {
+            jniRotate(mHandler, degrees);
+        }
     }
 
     public void flipHorizontal() {
-        jniFlipHorizontal(mHandler);
+        if (mHandler != null) {
+            jniFlipHorizontal(mHandler);
+        }
     }
 
     public void flipVertical() {
-        jniFlipVertical(mHandler);
+        if (mHandler != null) {
+            jniFlipVertical(mHandler);
+        }
     }
 
     public void crop(Rect crop) {
-        jniCrop(mHandler, crop.left, crop.top, crop.width(), crop.height());
+        if (mHandler != null) {
+            jniCrop(mHandler, crop.left, crop.top, crop.width(), crop.height());
+        }
     }
 
     static {
