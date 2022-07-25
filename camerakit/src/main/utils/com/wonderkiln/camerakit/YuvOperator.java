@@ -32,6 +32,7 @@ public class YuvOperator {
     }
 
     public byte[] getYuvData() {
+        if (handler == null) return null;
         byte[] yuv = jniGetYuvData(handler);
         freeYuvData();
         return yuv;
