@@ -71,14 +71,23 @@ Java_com_wonderkiln_camerakit_YuvOperator_jniRotateYuvCcw90(JNIEnv *env, jobject
     int length = yuvOperator->_length;
 
     std::vector<unsigned char> yuvCopy(yuv, yuv + length);
-
+    int bufferSize = sizeof(yuvCopy);
     int n = 0;
     int uvHeight = height >> 1;
     int wh = width * height;
+
+    if (bufferSize < width * height + width) {
+        return;
+    }
+
     for (int j = width - 1; j >= 0; j--) {
         for (int i = 0; i < height; i++) {
             yuv[n++] = yuvCopy[width * i + j];
         }
+    }
+
+    if (bufferSize < wh + width * uvHeight + width) {
+        return;
     }
 
     for (int j = width - 1; j > 0; j -= 2) {
@@ -100,14 +109,23 @@ Java_com_wonderkiln_camerakit_YuvOperator_jniRotateYuvCw90(JNIEnv *env, jobject 
 
 
     std::vector<unsigned char> yuvCopy(yuv, yuv + length);
-
+    int bufferSize = sizeof(yuvCopy);
     int wh = width * height;
     int k = 0;
+
+    if (bufferSize < width * height + width) {
+        return;
+    }
+
     for (int i = 0; i < width; i++) {
         for (int j = height - 1; j >= 0; j--) {
             yuv[k] = yuvCopy[width * j + i];
             k++;
         }
+    }
+
+    if (bufferSize < wh + width * height / 2 + width) {
+        return;
     }
     for (int i = 0; i < width; i += 2) {
         for (int j = height / 2 - 1; j >= 0; j--) {
@@ -128,14 +146,23 @@ Java_com_wonderkiln_camerakit_YuvOperator_jniRotateYuv180(JNIEnv *env, jobject o
     int length = yuvOperator->_length;
 
     std::vector<unsigned char> yuvCopy(yuv, yuv + length);
-
+    int bufferSize = sizeof(yuvCopy);
     int n = 0;
     int uh = height >> 1;
     int wh = width * height;
+
+    if (bufferSize < width * height + width) {
+        return;
+    }
+
     for (int j = height - 1; j >= 0; j--) {
         for (int i = width - 1; i >= 0; i--) {
             yuv[n++] = yuvCopy[width * j + i];
         }
+    }
+
+    if (bufferSize < wh + width * uh) {
+        return;
     }
 
     for (int j = uh - 1; j >= 0; j--) {
