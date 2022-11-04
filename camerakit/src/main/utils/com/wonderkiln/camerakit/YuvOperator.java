@@ -13,6 +13,7 @@ public class YuvOperator {
     }
 
     public YuvOperator(byte[] yuv, int width, int height) {
+        if (width*height != yuv.length) return;
         storeYuvData(yuv, width, height);
         this.width = width;
         this.height = height;
@@ -31,6 +32,7 @@ public class YuvOperator {
     }
 
     public byte[] getYuvData() {
+        if (handler == null) return null;
         byte[] yuv = jniGetYuvData(handler);
         freeYuvData();
         return yuv;
