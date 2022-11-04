@@ -265,7 +265,7 @@ public class CameraView extends CameraViewLayout {
             public void run() {
                 mCameraImpl.start();
             }
-        }, 100);
+        }, 300);
     }
 
     public void stop() {
