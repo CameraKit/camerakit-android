@@ -588,7 +588,7 @@ public class Camera1 extends CameraImpl {
     Size getPreviewResolution() {
         Size cameraPreviewResolution = getCameraPreviewResolution();
         boolean invertPreviewSizes = (mCameraInfo.orientation + mDeviceOrientation) % 180 == 90;
-        if (invertPreviewSizes) {
+        if (invertPreviewSizes && cameraPreviewResolution != null) {
             return new Size(cameraPreviewResolution.getHeight(), cameraPreviewResolution.getWidth());
         }
         return cameraPreviewResolution;
