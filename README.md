@@ -16,7 +16,7 @@
     </a>
 </p>
 
-CameraKit helps you add reliable camera to your app quickly. Our open source camera platform provides consistent capture results, service that scales, and endless camera possibilities.
+CameraKit helps you add a reliable camera to your app quickly. Our open source camera platform provides consistent capture results, service that scales, and endless camera possibilities.
 
 With CameraKit you are able to effortlessly do the following: 
 
